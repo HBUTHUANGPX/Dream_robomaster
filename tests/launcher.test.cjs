@@ -75,6 +75,10 @@ exit 0
   for (const tool of ['cargo', 'rustc']) executable(path.join(root, '.deps/cargo/bin', tool), dispatcher);
   executable(path.join(root, '.deps/node/bin/node'), dispatcher);
   const worker = `#!/bin/bash
+if [[ "\${1:-}" == --help ]]; then
+  if [[ "\${FAKE_OLD_LAUNCHER:-}" != 1 ]]; then printf '  robomaster stop [--root DIR]\\n'; fi
+  exit 0
+fi
 printf '%s\\n' "\${0##*/}" "$@" >> "$TRACE"
 printf '\\n' >> "$TRACE"
 for arg in "$@"; do if [[ "$arg" == --unknown ]]; then echo '未知参数：--unknown' >&2; exit 2; fi; done
@@ -129,6 +133,28 @@ test('准备命令修复旧 Cargo 和未完成安装的 Rust 工具链', t => {
 test('底盘帮助不需要 DISPLAY，也不执行构建', t => {
   const f = fixture(t); const r = f.run(['robot', '--help'], {DISPLAY: ''});
   assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /底盘/); assert.deepEqual(r.calls, []);
+});
+test('停止命令不检查开发工具或资产，也不执行构建', t => {
+  const f = fixture(t);
+  fs.rmSync(path.join(f.root, 'assets'), {recursive: true});
+  const r = f.run(['stop'], {MISSING_PACKAGE: '1', FAKE_RUST_BROKEN: '1', DISPLAY: ''});
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(r.calls, [['robomaster', 'stop', '--root', f.root]]);
+});
+test('停止命令拒绝多余参数，缺少启动器时给出结束方式', t => {
+  const f = fixture(t);
+  let r = f.run(['stop', '--unknown']);
+  assert.notEqual(r.status, 0); assert.deepEqual(r.calls, []);
+  fs.unlinkSync(path.join(f.root, 'target/release/robomaster'));
+  r = f.run(['stop']);
+  assert.notEqual(r.status, 0); assert.match(r.stderr, /Ctrl\+C/);
+  assert.deepEqual(r.calls, []);
+});
+test('更新代码后遇到旧启动器时，停止命令给出中文处理方式', t => {
+  const f = fixture(t);
+  const r = f.run(['stop'], {FAKE_OLD_LAUNCHER: '1'});
+  assert.notEqual(r.status, 0); assert.match(r.stderr, /旧|更新/);
+  assert.match(r.stderr, /Ctrl\+C/); assert.deepEqual(r.calls, []);
 });
 test('缺少系统开发库时给出准备指令', t => {
   const f = fixture(t); const r = f.run(['build'], {MISSING_PACKAGE: '1'});

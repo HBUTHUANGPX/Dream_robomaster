@@ -82,12 +82,22 @@ target/release/robomaster --help
 | 用途 | 命令 |
 | --- | --- |
 | 同时启动网页服务 | `target/release/robomaster up` |
+| 停止本仓库的网页服务 | `target/release/robomaster stop` |
 | 指定两个网页端口 | `target/release/robomaster up --navigation-port 18765 --duel-port 18766` |
 | 启动一个网页服务 | `target/release/robomaster serve navigation` |
 | 运行原生魔方任务 | `target/release/robomaster run cube -- --headless --scramble R --solve` |
 
 从其他目录调用底层程序时，用 `--root` 指定仓库的绝对路径。
 普通用户使用根入口即可，无需记住这些底层路径。
+直接调用底层启动器时，也建议显式传入 `--root`。
+如果旧进程没有声明根目录，且运行中的二进制已被替换，停止命令无法确认其编译目录。
+此时在原启动终端按 `Ctrl+C`。根入口始终传入根目录，不受这个限制影响。
+
+停止命令在 Linux 的 `/proc` 中核对进程用户、可执行文件、启动操作和仓库目录。
+它通过 `pidfd` 向确认过的进程发送 `SIGTERM`，并等待进程退出。
+`pidfd` 绑定具体进程，可以避免进程编号复用导致的误操作。
+停止逻辑复用依赖树中已有的 `libc`，不增加外部运行工具。
+遗留的 `output/run/*.pid` 文件不参与停止判断。
 
 ## 原生进程协议
 

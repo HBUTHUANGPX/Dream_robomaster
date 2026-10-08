@@ -257,6 +257,7 @@ dependencies = [
  "axum",
  "base64",
  "http-body-util",
+ "libc",
  "serde_json",
  "tokio",
  "tower",

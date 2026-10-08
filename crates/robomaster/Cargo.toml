@@ -8,6 +8,7 @@ description = "RoboMaster 原生仿真启动器与本机网页服务"
 [dependencies]
 axum = { version = "0.8.9", default-features = false, features = ["http1", "tokio"] }
 base64 = "0.22.1"
+libc = "0.2.190"
 serde_json = "1.0.151"
 tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros", "net", "process", "io-util", "sync", "time", "signal"] }
 

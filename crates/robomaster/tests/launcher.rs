@@ -92,6 +92,14 @@ esac"#
             }
         }
     }
+
+    fn stop(&self) -> std::process::Output {
+        Command::new(env!("CARGO_BIN_EXE_robomaster"))
+            .args(["stop", "--root"])
+            .arg(&self.root)
+            .output()
+            .unwrap()
+    }
 }
 impl Drop for Fixture {
     fn drop(&mut self) {
@@ -214,6 +222,151 @@ fn up_serves_both_modules_and_signals_reap_every_worker() {
 }
 
 #[test]
+fn stop_reaps_both_workers_releases_custom_ports_and_can_repeat() {
+    let fixture = Fixture::new("normal");
+    let first = port();
+    let second = port();
+    let navigation = first.local_addr().unwrap().port();
+    let duel = second.local_addr().unwrap().port();
+    drop((first, second));
+    let mut running = fixture.launch(navigation, duel);
+    wait_for(|| health(navigation, "navigation") && health(duel, "duel"));
+    // 停止只依赖已构建的启动器，不依赖资产或开发环境。
+    fs::remove_dir(fixture.root.join("assets")).unwrap();
+    let stopped = fixture.stop();
+    assert!(
+        stopped.status.success(),
+        "{}",
+        String::from_utf8_lossy(&stopped.stderr)
+    );
+    assert!(String::from_utf8_lossy(&stopped.stdout).contains("已停止"));
+    fixture.assert_reaped();
+    assert!(running.finish().0);
+    assert!(TcpListener::bind((Ipv4Addr::LOCALHOST, navigation)).is_ok());
+    assert!(TcpListener::bind((Ipv4Addr::LOCALHOST, duel)).is_ok());
+    let repeated = fixture.stop();
+    assert!(repeated.status.success());
+    assert!(String::from_utf8_lossy(&repeated.stdout).contains("没有运行"));
+}
+
+#[test]
+fn stop_preserves_another_repository_and_ignores_stale_pid_files() {
+    let fixture = Fixture::new("normal");
+    let other = Fixture::new("normal");
+    let ports: Vec<_> = (0..4).map(|_| port()).collect();
+    let values: Vec<_> = ports
+        .iter()
+        .map(|p| p.local_addr().unwrap().port())
+        .collect();
+    drop(ports);
+    let mut running = fixture.launch(values[0], values[1]);
+    let mut preserved = other.launch(values[2], values[3]);
+    wait_for(|| health(values[0], "navigation") && health(values[2], "navigation"));
+    fs::create_dir_all(fixture.root.join("output/run")).unwrap();
+    fs::write(
+        fixture.root.join("output/run/navigation.pid"),
+        preserved.child.id().to_string(),
+    )
+    .unwrap();
+    let stopped = fixture.stop();
+    assert!(
+        stopped.status.success(),
+        "{}",
+        String::from_utf8_lossy(&stopped.stderr)
+    );
+    assert!(running.finish().0);
+    fixture.assert_reaped();
+    assert!(health(values[2], "navigation") && health(values[3], "duel"));
+    preserved.signal("-TERM");
+    assert!(preserved.finish().0);
+    other.assert_reaped();
+}
+
+#[test]
+fn stop_during_initialization_reaps_workers() {
+    let fixture = Fixture::new("hang");
+    let first = port();
+    let second = port();
+    let navigation = first.local_addr().unwrap().port();
+    let duel = second.local_addr().unwrap().port();
+    drop((first, second));
+    let mut running = fixture.launch(navigation, duel);
+    wait_for(|| fixture.root.join("duel.pid").exists());
+    let stopped = fixture.stop();
+    assert!(
+        stopped.status.success(),
+        "{}",
+        String::from_utf8_lossy(&stopped.stderr)
+    );
+    assert!(running.finish().0);
+    fixture.assert_reaped();
+}
+
+#[test]
+fn root_stop_closes_individual_services_even_after_the_binary_is_replaced() {
+    let fixture = Fixture::new("normal");
+    // 根入口和运行中的旧二进制来自同一仓库；不需要构建工具或 PID 文件。
+    let repository = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    fs::copy(repository.join("rm"), fixture.root.join("rm")).unwrap();
+    let executable = fixture.root.join("target/release/robomaster");
+    fs::create_dir_all(executable.parent().unwrap()).unwrap();
+    fs::hard_link(env!("CARGO_BIN_EXE_robomaster"), &executable).unwrap();
+    std::os::unix::fs::symlink(&fixture.root, fixture.root.join("仓库 别名")).unwrap();
+    let first = port();
+    let second = port();
+    let navigation = first.local_addr().unwrap().port();
+    let duel = second.local_addr().unwrap().port();
+    drop((first, second));
+    let mut running = Vec::new();
+    for (module, port) in [("navigation", navigation), ("duel", duel)] {
+        let mut command = Command::new(&executable);
+        command.current_dir(&fixture.root).args(["serve", module]);
+        if module == "navigation" {
+            command.args(["--root", "仓库 别名"]);
+            // 显式根目录优先于环境变量。
+            command.env("ROBOMASTER_ROOT", "/不存在的仓库");
+        } else {
+            command.env("ROBOMASTER_ROOT", "仓库 别名");
+        }
+        running.push(Running {
+            child: command
+                .arg("--bin-dir")
+                .arg(fixture.root.join("bin"))
+                .args(["--port", &port.to_string()])
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap(),
+        });
+    }
+    wait_for(|| health(navigation, "navigation") && health(duel, "duel"));
+    fs::remove_file(&executable).unwrap();
+    fs::copy(env!("CARGO_BIN_EXE_robomaster"), &executable).unwrap();
+    for service in &running {
+        let old = fs::read_link(format!("/proc/{}/exe", service.child.id())).unwrap();
+        assert!(old.to_string_lossy().ends_with(" (deleted)"));
+    }
+    let stopped = Command::new("bash")
+        .arg(fixture.root.join("rm"))
+        .arg("stop")
+        .current_dir("/")
+        .output()
+        .unwrap();
+    assert!(
+        stopped.status.success(),
+        "{}",
+        String::from_utf8_lossy(&stopped.stderr)
+    );
+    assert!(String::from_utf8_lossy(&stopped.stdout).contains("已停止"));
+    fixture.assert_reaped();
+    for service in &mut running {
+        assert!(service.finish().0);
+    }
+    assert!(TcpListener::bind((Ipv4Addr::LOCALHOST, navigation)).is_ok());
+    assert!(TcpListener::bind((Ipv4Addr::LOCALHOST, duel)).is_ok());
+}
+
+#[test]
 fn second_port_conflict_starts_no_workers_and_preserves_existing_listener() {
     let fixture = Fixture::new("normal");
     let first = port();
@@ -293,6 +446,8 @@ fn help_and_cli_errors_explain_usage_in_chinese() {
         vec!["up", "--duel-port", "0"],
         vec!["serve", "unknown"],
         vec!["up", "--navigation-port"],
+        vec!["stop", "navigation"],
+        vec!["stop", "--port", "8765"],
     ] {
         let output = Command::new(env!("CARGO_BIN_EXE_robomaster"))
             .args(args)

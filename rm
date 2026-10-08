@@ -9,6 +9,7 @@ RoboMaster 仓库入口
 
   ./rm                         增量构建后启动导航和自瞄对战服务。
   ./rm start [服务参数]         与无参数入口相同。
+  ./rm stop                    停止当前用户在本仓库启动的所有网页服务。
   ./rm navigation [服务参数]    启动导航服务。
   ./rm duel [服务参数]          启动自瞄对战服务。
   ./rm cube                    打开魔方窗口。需要 DISPLAY。
@@ -26,7 +27,8 @@ Node.js 版本要求：18 或更高。仅测试需要 Node.js。
 默认地址：导航 http://127.0.0.1:8765；自瞄对战 http://127.0.0.1:8766。
 服务端口示例：./rm start --navigation-port 18765 --duel-port 18766。
 单项端口示例：./rm navigation --port 18765。
-准备命令可能需要 sudo。日常命令不会安装系统包，也不会结束已有服务。
+停止命令可在另一个终端执行。它使用已有启动器，不检查依赖或重新构建。
+准备命令可能需要 sudo。日常命令不会安装系统包。启动命令不会结束已有服务。
 HELP
 }
 case "$command_name" in
@@ -34,9 +36,20 @@ case "$command_name" in
   start|navigation|duel|cube|robot) ;;
   setup) [[ $# == 0 || ( $# == 1 && "$1" == --with-tests ) ]] || { printf '错误：用法：./rm setup [--with-tests]。\n' >&2; exit 2; } ;;
   doctor) [[ $# == 0 || ( $# == 1 && "$1" == --test ) ]] || { printf '错误：用法：./rm doctor [--test]。未知参数。\n' >&2; exit 2; } ;;
-  build|test) [[ $# == 0 ]] || { printf '错误：%s 不接受额外参数。\n' "$command_name" >&2; exit 2; } ;;
+  build|test|stop) [[ $# == 0 ]] || { printf '错误：%s 不接受额外参数。\n' "$command_name" >&2; exit 2; } ;;
   *) printf '错误：未知命令：%s。请执行 ./rm help。\n' "$command_name" >&2; exit 2 ;;
 esac
+if [[ "$command_name" == stop ]]; then
+  if [[ ! -x "$root/target/release/robomaster" ]]; then
+    printf '错误：找不到已构建的启动器。若服务仍在运行，请在原启动终端按 Ctrl+C。下次启动前执行 ./rm setup。\n' >&2
+    exit 1
+  fi
+  if ! "$root/target/release/robomaster" --help | grep -Fq 'robomaster stop'; then
+    printf '错误：已有启动器仍是旧版本，不支持停止命令。请在原启动终端按 Ctrl+C，再执行 ./rm 更新启动器并启动服务。\n' >&2
+    exit 1
+  fi
+  exec "$root/target/release/robomaster" stop --root "$root"
+fi
 if [[ "$command_name" == setup ]]; then exec bash "$root/tools/setup.sh" "$@"; fi
 if [[ "$command_name" == doctor ]]; then exec bash "$root/tools/doctor.sh" "$@"; fi
 if [[ "$command_name" == robot && $# == 1 && ( "$1" == --help || "$1" == -h ) ]]; then

@@ -1,4 +1,4 @@
-.PHONY: configure build test setup doctor navigation duel cube robot
+.PHONY: configure build test setup doctor navigation duel cube robot stop
 
 # 所有目标使用同一个仓库入口。
 # 从其他工作目录使用 make -f /绝对路径/Makefile 时，仍定位到本仓库。
@@ -21,6 +21,9 @@ setup:
 
 doctor:
 	@bash "$(RM_ROOT)/rm" doctor
+
+stop:
+	@bash "$(RM_ROOT)/rm" stop
 
 navigation:
 	@bash "$(RM_ROOT)/rm" navigation

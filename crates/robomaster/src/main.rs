@@ -13,24 +13,30 @@ use tokio::{
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
+#[cfg(target_os = "linux")]
+mod stop;
+
 const HELP: &str = "RoboMaster 本机仿真启动器
 
 推荐：在仓库根目录执行 ./rm，一次启动导航和自瞄对战。
 
   robomaster up [--navigation-port N] [--duel-port N] [--root DIR] [--bin-dir DIR]
+  robomaster stop [--root DIR]
   robomaster serve navigation|duel [--port N] [--root DIR] [--bin-dir DIR]
   robomaster run navigation|duel|cube [--root DIR] [--bin-dir DIR] [-- 原生模块参数...]
 
 模块：navigation 导航；duel 自瞄对战；cube 物理魔方。
 默认地址：导航 http://127.0.0.1:8765/；自瞄对战 http://127.0.0.1:8766/。
 up 在同一终端运行两个服务；按 Ctrl+C 同时关闭，并回收本次启动的仿真进程。
+stop 停止当前用户在指定仓库启动的所有网页服务，包括单独启动和自定义端口的服务。
+可在另一个终端执行 ./rm stop；无需重新构建。没有运行中的服务时正常返回。
 端口已占用时停止启动，不关闭已有服务、不自动换端口；可显式指定两个新端口。
 所有网页服务仅监听本机 127.0.0.1。
 
 导航单独启动还可指定：--localization prior|slam --power-budget W。
 魔方窗口：robomaster run cube -- --viewer；双夹爪模式再加 --dual。
 魔方无窗口：robomaster run cube -- --headless --duration 2。
-根目录必须包含 assets/，原生程序默认位于该目录的 build/bin/。
+启动仿真时，根目录必须包含 assets/，原生程序默认位于该目录的 build/bin/。
 未指定 --root 时优先使用 ROBOMASTER_ROOT 环境变量，否则使用编译时的仓库目录。
 直接运行本启动器需要已编译的原生程序；./rm 会检查并准备构建。
 --root 指定仓库目录；--bin-dir 指定原生程序目录；--help 查看本帮助。";
@@ -235,6 +241,7 @@ async fn serve(root: PathBuf, services: Vec<Service>, shutdown: &mut Shutdown) -
         );
     }
     println!("请在浏览器打开上述地址；按 Ctrl+C 关闭本次启动的全部服务。");
+    println!("也可在另一个终端进入本仓库，执行 ./rm stop 关闭本仓库的全部网页服务。");
     let mut failure = None;
     tokio::select! {
         _ = shutdown.recv() => {},
@@ -289,10 +296,10 @@ async fn run() -> Result<()> {
         println!("{HELP}");
         return Ok(());
     }
-    if !matches!(action.as_str(), "up" | "serve" | "run") {
+    if !matches!(action.as_str(), "up" | "serve" | "run" | "stop") {
         return Err(format!("未知操作：{action}\n{HELP}").into());
     }
-    let module = if action == "up" {
+    let module = if matches!(action.as_str(), "up" | "stop") {
         None
     } else {
         let name = args
@@ -320,7 +327,9 @@ async fn run() -> Result<()> {
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--root" => root = PathBuf::from(option_value(&mut args, &arg)?),
-            "--bin-dir" => bin_dir = Some(PathBuf::from(option_value(&mut args, &arg)?)),
+            "--bin-dir" if action != "stop" => {
+                bin_dir = Some(PathBuf::from(option_value(&mut args, &arg)?))
+            }
             "--port" if action == "serve" => port = port_value(&mut args, &arg)?,
             "--navigation-port" if action == "up" => navigation_port = port_value(&mut args, &arg)?,
             "--duel-port" if action == "up" => duel_port = port_value(&mut args, &arg)?,
@@ -344,6 +353,12 @@ async fn run() -> Result<()> {
     root = root
         .canonicalize()
         .map_err(|error| format!("仓库目录无法访问 {}：{error}", root.display()))?;
+    if action == "stop" {
+        #[cfg(target_os = "linux")]
+        return stop::services(&root).await;
+        #[cfg(not(target_os = "linux"))]
+        return Err("停止命令需要 Linux。请在启动终端按 Ctrl+C。".into());
+    }
     if !root.join("assets").is_dir() {
         return Err(format!(
             "仓库目录 {} 缺少 assets/，请用 --root 指向仓库根目录。",
