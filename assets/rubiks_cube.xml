@@ -1,0 +1,336 @@
+<mujoco model="Rubiks cube - switchable weld constraints">
+  <compiler angle="radian" autolimits="true" />
+  <option timestep=".001" integrator="implicitfast" solver="Newton" iterations="80" tolerance="1e-10" gravity="0 0 -9.81" />
+  <default>
+    <geom contype="1" conaffinity="2" friction=".8 .002 .0001" />
+    <equality solref=".004 1" solimp=".99 .99 .001" />
+  </default>
+  <visual>
+    <global offwidth="1280" offheight="720" />
+    <quality shadowsize="4096" offsamples="4" />
+    <headlight ambient=".32 .32 .32" diffuse=".5 .5 .5" specular=".15 .15 .15" />
+    <rgba haze=".055 .065 .09 1" />
+  </visual>
+  <asset>
+    <texture name="sky" type="skybox" builtin="gradient" rgb1=".035 .045 .07" rgb2=".10 .13 .18" width="512" height="3072" />
+    <material name="floor_mat" rgba=".13 .16 .21 1" reflectance=".15" specular=".25" shininess=".4" />
+  </asset>
+  <worldbody>
+    <light pos=".15 -.2 .5" dir="-.25 .3 -1" diffuse=".85 .85 .85" castshadow="true" />
+    <light pos="-.2 -.1 .25" dir=".5 .1 -1" diffuse=".45 .48 .55" castshadow="false" />
+    <geom name="floor" type="plane" size="1 1 .01" material="floor_mat" contype="2" conaffinity="1" />
+    <geom name="plinth" type="cylinder" pos="0 0 .012" size=".055 .012" rgba=".075 .09 .12 1" contype="0" conaffinity="0" />
+    <geom name="core_support" type="cylinder" pos="0 0 .051" size=".003 .027" rgba=".22 .25 .3 1" contype="0" conaffinity="0" />
+    <body name="core" pos="0.0 0.0 0.105">
+      <geom type="sphere" size=".008" rgba=".04 .05 .07 1" contype="0" conaffinity="0" />
+      <body name="center_R">
+        <joint name="hinge_R" type="hinge" axis="1.0 0.0 0.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="0.02 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="0.02985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      </body>
+      <body name="center_L">
+        <joint name="hinge_L" type="hinge" axis="-1.0 -0.0 -0.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="-0.02 -0.0 -0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="-0.02985 -0.0 -0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      </body>
+      <body name="center_U">
+        <joint name="hinge_U" type="hinge" axis="0.0 0.0 1.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="0.0 0.0 0.02" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="0.0 0.0 0.02985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+      </body>
+      <body name="center_D">
+        <joint name="hinge_D" type="hinge" axis="-0.0 -0.0 -1.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="-0.0 -0.0 -0.02" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="-0.0 -0.0 -0.02985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+      </body>
+      <body name="center_F">
+        <joint name="hinge_F" type="hinge" axis="-0.0 -1.0 -0.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="-0.0 -0.02 -0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="-0.0 -0.02985 -0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      </body>
+      <body name="center_B">
+        <joint name="hinge_B" type="hinge" axis="0.0 1.0 0.0" damping=".00002" armature=".000001" />
+        <geom type="box" pos="0.0 0.02 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+        <geom type="box" pos="0.0 0.02985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      </body>
+    </body>
+    <body name="piece_00" pos="-0.02 -0.02 0.08499999999999999">
+      <freejoint name="piece_00_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_01" pos="-0.02 -0.02 0.105">
+      <freejoint name="piece_01_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_02" pos="-0.02 -0.02 0.125">
+      <freejoint name="piece_02_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_03" pos="-0.02 0.0 0.08499999999999999">
+      <freejoint name="piece_03_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_04" pos="-0.02 0.0 0.125">
+      <freejoint name="piece_04_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_05" pos="-0.02 0.02 0.08499999999999999">
+      <freejoint name="piece_05_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_06" pos="-0.02 0.02 0.105">
+      <freejoint name="piece_06_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_07" pos="-0.02 0.02 0.125">
+      <freejoint name="piece_07_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="-0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba="1 .30 .015 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_08" pos="0.0 -0.02 0.08499999999999999">
+      <freejoint name="piece_08_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_09" pos="0.0 -0.02 0.125">
+      <freejoint name="piece_09_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_10" pos="0.0 0.02 0.08499999999999999">
+      <freejoint name="piece_10_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_11" pos="0.0 0.02 0.125">
+      <freejoint name="piece_11_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_12" pos="0.02 -0.02 0.08499999999999999">
+      <freejoint name="piece_12_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_13" pos="0.02 -0.02 0.105">
+      <freejoint name="piece_13_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_14" pos="0.02 -0.02 0.125">
+      <freejoint name="piece_14_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 -0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".015 .63 .27 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_15" pos="0.02 0.0 0.08499999999999999">
+      <freejoint name="piece_15_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_16" pos="0.02 0.0 0.125">
+      <freejoint name="piece_16_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_17" pos="0.02 0.02 0.08499999999999999">
+      <freejoint name="piece_17_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 -0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba="1 .77 .015 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_18" pos="0.02 0.02 0.105">
+      <freejoint name="piece_18_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+    </body>
+    <body name="piece_19" pos="0.02 0.02 0.125">
+      <freejoint name="piece_19_free" />
+      <geom type="box" pos="0.0 0.0 0.0" size=".00965 .00965 .00965" mass=".006" rgba=".025 .029 .035 1" />
+      <geom type="box" pos="0.00985 0.0 0.0" size="0.00025 0.00825 0.00825" mass="0" rgba=".82 .035 .055 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.00985 0.0" size="0.00825 0.00025 0.00825" mass="0" rgba=".025 .19 .85 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.0 0.0 0.00985" size="0.00825 0.00825 0.00025" mass="0" rgba=".94 .95 .96 1" contype="0" conaffinity="0" />
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="drive_R" joint="hinge_R" kp=".3" kv=".003" forcerange="-.15 .15" />
+    <position name="drive_L" joint="hinge_L" kp=".3" kv=".003" forcerange="-.15 .15" />
+    <position name="drive_U" joint="hinge_U" kp=".3" kv=".003" forcerange="-.15 .15" />
+    <position name="drive_D" joint="hinge_D" kp=".3" kv=".003" forcerange="-.15 .15" />
+    <position name="drive_F" joint="hinge_F" kp=".3" kv=".003" forcerange="-.15 .15" />
+    <position name="drive_B" joint="hinge_B" kp=".3" kv=".003" forcerange="-.15 .15" />
+  </actuator>
+  <equality>
+    <weld name="piece_00_to_core" body1="core" body2="piece_00" active="true" torquescale=".03" />
+    <weld name="piece_00_to_center_R" body1="center_R" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_00_to_center_L" body1="center_L" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_00_to_center_U" body1="center_U" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_00_to_center_D" body1="center_D" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_00_to_center_F" body1="center_F" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_00_to_center_B" body1="center_B" body2="piece_00" active="false" torquescale=".03" />
+    <weld name="piece_01_to_core" body1="core" body2="piece_01" active="true" torquescale=".03" />
+    <weld name="piece_01_to_center_R" body1="center_R" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_01_to_center_L" body1="center_L" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_01_to_center_U" body1="center_U" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_01_to_center_D" body1="center_D" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_01_to_center_F" body1="center_F" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_01_to_center_B" body1="center_B" body2="piece_01" active="false" torquescale=".03" />
+    <weld name="piece_02_to_core" body1="core" body2="piece_02" active="true" torquescale=".03" />
+    <weld name="piece_02_to_center_R" body1="center_R" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_02_to_center_L" body1="center_L" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_02_to_center_U" body1="center_U" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_02_to_center_D" body1="center_D" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_02_to_center_F" body1="center_F" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_02_to_center_B" body1="center_B" body2="piece_02" active="false" torquescale=".03" />
+    <weld name="piece_03_to_core" body1="core" body2="piece_03" active="true" torquescale=".03" />
+    <weld name="piece_03_to_center_R" body1="center_R" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_03_to_center_L" body1="center_L" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_03_to_center_U" body1="center_U" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_03_to_center_D" body1="center_D" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_03_to_center_F" body1="center_F" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_03_to_center_B" body1="center_B" body2="piece_03" active="false" torquescale=".03" />
+    <weld name="piece_04_to_core" body1="core" body2="piece_04" active="true" torquescale=".03" />
+    <weld name="piece_04_to_center_R" body1="center_R" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_04_to_center_L" body1="center_L" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_04_to_center_U" body1="center_U" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_04_to_center_D" body1="center_D" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_04_to_center_F" body1="center_F" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_04_to_center_B" body1="center_B" body2="piece_04" active="false" torquescale=".03" />
+    <weld name="piece_05_to_core" body1="core" body2="piece_05" active="true" torquescale=".03" />
+    <weld name="piece_05_to_center_R" body1="center_R" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_05_to_center_L" body1="center_L" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_05_to_center_U" body1="center_U" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_05_to_center_D" body1="center_D" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_05_to_center_F" body1="center_F" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_05_to_center_B" body1="center_B" body2="piece_05" active="false" torquescale=".03" />
+    <weld name="piece_06_to_core" body1="core" body2="piece_06" active="true" torquescale=".03" />
+    <weld name="piece_06_to_center_R" body1="center_R" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_06_to_center_L" body1="center_L" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_06_to_center_U" body1="center_U" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_06_to_center_D" body1="center_D" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_06_to_center_F" body1="center_F" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_06_to_center_B" body1="center_B" body2="piece_06" active="false" torquescale=".03" />
+    <weld name="piece_07_to_core" body1="core" body2="piece_07" active="true" torquescale=".03" />
+    <weld name="piece_07_to_center_R" body1="center_R" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_07_to_center_L" body1="center_L" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_07_to_center_U" body1="center_U" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_07_to_center_D" body1="center_D" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_07_to_center_F" body1="center_F" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_07_to_center_B" body1="center_B" body2="piece_07" active="false" torquescale=".03" />
+    <weld name="piece_08_to_core" body1="core" body2="piece_08" active="true" torquescale=".03" />
+    <weld name="piece_08_to_center_R" body1="center_R" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_08_to_center_L" body1="center_L" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_08_to_center_U" body1="center_U" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_08_to_center_D" body1="center_D" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_08_to_center_F" body1="center_F" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_08_to_center_B" body1="center_B" body2="piece_08" active="false" torquescale=".03" />
+    <weld name="piece_09_to_core" body1="core" body2="piece_09" active="true" torquescale=".03" />
+    <weld name="piece_09_to_center_R" body1="center_R" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_09_to_center_L" body1="center_L" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_09_to_center_U" body1="center_U" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_09_to_center_D" body1="center_D" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_09_to_center_F" body1="center_F" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_09_to_center_B" body1="center_B" body2="piece_09" active="false" torquescale=".03" />
+    <weld name="piece_10_to_core" body1="core" body2="piece_10" active="true" torquescale=".03" />
+    <weld name="piece_10_to_center_R" body1="center_R" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_10_to_center_L" body1="center_L" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_10_to_center_U" body1="center_U" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_10_to_center_D" body1="center_D" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_10_to_center_F" body1="center_F" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_10_to_center_B" body1="center_B" body2="piece_10" active="false" torquescale=".03" />
+    <weld name="piece_11_to_core" body1="core" body2="piece_11" active="true" torquescale=".03" />
+    <weld name="piece_11_to_center_R" body1="center_R" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_11_to_center_L" body1="center_L" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_11_to_center_U" body1="center_U" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_11_to_center_D" body1="center_D" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_11_to_center_F" body1="center_F" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_11_to_center_B" body1="center_B" body2="piece_11" active="false" torquescale=".03" />
+    <weld name="piece_12_to_core" body1="core" body2="piece_12" active="true" torquescale=".03" />
+    <weld name="piece_12_to_center_R" body1="center_R" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_12_to_center_L" body1="center_L" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_12_to_center_U" body1="center_U" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_12_to_center_D" body1="center_D" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_12_to_center_F" body1="center_F" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_12_to_center_B" body1="center_B" body2="piece_12" active="false" torquescale=".03" />
+    <weld name="piece_13_to_core" body1="core" body2="piece_13" active="true" torquescale=".03" />
+    <weld name="piece_13_to_center_R" body1="center_R" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_13_to_center_L" body1="center_L" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_13_to_center_U" body1="center_U" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_13_to_center_D" body1="center_D" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_13_to_center_F" body1="center_F" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_13_to_center_B" body1="center_B" body2="piece_13" active="false" torquescale=".03" />
+    <weld name="piece_14_to_core" body1="core" body2="piece_14" active="true" torquescale=".03" />
+    <weld name="piece_14_to_center_R" body1="center_R" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_14_to_center_L" body1="center_L" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_14_to_center_U" body1="center_U" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_14_to_center_D" body1="center_D" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_14_to_center_F" body1="center_F" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_14_to_center_B" body1="center_B" body2="piece_14" active="false" torquescale=".03" />
+    <weld name="piece_15_to_core" body1="core" body2="piece_15" active="true" torquescale=".03" />
+    <weld name="piece_15_to_center_R" body1="center_R" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_15_to_center_L" body1="center_L" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_15_to_center_U" body1="center_U" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_15_to_center_D" body1="center_D" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_15_to_center_F" body1="center_F" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_15_to_center_B" body1="center_B" body2="piece_15" active="false" torquescale=".03" />
+    <weld name="piece_16_to_core" body1="core" body2="piece_16" active="true" torquescale=".03" />
+    <weld name="piece_16_to_center_R" body1="center_R" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_16_to_center_L" body1="center_L" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_16_to_center_U" body1="center_U" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_16_to_center_D" body1="center_D" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_16_to_center_F" body1="center_F" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_16_to_center_B" body1="center_B" body2="piece_16" active="false" torquescale=".03" />
+    <weld name="piece_17_to_core" body1="core" body2="piece_17" active="true" torquescale=".03" />
+    <weld name="piece_17_to_center_R" body1="center_R" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_17_to_center_L" body1="center_L" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_17_to_center_U" body1="center_U" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_17_to_center_D" body1="center_D" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_17_to_center_F" body1="center_F" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_17_to_center_B" body1="center_B" body2="piece_17" active="false" torquescale=".03" />
+    <weld name="piece_18_to_core" body1="core" body2="piece_18" active="true" torquescale=".03" />
+    <weld name="piece_18_to_center_R" body1="center_R" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_18_to_center_L" body1="center_L" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_18_to_center_U" body1="center_U" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_18_to_center_D" body1="center_D" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_18_to_center_F" body1="center_F" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_18_to_center_B" body1="center_B" body2="piece_18" active="false" torquescale=".03" />
+    <weld name="piece_19_to_core" body1="core" body2="piece_19" active="true" torquescale=".03" />
+    <weld name="piece_19_to_center_R" body1="center_R" body2="piece_19" active="false" torquescale=".03" />
+    <weld name="piece_19_to_center_L" body1="center_L" body2="piece_19" active="false" torquescale=".03" />
+    <weld name="piece_19_to_center_U" body1="center_U" body2="piece_19" active="false" torquescale=".03" />
+    <weld name="piece_19_to_center_D" body1="center_D" body2="piece_19" active="false" torquescale=".03" />
+    <weld name="piece_19_to_center_F" body1="center_F" body2="piece_19" active="false" torquescale=".03" />
+    <weld name="piece_19_to_center_B" body1="center_B" body2="piece_19" active="false" torquescale=".03" />
+  </equality>
+</mujoco>

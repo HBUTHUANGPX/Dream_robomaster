@@ -1,0 +1,17 @@
+.venv/
+.venv-cube/
+__pycache__/
+.pytest_cache/
+*.pyc
+/.deps/
+/.cache/
+/build/
+/build-*/
+/target/
+/output/
+/artifacts/
+/integrations/fast_lio/logs/
+*.bag
+*.tar
+*.tar.gz
+.DS_Store

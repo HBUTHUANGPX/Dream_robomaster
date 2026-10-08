@@ -1,0 +1,13 @@
+# 保留原始资产、第三方源码和历史归档的字节，避免换行转换改变校验值。
+/assets/** -text -whitespace
+/modules/cube/third_party/kociemba/** -text -whitespace
+/legacy/python/** -text
+
+# 几何与媒体文件不生成逐行差异。
+*.step binary
+*.stl binary
+*.obj binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.onnx binary

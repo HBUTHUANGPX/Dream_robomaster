@@ -1,0 +1,37 @@
+[
+  {
+    "file": "assets/official/rules_2026_v2.2.0.pdf",
+    "title": "RoboMaster 2026 机甲大师超级对抗赛比赛规则手册V2.2.0（20260807）.pdf",
+    "url": "https://hz-rm-bbs-web-prod.oss-cn-hangzhou.aliyuncs.com/e354d2750e17485e8f67e5b5a9d1a2891786094242879/RoboMaster 2026 机甲大师超级对抗赛比赛规则手册V2.2.0（20260807）.pdf",
+    "page": "https://bbs.robomaster.com/wiki/20204847/809871",
+    "sha256": "88ae3c7d0bbd7312c8095eff2603910437e292a0b53f46c9378f26144c09a6f5"
+  },
+  {
+    "file": "assets/official/spec_2026_v2.0.0.pdf",
+    "title": "RoboMaster 2026 机甲大师高校系列赛机器人制作规范手册V1.4.1（20260421）.pdf",
+    "url": "https://hz-rm-bbs-web-prod.oss-cn-hangzhou.aliyuncs.com/36eeb3f9ce2b4d0caf551a58151d4cd21776999563305/RoboMaster 2026 机甲大师高校系列赛机器人制作规范手册V1.4.1（20260421）.pdf",
+    "page": "https://bbs.robomaster.com/wiki/20204847/809871",
+    "sha256": "beb5f83f722d65f3c39758d2f89b0ff282e129c19507c52310422f72d518b8a0"
+  },
+  {
+    "file": "assets/official/armor_am02_manual.pdf",
+    "title": "RoboMaster 装甲模块 AM02&AM12 2020 使用说明书.pdf",
+    "url": "https://hz-rm-bbs-web-prod.oss-cn-hangzhou.aliyuncs.com/70ff834a1366481086af577476921cf41761019131997/RoboMaster 装甲模块 AM02&AM12 2020 使用说明书.pdf",
+    "page": "https://bbs.robomaster.com/wiki/20204847/811816",
+    "sha256": "f9c89979d83c9235f6063fe2d1506d38e062156c7ea5256955f79be8c7d4be58"
+  },
+  {
+    "file": "assets/official/armor_am02.step",
+    "title": "RoboMaster 装甲模块 AM02 2019.STEP",
+    "url": "https://hz-rm-bbs-web-prod.oss-cn-hangzhou.aliyuncs.com/be2a04862db54079b0bdfa100f5a963d1761019143407/RoboMaster 装甲模块 AM02 2019.STEP",
+    "page": "https://bbs.robomaster.com/wiki/20204847/811816",
+    "sha256": "dcc2141c6a2928493f9f95ba00eb103ccd15354433f81b03dbba9f58e92e7e49"
+  },
+  {
+    "file": "assets/official/armor_frame_a.step",
+    "title": "RoboMaster 装甲支撑架A型 2019.STEP",
+    "url": "https://hz-rm-bbs-web-prod.oss-cn-hangzhou.aliyuncs.com/3cba0787759f43799e65f1aad6f2612f1758941699123/RoboMaster 装甲支撑架A型 2019.STEP",
+    "page": "https://bbs.robomaster.com/wiki/20204847/811821",
+    "sha256": "6a7c6b9dc7b9ddf14d7ff7e6164aced72c401b5ea3afab2a45064e5f662ca5b8"
+  }
+]

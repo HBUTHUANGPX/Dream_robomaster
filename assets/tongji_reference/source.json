@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/TongjiSuperPower/sp_vision_25",
+  "commit": "bd9f5e798fa3c6dd3b483ae6627796afb41c608d",
+  "article": "https://bbs.robomaster.com/article/803315?source=4",
+  "adaptation": "Fixed-tilt yaw reprojection search and trajectory/fire-window concepts; no upstream neural weights or TinyMPC solver copied. Independently implemented NumPy search."
+}

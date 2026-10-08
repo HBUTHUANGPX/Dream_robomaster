@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "configurePresets": [{
+    "name": "native",
+    "displayName": "原生 C++ 发布构建与测试",
+    "generator": "Ninja",
+    "binaryDir": "${sourceDir}/build",
+    "cacheVariables": {"CMAKE_BUILD_TYPE": "RelWithDebInfo", "BUILD_TESTING": "ON"}
+  }],
+  "buildPresets": [{"name": "native", "configurePreset": "native", "jobs": 4}],
+  "testPresets": [{"name": "native", "configurePreset": "native", "output": {"outputOnFailure": true}}]
+}

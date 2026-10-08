@@ -1,0 +1,28 @@
+common:
+  lid_topic: /sim/lidar
+  imu_topic: /sim/imu
+  time_sync_en: false
+  time_offset_lidar_to_imu: 0.0
+preprocess:
+  lidar_type: 4  # Official MARSIM PointXYZI snapshot path; no per-point offsets.
+  scan_line: 1  # Not used by sim_handler.
+  blind: 0.2
+mapping:
+  acc_cov: 0.1
+  gyr_cov: 0.1
+  b_acc_cov: 0.0001
+  b_gyr_cov: 0.0001
+  fov_degree: 360.0
+  det_range: 40.0
+  extrinsic_est_en: false
+  # p_IMU = R * p_top_lidar + T (metres).
+  extrinsic_T: [0.0, 0.0, 0.438]
+  extrinsic_R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+publish:
+  path_en: false
+  scan_publish_en: false
+  dense_publish_en: false
+  scan_bodyframe_pub_en: false
+pcd_save:
+  pcd_save_en: false
+  interval: -1

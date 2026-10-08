@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>赛场导航 · MuJoCo</title>
+<style>
+:root{color-scheme:dark;--bg:#090f19;--panel:#101b2a;--line:#233247;--text:#e5eef9;--muted:#8fabc1;--mint:#81e6bc;--cyan:#44d7f4;--orange:#ffae64}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% 0,#152d3d 0,transparent 45%),var(--bg);color:var(--text);font:14px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit;color:inherit;cursor:pointer;background:#192b3e;border:1px solid #324b62;border-radius:9px;padding:9px 15px;transition:background .15s,transform .15s}button:hover:not(:disabled){background:#25425a;transform:translateY(-1px)}button:focus-visible,canvas:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}button:disabled{opacity:.45;cursor:wait}main{max-width:1600px;margin:auto;padding:27px 32px 24px}header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:14px}.logo{display:grid;place-items:center;width:44px;height:44px;border:1px solid #3b706e;background:#153b3b;border-radius:13px;color:var(--mint);font-size:24px}h1{font-size:23px;letter-spacing:1px;margin:0}h2{font-size:15px;margin:0}p{margin:0}.eyebrow{font-size:10px;letter-spacing:2px;color:var(--mint)}.subtitle,.muted{color:var(--muted);font-size:12px}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;padding:7px 11px;border:1px solid var(--line);border-radius:30px;white-space:nowrap}.dot{height:7px;width:7px;background:currentColor;border-radius:50%}.badge.online{color:var(--mint)}.badge.error{color:#ffbc8b}.primary{background:#194738;border-color:#32725a;color:#b6f8d9}.notice{padding:12px 16px;background:#11292c;border:1px solid #254748;border-radius:10px;color:#aed7cf;font-size:12px;margin-bottom:18px}.dashboard{display:grid;grid-template-columns:minmax(360px,1.08fr) minmax(390px,1fr);gap:18px;align-items:start}.panel{background:linear-gradient(145deg,#132031,#0e1926);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 38px #0002}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 20px;border-bottom:1px solid var(--line)}.panel-head .muted{margin-top:3px}.tag{font:11px ui-monospace,monospace;color:#a2bacb;background:#1b2e40;border-radius:5px;padding:4px 7px;white-space:nowrap}.map-wrap{position:relative;height:clamp(490px,66vh,760px);background:#0a1420;margin:14px;border:1px solid #223246;border-radius:10px;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:manipulation;cursor:crosshair}.empty{position:absolute;inset:0;display:grid;place-content:center;text-align:center;color:var(--muted);pointer-events:none;padding:20px}.empty strong{font-size:18px;color:#c8d9e7;margin-bottom:5px}.map-bottom{padding:0 20px 17px}.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;color:#b6c7d7}.legend span{display:inline-flex;align-items:center;gap:7px}.swatch{width:18px;height:3px;border-radius:2px;background:var(--c)}.swatch.area{height:9px;width:10px}.scale-caption{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px;margin-top:12px}.ramp{width:72px;height:6px;display:inline-block;border-radius:6px;background:linear-gradient(90deg,#25564c,#499275,#afc385);margin:0 5px}.right{display:grid;gap:18px}.camera{position:relative;background:#070e16;aspect-ratio:16/9;overflow:hidden}.camera img{width:100%;height:100%;object-fit:contain;display:block}.camera img:not([src]){visibility:hidden}.camera-chip{position:absolute;left:14px;top:12px;padding:4px 9px;background:#07111bce;border:1px solid #334354;border-radius:5px;color:#aabfce;font:10px ui-monospace,monospace}.camera-foot{display:flex;justify-content:space-between;gap:10px;padding:10px 20px;color:var(--muted);font-size:11px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}.metric{background:#101d2c;padding:15px 18px;min-width:0}.metric dt{font-size:11px;color:var(--muted)}.metric dd{margin:5px 0 0;font:23px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}.metric small{font:11px system-ui;color:var(--muted);margin-left:4px}.metric.truth dd{color:#e7bc89}.metrics dl{margin:0}.position{padding:13px 20px;display:flex;gap:10px;justify-content:space-between;font-size:12px;color:var(--muted)}.position output{color:#c6d9e7;font-family:ui-monospace,monospace}.destination{padding:16px 20px}.target-line{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}.target-line strong{font-size:13px;font-weight:500}.target-line output{font:12px ui-monospace,monospace;color:var(--mint)}progress{width:100%;height:5px;appearance:none;border:0;display:block;border-radius:4px;background:#233446}progress::-webkit-progress-bar{background:#233446;border-radius:4px}progress::-webkit-progress-value{background:var(--mint);border-radius:4px}progress::-moz-progress-bar{background:var(--mint);border-radius:4px}.presets{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 16px}.presets button{text-align:left;font-size:12px;padding:8px 12px;background:#162b39}.presets small{display:block;color:var(--muted);font:10px ui-monospace,monospace}.preset-note{padding:0 20px 15px;font-size:11px;color:var(--muted)}.feedback{margin-top:16px;border:1px solid var(--line);border-radius:9px;padding:10px 14px;color:#b5c8d9;min-height:43px;font-size:12px}.feedback[data-error="true"]{border-color:#735239;color:#ffca9d}footer{display:flex;justify-content:space-between;gap:12px;margin-top:13px;color:#668198;font-size:10px;letter-spacing:.5px}[hidden]{display:none!important}@media(min-width:1400px){.map-wrap{height:760px}}@media(max-width:950px){main{padding:20px}.dashboard{grid-template-columns:minmax(300px,1fr) minmax(320px,1fr)}.metric{padding:13px 10px}.metric dd{font-size:20px}.position{flex-wrap:wrap}}@media(max-width:740px){main{padding:16px 12px}header{align-items:flex-start;flex-direction:column;gap:14px}.actions{width:100%}.actions .badge{margin-right:auto}.dashboard{grid-template-columns:1fr}.map-wrap{height:560px}h1{font-size:21px}.notice{font-size:11px}.scale-caption{flex-wrap:wrap}.metric{padding:14px}.position{font-size:11px}footer{flex-wrap:wrap}}@media(prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand"><div class="logo" aria-hidden="true">⌖</div><div><div class="eyebrow">MUJOCO / NAVIGATION</div><h1>赛场自主导航</h1><p class="subtitle">全局规划 · 局部避障 · 在线定位</p></div></div><div class="actions"><span id="connection" class="badge"><i class="dot"></i><span id="connectionText">正在连接</span></span><button id="pause" class="primary" disabled>暂停导航</button><button id="reset" disabled>重置仿真</button></div></header>
+<div class="notice">已知赛场先验 + 在线激光建图定位；绿色区域可点选，坡道与高地按地形高度规划</div>
+<div class="dashboard">
+<section class="panel" aria-labelledby="mapTitle"><div class="panel-head"><div><h2 id="mapTitle">赛场俯视地图</h2><p class="muted">点击绿色区域设置目标 · 北向 / +Y 朝上</p></div><span id="mapSize" class="tag">等待地图</span></div><div class="map-wrap"><canvas id="map" tabindex="0" aria-label="赛场地图，点击绿色可达区域设置目标；也可使用右侧预设目标按钮"></canvas><div id="mapEmpty" class="empty"><strong>正在载入赛场</strong><span>等待地图与可达区域数据…</span></div></div><div class="map-bottom"><div class="legend"><span><i class="swatch" style="--c:#44d7f4"></i>全局路径</span><span><i class="swatch" style="--c:#ffae64"></i>局部路径</span><span><i class="swatch" style="--c:#ffffff"></i>已行驶轨迹（估计）</span><span><i class="swatch area" style="--c:#81e6bc88"></i>实时激光</span><span><i class="swatch area" style="--c:#499275"></i>可达区域</span><span><i class="swatch area" style="--c:#070d16"></i>不可通行</span></div><div class="scale-caption"><span id="reachable">可达栅格 —</span><span>高程 <span id="minHeight">—</span><i class="ramp"></i><span id="maxHeight">—</span> m</span></div><p id="hover" class="muted" style="margin-top:8px">地图采用米制坐标，显示每个栅格的最上层。</p></div></section>
+<div class="right">
+<section class="panel" aria-labelledby="cameraTitle"><div class="panel-head"><h2 id="cameraTitle">实时三维画面</h2><span class="tag">MuJoCo · 2 Hz</span></div><div class="camera"><img id="frame" alt="MuJoCo 赛场实时三维视图"><span class="camera-chip">仿真视角 / LIVE</span><div id="frameEmpty" class="empty"><strong>等待实时画面</strong><span>画面连接后自动显示</span></div></div><div class="camera-foot"><span id="frameStatus">尚未接收画面</span><span>画面刷新 500 ms</span></div></section>
+<section class="panel" aria-labelledby="stateTitle"><div class="panel-head"><h2 id="stateTitle">导航与定位</h2><span id="status" class="tag">等待状态</span></div><div class="metrics"><dl class="metric"><dt>仿真时间</dt><dd><span id="time">—</span><small>s</small></dd></dl><dl class="metric"><dt>移动速度</dt><dd><span id="speed">—</span><small>m/s</small></dd></dl><dl class="metric"><dt>激光地图点数</dt><dd id="slam">—</dd></dl><dl class="metric"><dt>本帧扫描点数</dt><dd id="scan">—</dd></dl><dl class="metric"><dt>ICP 配准均方根误差</dt><dd><span id="icp">—</span><small>m</small></dd></dl><dl class="metric truth"><dt>定位真值误差 · 仅诊断</dt><dd><span id="error">—</span><small>m</small></dd></dl></div><div class="position"><span>估计电功率 / 预算（仿真）</span><output id="power">—</output></div><div class="position"><label for="yawRate">独立旋转速度</label><output id="yawValue">0°/s</output></div><div style="padding:0 18px 12px;display:flex;gap:12px;align-items:center"><input id="yawRate" type="range" min="-60" max="60" step="5" value="0" style="flex:1;min-width:0" disabled><button id="yawStop" disabled>取消持续旋转</button></div><p class="preset-note">平移与旋转可同时执行。坡道会在行进中调整方向，以改善牵引。</p><div class="position"><span id="controller">DWA + PID</span><output id="dwa">等待局部规划</output></div><div class="position"><span>估计位姿 / x, y, z, 航向</span><output id="pose">—</output></div></section>
+<section class="panel" aria-labelledby="goalTitle"><div class="panel-head"><h2 id="goalTitle">目的地与快捷目标</h2><span id="progressText" class="tag">进度 —</span></div><div class="destination"><div class="target-line"><strong id="goalName">尚未设置目的地</strong><output id="goalHeight">高度 — m</output></div><p id="goalCoords" class="muted" style="margin-bottom:12px">点击地图或选择下方预设目标</p><progress id="progress" max="1" value="0" aria-label="导航进度"></progress></div><div id="presets" class="presets"><span class="muted">等待预设目标…</span></div><p class="preset-note">当前接口仅支持最上层目标；预设显示参考高度，实际目标高度以状态返回为准。地图不支持同一位置的多层选择。</p></section>
+</div></div>
+<div id="feedback" class="feedback" role="status" aria-live="polite">正在建立本地连接…</div>
+<footer><span>本地导航控制台 · 无外部依赖</span><span>状态 300 ms · 坐标单位 m · 位姿与轨迹均为定位估计</span></footer>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas = $('map'), ctx = canvas.getContext('2d');
+const terrain = document.createElement('canvas');
+let mapData = null, state = {}, view = null, busy = false, connected = false;
+let mapLoading = false, stateLoading = false, frameLoading = false, frameStarted = 0;
+let low = 0, high = 0, pendingGoal = null, frameLoaded = false;
+const finite = value => typeof value === 'number' && Number.isFinite(value);
+const fmt = (value, digits = 2) => finite(value) ? value.toFixed(digits) : '—';
+const point = p => Array.isArray(p) && finite(p[0]) && finite(p[1]);
+const points = list => Array.isArray(list) ? list : [];
+function tell(message, error = false) { $('feedback').textContent = message; $('feedback').dataset.error = String(error); }
+async function api(path, body) {
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 6000);
+  try {
+    const response = await fetch(path, {cache:'no-store', signal:controller.signal,
+      ...(body === undefined ? {} : {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})});
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (response.status === 204) return {};
+    const text = await response.text();
+    return text ? JSON.parse(text) : {};
+  } finally { clearTimeout(timer); }
+}
+function errorText(error) { return error.name === 'AbortError' ? '请求超时' : error.message || '连接失败'; }
+function controls() {
+  $('pause').disabled = busy || !connected;
+  $('yawRate').disabled=busy||!connected;$('yawStop').disabled=busy||!connected;
+  $('reset').disabled = busy || !connected;
+  $('pause').textContent = state.paused ? '继续导航' : '暂停导航';
+  for (const button of $('presets').querySelectorAll('button')) button.disabled = busy || !mapData;
+}
+function connection(ok) {
+  connected = ok;
+  $('connection').className = `badge ${ok ? 'online' : 'error'}`;
+  $('connectionText').textContent = ok ? '状态已连接' : '状态断开 · 重试中';
+  controls();
+}
+async function loadMap() {
+  if (mapLoading) return;
+  mapLoading = true;
+  try {
+    const data = window.NAV_INITIAL_MAP || await api('/api/map');
+    if (!data || !finite(data.width) || data.width <= 0 || !finite(data.height) || data.height <= 0 ||
+      !finite(data.resolution) || data.resolution <= 0 || !Number.isInteger(data.cols) || data.cols <= 0 ||
+      !Number.isInteger(data.rows) || data.rows <= 0 || !Array.isArray(data.heights) || !Array.isArray(data.reachable) ||
+      data.heights.length !== data.cols * data.rows || data.reachable.length !== data.cols * data.rows) throw new Error('地图栅格数据不完整');
+    mapData = data;
+    if (data.localization === "slam") document.querySelector(".notice").textContent = "在线 SLAM：仅用实测点云积累地图和定位；全局规划使用已知地形。无回环优化，长程可能漂移。";
+    low = Infinity; high = -Infinity;
+    let count = 0;
+    data.reachable.forEach((value, i) => { if (value === 1 && finite(data.heights[i])) { count++; low = Math.min(low, data.heights[i]); high = Math.max(high, data.heights[i]); } });
+    if (!count) low = high = 0;
+    terrain.width = data.cols; terrain.height = data.rows;
+    const tctx = terrain.getContext('2d'), pixels = tctx.createImageData(data.cols, data.rows);
+    for (let row = 0; row < data.rows; row++) for (let col = 0; col < data.cols; col++) {
+      const index = row * data.cols + col, target = ((data.rows - 1 - row) * data.cols + col) * 4;
+      const elevation = data.heights[index], accessible = data.reachable[index] === 1 && finite(elevation);
+      const fraction = high > low ? Math.max(0, Math.min(1, (elevation-low)/(high-low))) : 0;
+      const color = accessible ? [37+138*fraction,86+109*fraction,76+57*fraction] : [8,15,24];
+      pixels.data.set([...color.map(Math.round),255],target);
+    }
+    tctx.putImageData(pixels,0,0);
+    $('mapEmpty').hidden = true;
+    $('mapSize').textContent = `${fmt(data.width)} × ${fmt(data.height)} m`;
+    $('reachable').textContent = `可达栅格 ${count.toLocaleString('zh-CN')} · 分辨率 ${fmt(data.resolution)} m`;
+    $('minHeight').textContent = fmt(low); $('maxHeight').textContent = fmt(high);
+    $('presets').replaceChildren();
+    for (const preset of points(data.presets)) {
+      if (!preset || !finite(preset.x) || !finite(preset.y)) continue;
+      const button = document.createElement('button'), label = document.createElement('span'), height = document.createElement('small');
+      label.textContent = preset.name || '预设目标'; height.textContent = `参考 z ${fmt(preset.z)} m`;
+      button.append(label,height); button.addEventListener('click',() => sendGoal(preset.x,preset.y,preset.name || '预设目标'));
+      $('presets').append(button);
+    }
+    if (!$('presets').children.length) $('presets').textContent = '暂无预设目标，请在地图上点选。';
+    controls(); resize(); tell('地图已就绪。点击绿色可达区域，或选择预设目标。');
+  } catch (error) {
+    $('mapEmpty').textContent = `地图暂不可用：${errorText(error)}，自动重试中…`;
+    tell(`地图加载失败：${errorText(error)}`,true);
+  } finally { mapLoading = false; }
+}
+function resize() {
+  const box = canvas.getBoundingClientRect(), ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(box.width*ratio); canvas.height = Math.round(box.height*ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  if (mapData) {
+    const scale = Math.max(.01,Math.min((box.width-72)/mapData.width,(box.height-66)/mapData.height));
+    view = {scale,left:(box.width-mapData.width*scale)/2+10,top:(box.height-mapData.height*scale)/2-5,width:mapData.width*scale,height:mapData.height*scale};
+  }
+  draw();
+}
+function xy(p) { return [view.left+p[0]*view.scale, view.top+view.height-p[1]*view.scale]; }
+function path(list,color,width,dash = []) {
+  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.setLineDash(dash); ctx.beginPath();
+  let started = false;
+  for (const p of points(list)) { if (!point(p)) { started = false; continue; } const [x,y] = xy(p); if (!started) ctx.moveTo(x,y); else ctx.lineTo(x,y); started = true; }
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function marker(p,color,label,radius=6) {
+  if (!point(p)) return;
+  const [x,y] = xy(p); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.fillStyle = '#0b1826';
+  ctx.beginPath(); ctx.arc(x,y,radius,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = color; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
+  ctx.fillText(label,x+radius+5,y-7);
+}
+function draw() {
+  const box = canvas.getBoundingClientRect(); ctx.clearRect(0,0,box.width,box.height);
+  if (!mapData || !view) return;
+  const v = view;
+  ctx.save(); ctx.beginPath(); ctx.rect(v.left,v.top,v.width,v.height); ctx.clip();
+  ctx.imageSmoothingEnabled = false;
+  // Cells retain their physical resolution even when field bounds contain a partial edge cell.
+  ctx.drawImage(terrain,v.left,v.top+v.height-mapData.rows*mapData.resolution*v.scale,mapData.cols*mapData.resolution*v.scale,mapData.rows*mapData.resolution*v.scale);
+  ctx.strokeStyle = '#9bb7ce14'; ctx.lineWidth = 1;
+  for (let x=0;x<=mapData.width;x+=2) { const a = xy([x,0]); ctx.beginPath();ctx.moveTo(a[0],v.top);ctx.lineTo(a[0],v.top+v.height);ctx.stroke(); }
+  for (let y=0;y<=mapData.height;y+=2) { const a = xy([0,y]); ctx.beginPath();ctx.moveTo(v.left,a[1]);ctx.lineTo(v.left+v.width,a[1]);ctx.stroke(); }
+  ctx.fillStyle = '#a1ffd44d';
+  for (const p of points(state.cloud)) if (point(p)) { const [x,y]=xy(p); ctx.fillRect(x-1,y-1,2,2); }
+  path(state.trail,'#ffffffb8',1.7);
+  path(state.global_path,'#44d7f4',2.5);
+  path(state.local_path,'#ffae64',3.5);
+  marker(mapData.spawn,'#96afc3','起点',4);
+  marker(state.goal,'#b7f9cd','目标',7);
+  if (pendingGoal) marker(pendingGoal,'#ffcf85','提交中',8);
+  if (point(state.pose)) {
+    const [x,y]=xy(state.pose), yaw = finite(state.pose[3]) ? state.pose[3] : 0;
+    ctx.save(); ctx.translate(x,y); ctx.rotate(-yaw);ctx.shadowColor='#72ddff';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(-7,-6);ctx.lineTo(-4,0);ctx.lineTo(-7,6);ctx.closePath();ctx.fillStyle='#e5faff';ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#4bcfe9';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  }
+  ctx.restore();
+  ctx.strokeStyle='#385268';ctx.lineWidth=1;ctx.strokeRect(v.left,v.top,v.width,v.height);
+  ctx.fillStyle='#8da7bd';ctx.font='10px system-ui';ctx.textAlign='center';
+  for(let x=0;x<=mapData.width;x+=4) ctx.fillText(String(x),xy([x,0])[0],v.top+v.height+17);
+  ctx.textAlign='right';for(let y=0;y<=mapData.height;y+=4) ctx.fillText(String(y),v.left-8,xy([0,y])[1]+3);
+  ctx.fillText('Y / m ↑',v.left+36,v.top-12);ctx.fillText('X / m →',v.left+v.width,v.top+v.height+31);
+  const length = Math.min(2,mapData.width/4)*v.scale, sx=v.left, sy=v.top+v.height+31;
+  ctx.strokeStyle='#adbdcd';ctx.beginPath();ctx.moveTo(sx,sy-4);ctx.lineTo(sx,sy);ctx.lineTo(sx+length,sy);ctx.lineTo(sx+length,sy-4);ctx.stroke();ctx.textAlign='left';ctx.fillText(`${fmt(length/v.scale,1)} m`,sx+length+6,sy+3);
+}
+function cellAt(event) {
+  if (!mapData || !view) return null;
+  const box=canvas.getBoundingClientRect(), x=(event.clientX-box.left-view.left)/view.scale, y=(view.top+view.height-(event.clientY-box.top))/view.scale;
+  if(x<0 || y<0 || x>=mapData.width || y>=mapData.height) return null;
+  const col=Math.floor(x/mapData.resolution), row=Math.floor(y/mapData.resolution);
+  if(col>=mapData.cols || row>=mapData.rows) return null;
+  const i=row*mapData.cols+col;
+  return {x:(col+.5)*mapData.resolution,y:(row+.5)*mapData.resolution,z:mapData.heights[i],reachable:mapData.reachable[i]===1 && finite(mapData.heights[i])};
+}
+canvas.addEventListener('pointermove',event => { const c=cellAt(event); $('hover').textContent=c ? `x ${fmt(c.x)} · y ${fmt(c.y)} · 顶层 z ${fmt(c.z)} m · ${c.reachable?'可设为目标':'不可通行'}` : '地图采用米制坐标，显示每个栅格的最上层。'; });
+canvas.addEventListener('click',event => { const c=cellAt(event); if(!c) return; if(!c.reachable) { tell('该位置不可通行，请选择绿色可达区域。',true);return; } sendGoal(c.x,c.y,'地图目标'); });
+async function sendGoal(x,y,name) {
+  if(busy) return;
+  busy=true;pendingGoal=[x,y];controls();draw();tell(`正在设置${name}…`);
+  try {
+    const result=await api('/api/goal',{x,y});
+    if(result.ok !== true) throw new Error(result.message || '目标未被接受');
+    tell(result.message || `${name}已接受：x ${fmt(x)} m，y ${fmt(y)} m。`);
+    await pollState();
+  } catch(error) { tell(`设置目标失败：${errorText(error)}`,true); }
+  finally {busy=false;pendingGoal=null;controls();draw();}
+}
+const statusNames={idle:'待命',planning:'规划中',navigating:'导航中',moving:'行驶中',running:'运行中',paused:'已暂停',arrived:'已到达',reached:'已到达',goal_reached:'已到达',blocked:'路径受阻',no_path:'无可用路径',error:'异常',waiting:'等待目标',stopped:'已停止',done:'已完成'};
+function renderState() {
+  $('controller').textContent=state.controller||'DWA + PID';
+  $('power').textContent=`${fmt(state.power_w,1)} / ${fmt(state.power_budget_w,0)} W`;
+  if(document.activeElement!==$('yawRate')) $('yawRate').value=Math.round((state.yaw_rate_request||0)*180/Math.PI);
+  $('yawValue').textContent=`${Math.round((state.yaw_rate_request||0)*180/Math.PI)}°/s`;
+  $('yawRate').disabled=!connected||busy;$('yawStop').disabled=!connected||busy;
+  $('dwa').textContent=`可用轨迹 ${state.dwa_admissible??0} / ${state.dwa_candidates??0}`;
+  $('time').textContent=fmt(state.time,1);$('speed').textContent=fmt(state.speed);
+  $('slam').textContent=finite(state.slam_points)?Math.trunc(state.slam_points).toLocaleString('zh-CN'):'—';
+  $('scan').textContent=finite(state.scan_points)?Math.trunc(state.scan_points).toLocaleString('zh-CN'):'—';
+  $('icp').textContent=fmt(state.icp_rmse,3);$('error').textContent=fmt(state.localization_error,3);
+  $('status').textContent=state.paused?'已暂停':statusNames[state.status] || (typeof state.status==='string'?state.status:'等待状态');
+  $('pose').textContent=point(state.pose)?`${fmt(state.pose[0])}, ${fmt(state.pose[1])}, ${fmt(state.pose[2])} m / ${fmt(finite(state.pose[3])?state.pose[3]*180/Math.PI:null,1)}°`:'—';
+  const goal=point(state.goal)?state.goal:null;
+  $('goalName').textContent=goal?'当前导航目标':'尚未设置目的地';
+  $('goalHeight').textContent=`高度 ${goal?fmt(goal[2]):'—'} m`;
+  $('goalCoords').textContent=goal?`x ${fmt(goal[0])} m · y ${fmt(goal[1])} m · 高度以当前导航状态为准`:'点击地图或选择下方预设目标';
+  const progress=finite(state.progress)?Math.max(0,Math.min(1,state.progress)):null;
+  $('progress').value=progress ?? 0;$('progressText').textContent=`进度 ${progress===null?'—':Math.round(progress*100)+'%'}`;
+  controls();draw();
+}
+async function pollState() {
+  if(stateLoading) return;
+  stateLoading=true;
+  try {
+    const next=await api('/api/state');
+    if(!next || typeof next!=='object' || Array.isArray(next)) throw new Error('状态格式无效');
+    const recovering=!connected;state=next;connection(true);renderState();
+    if(recovering) tell('本地状态连接已建立，导航数据正在实时更新。');
+  } catch(error) { connection(false);$('status').textContent='连接中断 · 数据已过期';tell(`状态更新失败：${errorText(error)}。保留最后数据，自动重试中。`,true); }
+  finally {stateLoading=false;}
+}
+async function command(path,label,payload={}) {
+  if(busy) return;busy=true;controls();
+  try {const result=await api(path,payload);if(result.ok===false) throw new Error(result.message || '操作被拒绝');tell(result.message || `${label}请求已完成。`);await pollState();}
+  catch(error) {tell(`${label}失败：${errorText(error)}`,true);}
+  finally {busy=false;controls();}
+}
+$('pause').addEventListener('click',()=>command('/api/pause',state.paused?'继续':'暂停'));
+$('reset').addEventListener('click',()=>command('/api/reset','重置'));
+$('yawRate').addEventListener('input',()=>{$('yawValue').textContent=`${$('yawRate').value}°/s`;});
+$('yawRate').addEventListener('change',()=>command('/api/yaw','旋转速度',{rate:Number($('yawRate').value)*Math.PI/180}));
+$('yawStop').addEventListener('click',()=>command('/api/yaw','取消持续旋转',{rate:0}));
+const frame=$('frame');
+frame.addEventListener('load',()=>{frameLoading=false;frameLoaded=true;$('frameEmpty').hidden=true;$('frameStatus').textContent=`画面已更新 · ${new Date().toLocaleTimeString('zh-CN',{hour12:false})}`;});
+frame.addEventListener('error',()=>{frameLoading=false;$('frameEmpty').hidden=false;$('frameEmpty').textContent='画面暂不可用，自动重试中…';$('frameStatus').textContent=frameLoaded?'画面连接中断':'尚未接收画面';});
+function refreshFrame() {
+  if(frameLoading && Date.now()-frameStarted<6000) return;
+  frameLoading=true;frameStarted=Date.now();frame.src=`/api/frame.jpg?t=${frameStarted}`;
+}
+if(typeof ResizeObserver!=='undefined') new ResizeObserver(resize).observe(canvas.parentElement);
+else window.addEventListener('resize',resize);
+resize();loadMap();pollState();refreshFrame();
+setInterval(pollState,300);setInterval(refreshFrame,500);setInterval(()=>{if(!mapData) loadMap();},4000);
+</script>
+</body>
+</html>

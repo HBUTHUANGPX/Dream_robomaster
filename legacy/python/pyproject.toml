@@ -1,0 +1,25 @@
+[project]
+name = "robomaster-mecanum"
+version = "0.1.0"
+description = "Simplified RoboMaster infantry with physical mecanum rollers in MuJoCo"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "mujoco>=3.3,<4",
+    "numpy>=2,<3",
+    "opencv-python-headless>=4.10,<5",
+    "pillow>=11",
+    "scipy>=1.14",
+    "trimesh>=4.5",
+]
+
+[dependency-groups]
+cad = ["cadquery>=2.5,<3"]
+cube = [
+    "kociemba==1.2.1",
+]
+dev = [
+    "pytest>=8",
+]
+lio = [
+    "rosbags>=0.10,<0.12",
+]

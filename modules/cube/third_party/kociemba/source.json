@@ -1,0 +1,117 @@
+{
+  "project": "muodov/kociemba",
+  "version": "1.2.1",
+  "upstream": "https://github.com/muodov/kociemba",
+  "origin": "Installed kociemba 1.2.1 wheel package, C source and generated tables",
+  "license": "GPL-2.0",
+  "files": {
+    "ckociemba/cubiecube.c": {
+      "sha256": "0d460d4d50b93e8aec1386434bb6600efbf5dd3c227de1ebf6f62c6c6e01b67d",
+      "bytes": 20473
+    },
+    "ckociemba/prunetable_helpers.c": {
+      "sha256": "f48cdbf707d5956a294841404e620bece58a7d0aa3ec3dd6758fcccee12f78f6",
+      "bytes": 1989
+    },
+    "ckociemba/facecube.c": {
+      "sha256": "74e7e1a27f060c53b3ba8db67e33285165d7422e5f1de64489a98e9bc19ac584",
+      "bytes": 4037
+    },
+    "ckociemba/search.c": {
+      "sha256": "df0c92d9871280da87d1ca30cb479d1136ee0af1ad9b583598177452866560fd",
+      "bytes": 11480
+    },
+    "ckociemba/solve.c": {
+      "sha256": "720b0c3688be1ed35b66b6173773052d13ffa6a11827b7b8943fa0a3641b5e2e",
+      "bytes": 628
+    },
+    "ckociemba/coordcube.c": {
+      "sha256": "b7dc8270b90b47783baa059102d7c837f0fa8244c321d1c7bf3967bd2d8333d1",
+      "bytes": 14664
+    },
+    "ckociemba/include/coordcube.h": {
+      "sha256": "dc2d88b872cbd4bb0c48b2e1e23d812da6ce95bb3c20268a5bc0e7544f482cd2",
+      "bytes": 4194
+    },
+    "ckociemba/include/color.h": {
+      "sha256": "614a3a2ad0a569d8ee0a1be60aeca18f5812e0a5cc40de2724d1ac6c8ecc2f9f",
+      "bytes": 144
+    },
+    "ckociemba/include/prunetable_helpers.h": {
+      "sha256": "8b33911a975987a8f9da15142a7aca6b8ded4a71faa4d7245003ea0b4484a96b",
+      "bytes": 627
+    },
+    "ckociemba/include/facelet.h": {
+      "sha256": "ac37995a9346868b6bb57f47e00fa082b4bb488126cf9acbe2da4e424fa8b1fc",
+      "bytes": 1648
+    },
+    "ckociemba/include/corner.h": {
+      "sha256": "ebb1f2d4138770d48360cef956d7cc3db815838ff8113ef29115390cbb0a891c",
+      "bytes": 248
+    },
+    "ckociemba/include/edge.h": {
+      "sha256": "99d9f059858b028c7358b76909e7a993a055f0ab005170626b1484ea38d00975",
+      "bytes": 231
+    },
+    "ckociemba/include/search.h": {
+      "sha256": "b77a7405411b498e14d18cefa134eb172a674b89df350854b13296de71495fc1",
+      "bytes": 2645
+    },
+    "ckociemba/include/facecube.h": {
+      "sha256": "f69ac8edd61817f0c3296a061ad35fda9944404c34a5d2f0d86807158c331988",
+      "bytes": 1288
+    },
+    "ckociemba/include/cubiecube.h": {
+      "sha256": "eb264ea50bd701417bb7410b66e399d519d943821a54be1dcced3e90d2f3b4b1",
+      "bytes": 2125
+    },
+    "cprunetables/Slice_URtoDF_Parity_Prun": {
+      "sha256": "d33e3a5ac56b9d0e985857d0ed8a16622bc6b312879b6d8277800aed105fdcbc",
+      "bytes": 483840
+    },
+    "cprunetables/URFtoDLF_Move": {
+      "sha256": "7006c5a5dbdf7936203de8abaedba97f4b985b614ee7e7ca667f87adfd0009df",
+      "bytes": 725760
+    },
+    "cprunetables/FRtoBR_Move": {
+      "sha256": "e4d42bebabbb14c15355e33edda5495ab8daa9fe3ed0f25fe1acb71b4eecac7d",
+      "bytes": 427680
+    },
+    "cprunetables/twistMove": {
+      "sha256": "939129a843f648c462822075a0c27a7144ef566c8e7d1472c64d14e467a735a3",
+      "bytes": 78732
+    },
+    "cprunetables/URtoDF_Move": {
+      "sha256": "d1e1f78c99cf81e743448f2c4cc27c3772bd819c2cd99a7c4235d79fb1a5b18f",
+      "bytes": 725760
+    },
+    "cprunetables/UBtoDF_Move": {
+      "sha256": "3c582e70b659f86e3446e6a11252472b843424f05d3d841c3a1c13ead8860965",
+      "bytes": 47520
+    },
+    "cprunetables/MergeURtoULandUBtoDF": {
+      "sha256": "87ea12bf3ea180d131a711c82bdaf4bf8c0447485d086c3d77d912d1e94a7faa",
+      "bytes": 225792
+    },
+    "cprunetables/flipMove": {
+      "sha256": "9039eab0160efe072d62be9e01ad28267d629321c780c0750d84cd34c382050c",
+      "bytes": 73728
+    },
+    "cprunetables/Slice_Twist_Prun": {
+      "sha256": "9266b621191b41c1519f87ce2c3bee862b5408cbbfeceebc70be235ee403109c",
+      "bytes": 541283
+    },
+    "cprunetables/Slice_Flip_Prun": {
+      "sha256": "7a1f4968a453af6e0a181e406fe94d7b34cc0c373c8fc8975b2b1c3e87680d70",
+      "bytes": 506880
+    },
+    "cprunetables/Slice_URFtoDLF_Parity_Prun": {
+      "sha256": "327ac99091ded390ec0967fd918b4bc49130d49dc61b37f139a98bc1765c5426",
+      "bytes": 483840
+    },
+    "cprunetables/URtoUL_Move": {
+      "sha256": "3c582e70b659f86e3446e6a11252472b843424f05d3d841c3a1c13ead8860965",
+      "bytes": 47520
+    }
+  }
+}

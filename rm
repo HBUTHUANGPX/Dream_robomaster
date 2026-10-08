@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+command_name=${1:-start}
+if [[ $# -gt 0 ]]; then shift; fi
+help() {
+  cat <<'HELP'
+RoboMaster 仓库入口
+
+  ./rm                         增量构建后启动导航和自瞄对战服务。
+  ./rm start [服务参数]         与无参数入口相同。
+  ./rm navigation [服务参数]    启动导航服务。
+  ./rm duel [服务参数]          启动自瞄对战服务。
+  ./rm cube                    打开魔方窗口。需要 DISPLAY。
+  ./rm cube [原生参数]          原样传递魔方参数。不自动添加窗口参数。
+  ./rm robot [原生参数]         打开底盘窗口。添加 --headless 可无窗口运行。
+  ./rm setup [--with-tests]     准备依赖并构建。首次下载需要网络。
+  ./rm build                   检查依赖并增量构建。
+  ./rm test                    构建并运行原生、Rust、网页和入口测试。
+  ./rm doctor [--test]          检查平台、依赖和资产。不会安装软件。
+  ./rm help                    显示本说明。
+
+已验证平台：Ubuntu 22.04 x86_64。
+Rust 版本要求：1.85 或更高。
+Node.js 版本要求：18 或更高。仅测试需要 Node.js。
+默认地址：导航 http://127.0.0.1:8765；自瞄对战 http://127.0.0.1:8766。
+服务端口示例：./rm start --navigation-port 18765 --duel-port 18766。
+单项端口示例：./rm navigation --port 18765。
+准备命令可能需要 sudo。日常命令不会安装系统包，也不会结束已有服务。
+HELP
+}
+case "$command_name" in
+  help|--help|-h) [[ $# == 0 ]] || { printf '错误：帮助命令不接受额外参数。\n' >&2; exit 2; }; help; exit 0 ;;
+  start|navigation|duel|cube|robot) ;;
+  setup) [[ $# == 0 || ( $# == 1 && "$1" == --with-tests ) ]] || { printf '错误：用法：./rm setup [--with-tests]。\n' >&2; exit 2; } ;;
+  doctor) [[ $# == 0 || ( $# == 1 && "$1" == --test ) ]] || { printf '错误：用法：./rm doctor [--test]。未知参数。\n' >&2; exit 2; } ;;
+  build|test) [[ $# == 0 ]] || { printf '错误：%s 不接受额外参数。\n' "$command_name" >&2; exit 2; } ;;
+  *) printf '错误：未知命令：%s。请执行 ./rm help。\n' "$command_name" >&2; exit 2 ;;
+esac
+if [[ "$command_name" == setup ]]; then exec bash "$root/tools/setup.sh" "$@"; fi
+if [[ "$command_name" == doctor ]]; then exec bash "$root/tools/doctor.sh" "$@"; fi
+if [[ "$command_name" == robot && $# == 1 && ( "$1" == --help || "$1" == -h ) ]]; then
+  cat <<'ROBOT_HELP'
+底盘程序用法：
+  ./rm robot                              打开底盘窗口。需要 DISPLAY。
+  ./rm robot --duration 120                将运行时间设为 120 秒。
+  ./rm robot --headless --duration 3        无窗口运行 3 秒。
+  ./rm robot --velocity VX VY WZ           设置前向速度、横向速度和偏航角速度。
+  ./rm robot --snapshot /绝对路径/图像.png  保存结束时的图像。
+平移速度单位为 m/s。偏航角速度单位为 rad/s。
+默认运行时间为 12 秒。
+窗口按键：W/S 前后移动；A/D 横移；Q/E 旋转；空格停止；P 切换演示。
+ROBOT_HELP
+  exit 0
+fi
+source "$root/tools/doctor.sh"
+rm_prepare_path
+cd "$root"
+case "$command_name" in
+  start) rm_check_assets navigation; rm_check_assets duel ;;
+  navigation|duel) rm_check_assets "$command_name" ;;
+  cube)
+    rm_check_assets cube
+    if [[ $# == 0 ]]; then set -- --viewer; fi
+    for argument in "$@"; do
+      if [[ "$argument" == --viewer ]]; then rm_check_display; fi
+      if [[ "$argument" == --dual ]]; then rm_check_assets cube-dual; fi
+    done ;;
+  robot)
+    rm_check_assets robot
+    headless=false
+    for argument in "$@"; do
+      if [[ "$argument" == --headless ]]; then headless=true; fi
+      if [[ "$argument" == --viewer ]]; then rm_check_display; fi
+    done
+    if [[ "$headless" == false ]]; then rm_check_display; set -- --viewer "$@"; fi ;;
+  test) rm_check_assets all ;;
+esac
+rm_check_build
+if [[ "$command_name" == test ]]; then rm_check_node; fi
+mkdir -p "$root/.cache/tmp"
+export TMPDIR="$root/.cache/tmp"
+printf '正在检查 C++ 构建配置。\n'
+cmake --preset native
+printf '正在增量构建 C++ 程序。\n'
+cmake --build --preset native
+printf '正在增量构建 Rust 启动器。\n'
+cargo build --workspace --release --locked
+case "$command_name" in
+  start) exec "$root/target/release/robomaster" up --root "$root" "$@" ;;
+  navigation|duel) exec "$root/target/release/robomaster" serve "$command_name" --root "$root" "$@" ;;
+  cube) exec "$root/target/release/robomaster" run cube --root "$root" -- "$@" ;;
+  robot) exec "$root/build/bin/rm_robot" --root "$root" "$@" ;;
+  build) printf '构建完成。执行 ./rm 启动导航和自瞄对战服务。\n' ;;
+  test)
+    printf '正在运行 C++ 测试。\n'
+    ctest --preset native
+    printf '正在运行 Rust 测试。\n'
+    cargo test --workspace --locked
+    printf '正在运行网页与入口测试。\n'
+    node --test tests/duel_web.test.cjs tests/launcher.test.cjs
+    printf '正在检查维护文档。\n'
+    node tools/check-docs.mjs
+    printf '全部测试通过。\n' ;;
+esac

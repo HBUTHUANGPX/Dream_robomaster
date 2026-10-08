@@ -1,0 +1,330 @@
+<mujoco model="RoboMaster simplified infantry">
+  <compiler angle="radian" meshdir="meshes" autolimits="true" />
+  <option timestep="0.001" integrator="implicitfast" cone="elliptic" iterations="60" gravity="0 0 -9.81" />
+  <default>
+    <geom friction="1.0 0.002 0.0001" solref="0.008 1" solimp="0.95 0.99 0.001" condim="4" />
+  </default>
+  <visual>
+    <global offwidth="1280" offheight="960" />
+  </visual>
+  <asset>
+    <mesh name="armor_am02" file="armor_am02.obj" />
+    <mesh name="armor_frame_a" file="armor_frame_a.obj" />
+    <texture name="tiles" type="2d" builtin="checker" rgb1=".16 .19 .23" rgb2=".23 .27 .31" width="512" height="512" />
+    <material name="floor" texture="tiles" texrepeat="12 12" reflectance=".1" />
+  </asset>
+  <worldbody>
+    <light pos="1 -2 3" dir="-0.3 0.3 -1" diffuse=".9 .9 .9" ambient=".35 .35 .35" />
+    <light pos="-2 1 2" dir="0 0 -1" diffuse=".5 .5 .5" />
+    <geom name="ground" type="plane" size="6 6 .1" material="floor" contype="1" conaffinity="2" />
+    <body name="chassis" pos="0 0 .08">
+      <freejoint name="root" />
+      <geom name="lower_deck" type="box" pos="0 0 .045" size=".205 .135 .018" mass="8" rgba=".12 .15 .2 1" contype="2" conaffinity="1" />
+      <geom name="upper_deck" type="box" pos="0 0 .135" size=".12 .12 .012" mass="2" rgba=".28 .33 .39 1" contype="2" conaffinity="1" />
+      <geom name="battery" type="box" pos="-.045 0 .085" size=".075 .06 .023" mass="2" rgba=".08 .09 .12 1" contype="0" conaffinity="0" />
+      <geom name="front_marker" type="box" pos=".09 0 .151" size=".018 .04 .004" mass=".01" rgba=".95 .5 .08 1" contype="0" conaffinity="0" />
+      <geom type="cylinder" pos="-0.1 -0.1 .09" size=".009 .035" mass=".08" rgba=".45 .49 .54 1" contype="0" conaffinity="0" />
+      <geom type="cylinder" pos="-0.1 0.1 .09" size=".009 .035" mass=".08" rgba=".45 .49 .54 1" contype="0" conaffinity="0" />
+      <geom type="cylinder" pos="0.1 -0.1 .09" size=".009 .035" mass=".08" rgba=".45 .49 .54 1" contype="0" conaffinity="0" />
+      <geom type="cylinder" pos="0.1 0.1 .09" size=".009 .035" mass=".08" rgba=".45 .49 .54 1" contype="0" conaffinity="0" />
+      <geom name="bumper_0_-1" type="box" pos="-0.275 0 0.022" size="0.01 0.265 0.009" mass=".25" rgba=".32 .37 .43 1" contype="2" conaffinity="1" />
+      <geom name="bumper_0_1" type="box" pos="0.275 0 0.022" size="0.01 0.265 0.009" mass=".25" rgba=".32 .37 .43 1" contype="2" conaffinity="1" />
+      <geom name="bumper_1_-1" type="box" pos="0 -0.275 0.022" size="0.285 0.01 0.009" mass=".25" rgba=".32 .37 .43 1" contype="2" conaffinity="1" />
+      <geom name="bumper_1_1" type="box" pos="0 0.275 0.022" size="0.285 0.01 0.009" mass=".25" rgba=".32 .37 .43 1" contype="2" conaffinity="1" />
+      <body name="armor_mount_front" pos="0.245 0.0 .175" euler="0 0 0">
+        <body name="armor_front" euler="0 -0.2617993877991494 0">
+          <inertial pos="0 0 0" mass=".359" diaginertia=".001 .0005 .0006" />
+          <geom type="mesh" mesh="armor_am02" rgba=".21 .24 .29 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="armor_collision_front" type="box" size=".0095 .0705 .065" rgba="0 0 0 0" contype="2" conaffinity="1" mass="0" />
+          <site name="armor_face_front" pos=".0095 0 0" size=".001" rgba="0 0 0 0" />
+          <geom name="light_front_-1" type="box" pos=".0097 -0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="light_front_1" type="box" pos=".0097 0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+        </body>
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 -0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="box" pos="-.09 0 -.045" size=".07 .045 .007" mass=".15" rgba=".28 .32 .38 1" contype="0" conaffinity="0" />
+        <geom type="box" pos="-.034 0 -.034868407" size=".026 .062 .003" mass=".15" rgba=".3 .34 .4 1" contype="0" conaffinity="0" />
+        <site name="m4_front_-0.044894086_-0.0475" pos="-0.044894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_front_-0.044894086_0.0475" pos="-0.044894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_front_-0.019894086_-0.0475" pos="-0.019894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_front_-0.019894086_0.0475" pos="-0.019894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+      </body>
+      <body name="armor_mount_left" pos="1.5001923289555077e-17 0.245 .175" euler="0 0 1.5707963267948966">
+        <body name="armor_left" euler="0 -0.2617993877991494 0">
+          <inertial pos="0 0 0" mass=".359" diaginertia=".001 .0005 .0006" />
+          <geom type="mesh" mesh="armor_am02" rgba=".21 .24 .29 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="armor_collision_left" type="box" size=".0095 .0705 .065" rgba="0 0 0 0" contype="2" conaffinity="1" mass="0" />
+          <site name="armor_face_left" pos=".0095 0 0" size=".001" rgba="0 0 0 0" />
+          <geom name="light_left_-1" type="box" pos=".0097 -0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="light_left_1" type="box" pos=".0097 0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+        </body>
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 -0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="box" pos="-.09 0 -.045" size=".07 .045 .007" mass=".15" rgba=".28 .32 .38 1" contype="0" conaffinity="0" />
+        <geom type="box" pos="-.034 0 -.034868407" size=".026 .062 .003" mass=".15" rgba=".3 .34 .4 1" contype="0" conaffinity="0" />
+        <site name="m4_left_-0.044894086_-0.0475" pos="-0.044894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_left_-0.044894086_0.0475" pos="-0.044894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_left_-0.019894086_-0.0475" pos="-0.019894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_left_-0.019894086_0.0475" pos="-0.019894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+      </body>
+      <body name="armor_mount_rear" pos="-0.245 3.0003846579110155e-17 .175" euler="0 0 3.141592653589793">
+        <body name="armor_rear" euler="0 -0.2617993877991494 0">
+          <inertial pos="0 0 0" mass=".359" diaginertia=".001 .0005 .0006" />
+          <geom type="mesh" mesh="armor_am02" rgba=".21 .24 .29 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="armor_collision_rear" type="box" size=".0095 .0705 .065" rgba="0 0 0 0" contype="2" conaffinity="1" mass="0" />
+          <site name="armor_face_rear" pos=".0095 0 0" size=".001" rgba="0 0 0 0" />
+          <geom name="light_rear_-1" type="box" pos=".0097 -0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="light_rear_1" type="box" pos=".0097 0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+        </body>
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 -0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="box" pos="-.09 0 -.045" size=".07 .045 .007" mass=".15" rgba=".28 .32 .38 1" contype="0" conaffinity="0" />
+        <geom type="box" pos="-.034 0 -.034868407" size=".026 .062 .003" mass=".15" rgba=".3 .34 .4 1" contype="0" conaffinity="0" />
+        <site name="m4_rear_-0.044894086_-0.0475" pos="-0.044894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_rear_-0.044894086_0.0475" pos="-0.044894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_rear_-0.019894086_-0.0475" pos="-0.019894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_rear_-0.019894086_0.0475" pos="-0.019894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+      </body>
+      <body name="armor_mount_right" pos="1.5001923289555077e-17 -0.245 .175" euler="0 0 -1.5707963267948966">
+        <body name="armor_right" euler="0 -0.2617993877991494 0">
+          <inertial pos="0 0 0" mass=".359" diaginertia=".001 .0005 .0006" />
+          <geom type="mesh" mesh="armor_am02" rgba=".21 .24 .29 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="armor_collision_right" type="box" size=".0095 .0705 .065" rgba="0 0 0 0" contype="2" conaffinity="1" mass="0" />
+          <site name="armor_face_right" pos=".0095 0 0" size=".001" rgba="0 0 0 0" />
+          <geom name="light_right_-1" type="box" pos=".0097 -0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+          <geom name="light_right_1" type="box" pos=".0097 0.062 0" size=".0005 .003 .026" rgba=".05 .4 1 1" contype="0" conaffinity="0" mass="0" />
+        </body>
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 -0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="mesh" mesh="armor_frame_a" pos="-.009176295 0.0475 -.002458781" rgba=".48 .51 .55 1" contype="0" conaffinity="0" mass=".06" />
+        <geom type="box" pos="-.09 0 -.045" size=".07 .045 .007" mass=".15" rgba=".28 .32 .38 1" contype="0" conaffinity="0" />
+        <geom type="box" pos="-.034 0 -.034868407" size=".026 .062 .003" mass=".15" rgba=".3 .34 .4 1" contype="0" conaffinity="0" />
+        <site name="m4_right_-0.044894086_-0.0475" pos="-0.044894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_right_-0.044894086_0.0475" pos="-0.044894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_right_-0.019894086_-0.0475" pos="-0.019894086 -0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+        <site name="m4_right_-0.019894086_0.0475" pos="-0.019894086 0.0475 -.031868407" size=".0021" rgba=".8 .8 .8 1" />
+      </body>
+      <geom type="cylinder" fromto="0.18 0.108 0 0.18 0.18 0" size=".012" mass=".12" rgba=".38 .42 .47 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.18 0.108 .025" size=".025 .016 .03" mass=".1" rgba=".2 .23 .27 1" contype="0" conaffinity="0" />
+      <body name="wheel_fl" pos="0.18 0.18 0">
+        <joint name="wheel_fl" type="hinge" axis="0 1 0" damping=".02" armature=".003" />
+        <geom type="cylinder" size=".049 .022" quat=".70710678 .70710678 0 0" mass=".45" rgba=".45 .49 .55 1" contype="0" conaffinity="0" />
+        <body name="roller_fl_0" pos="0.0 0 -0.062" zaxis="-1.0 1 -0.0">
+          <joint name="roller_fl_0" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_0" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_1" pos="0.030999999999999996 0 -0.0536935750346352" zaxis="-0.8660254037844387 1 -0.49999999999999994">
+          <joint name="roller_fl_1" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_1" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_2" pos="0.05369357503463519 0 -0.031000000000000007" zaxis="-0.5000000000000001 1 -0.8660254037844386">
+          <joint name="roller_fl_2" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_2" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_3" pos="0.062 0 -3.796405077356795e-18" zaxis="-6.123233995736766e-17 1 -1.0">
+          <joint name="roller_fl_3" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_3" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_4" pos="0.0536935750346352 0 0.030999999999999986" zaxis="0.4999999999999998 1 -0.8660254037844387">
+          <joint name="roller_fl_4" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_4" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_5" pos="0.030999999999999996 0 0.0536935750346352" zaxis="0.8660254037844387 1 -0.49999999999999994">
+          <joint name="roller_fl_5" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_5" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_6" pos="7.59281015471359e-18 0 0.062" zaxis="1.0 1 -1.2246467991473532e-16">
+          <joint name="roller_fl_6" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_6" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_7" pos="-0.030999999999999982 0 0.053693575034635205" zaxis="0.8660254037844388 1 0.4999999999999997">
+          <joint name="roller_fl_7" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_7" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_8" pos="-0.05369357503463518 0 0.031000000000000028" zaxis="0.5000000000000004 1 0.8660254037844384">
+          <joint name="roller_fl_8" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_8" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_9" pos="-0.062 0 1.1389215232070384e-17" zaxis="1.8369701987210297e-16 1 1.0">
+          <joint name="roller_fl_9" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_9" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_10" pos="-0.05369357503463519 0 -0.031000000000000007" zaxis="-0.5000000000000001 1 0.8660254037844386">
+          <joint name="roller_fl_10" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_10" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fl_11" pos="-0.031000000000000028 0 -0.05369357503463518" zaxis="-0.8660254037844384 1 0.5000000000000004">
+          <joint name="roller_fl_11" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fl_11" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+      </body>
+      <geom type="cylinder" fromto="0.18 -0.108 0 0.18 -0.18 0" size=".012" mass=".12" rgba=".38 .42 .47 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="0.18 -0.108 .025" size=".025 .016 .03" mass=".1" rgba=".2 .23 .27 1" contype="0" conaffinity="0" />
+      <body name="wheel_fr" pos="0.18 -0.18 0">
+        <joint name="wheel_fr" type="hinge" axis="0 1 0" damping=".02" armature=".003" />
+        <geom type="cylinder" size=".049 .022" quat=".70710678 .70710678 0 0" mass=".45" rgba=".45 .49 .55 1" contype="0" conaffinity="0" />
+        <body name="roller_fr_0" pos="0.0 0 -0.062" zaxis="1.0 1 0.0">
+          <joint name="roller_fr_0" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_0" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_1" pos="0.030999999999999996 0 -0.0536935750346352" zaxis="0.8660254037844387 1 0.49999999999999994">
+          <joint name="roller_fr_1" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_1" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_2" pos="0.05369357503463519 0 -0.031000000000000007" zaxis="0.5000000000000001 1 0.8660254037844386">
+          <joint name="roller_fr_2" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_2" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_3" pos="0.062 0 -3.796405077356795e-18" zaxis="6.123233995736766e-17 1 1.0">
+          <joint name="roller_fr_3" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_3" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_4" pos="0.0536935750346352 0 0.030999999999999986" zaxis="-0.4999999999999998 1 0.8660254037844387">
+          <joint name="roller_fr_4" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_4" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_5" pos="0.030999999999999996 0 0.0536935750346352" zaxis="-0.8660254037844387 1 0.49999999999999994">
+          <joint name="roller_fr_5" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_5" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_6" pos="7.59281015471359e-18 0 0.062" zaxis="-1.0 1 1.2246467991473532e-16">
+          <joint name="roller_fr_6" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_6" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_7" pos="-0.030999999999999982 0 0.053693575034635205" zaxis="-0.8660254037844388 1 -0.4999999999999997">
+          <joint name="roller_fr_7" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_7" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_8" pos="-0.05369357503463518 0 0.031000000000000028" zaxis="-0.5000000000000004 1 -0.8660254037844384">
+          <joint name="roller_fr_8" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_8" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_9" pos="-0.062 0 1.1389215232070384e-17" zaxis="-1.8369701987210297e-16 1 -1.0">
+          <joint name="roller_fr_9" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_9" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_10" pos="-0.05369357503463519 0 -0.031000000000000007" zaxis="0.5000000000000001 1 -0.8660254037844386">
+          <joint name="roller_fr_10" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_10" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_fr_11" pos="-0.031000000000000028 0 -0.05369357503463518" zaxis="0.8660254037844384 1 -0.5000000000000004">
+          <joint name="roller_fr_11" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_fr_11" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+      </body>
+      <geom type="cylinder" fromto="-0.18 0.108 0 -0.18 0.18 0" size=".012" mass=".12" rgba=".38 .42 .47 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="-0.18 0.108 .025" size=".025 .016 .03" mass=".1" rgba=".2 .23 .27 1" contype="0" conaffinity="0" />
+      <body name="wheel_rl" pos="-0.18 0.18 0">
+        <joint name="wheel_rl" type="hinge" axis="0 1 0" damping=".02" armature=".003" />
+        <geom type="cylinder" size=".049 .022" quat=".70710678 .70710678 0 0" mass=".45" rgba=".45 .49 .55 1" contype="0" conaffinity="0" />
+        <body name="roller_rl_0" pos="0.0 0 -0.062" zaxis="1.0 1 0.0">
+          <joint name="roller_rl_0" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_0" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_1" pos="0.030999999999999996 0 -0.0536935750346352" zaxis="0.8660254037844387 1 0.49999999999999994">
+          <joint name="roller_rl_1" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_1" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_2" pos="0.05369357503463519 0 -0.031000000000000007" zaxis="0.5000000000000001 1 0.8660254037844386">
+          <joint name="roller_rl_2" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_2" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_3" pos="0.062 0 -3.796405077356795e-18" zaxis="6.123233995736766e-17 1 1.0">
+          <joint name="roller_rl_3" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_3" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_4" pos="0.0536935750346352 0 0.030999999999999986" zaxis="-0.4999999999999998 1 0.8660254037844387">
+          <joint name="roller_rl_4" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_4" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_5" pos="0.030999999999999996 0 0.0536935750346352" zaxis="-0.8660254037844387 1 0.49999999999999994">
+          <joint name="roller_rl_5" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_5" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_6" pos="7.59281015471359e-18 0 0.062" zaxis="-1.0 1 1.2246467991473532e-16">
+          <joint name="roller_rl_6" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_6" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_7" pos="-0.030999999999999982 0 0.053693575034635205" zaxis="-0.8660254037844388 1 -0.4999999999999997">
+          <joint name="roller_rl_7" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_7" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_8" pos="-0.05369357503463518 0 0.031000000000000028" zaxis="-0.5000000000000004 1 -0.8660254037844384">
+          <joint name="roller_rl_8" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_8" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_9" pos="-0.062 0 1.1389215232070384e-17" zaxis="-1.8369701987210297e-16 1 -1.0">
+          <joint name="roller_rl_9" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_9" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_10" pos="-0.05369357503463519 0 -0.031000000000000007" zaxis="0.5000000000000001 1 -0.8660254037844386">
+          <joint name="roller_rl_10" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_10" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rl_11" pos="-0.031000000000000028 0 -0.05369357503463518" zaxis="0.8660254037844384 1 -0.5000000000000004">
+          <joint name="roller_rl_11" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rl_11" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+      </body>
+      <geom type="cylinder" fromto="-0.18 -0.108 0 -0.18 -0.18 0" size=".012" mass=".12" rgba=".38 .42 .47 1" contype="0" conaffinity="0" />
+      <geom type="box" pos="-0.18 -0.108 .025" size=".025 .016 .03" mass=".1" rgba=".2 .23 .27 1" contype="0" conaffinity="0" />
+      <body name="wheel_rr" pos="-0.18 -0.18 0">
+        <joint name="wheel_rr" type="hinge" axis="0 1 0" damping=".02" armature=".003" />
+        <geom type="cylinder" size=".049 .022" quat=".70710678 .70710678 0 0" mass=".45" rgba=".45 .49 .55 1" contype="0" conaffinity="0" />
+        <body name="roller_rr_0" pos="0.0 0 -0.062" zaxis="-1.0 1 -0.0">
+          <joint name="roller_rr_0" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_0" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_1" pos="0.030999999999999996 0 -0.0536935750346352" zaxis="-0.8660254037844387 1 -0.49999999999999994">
+          <joint name="roller_rr_1" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_1" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_2" pos="0.05369357503463519 0 -0.031000000000000007" zaxis="-0.5000000000000001 1 -0.8660254037844386">
+          <joint name="roller_rr_2" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_2" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_3" pos="0.062 0 -3.796405077356795e-18" zaxis="-6.123233995736766e-17 1 -1.0">
+          <joint name="roller_rr_3" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_3" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_4" pos="0.0536935750346352 0 0.030999999999999986" zaxis="0.4999999999999998 1 -0.8660254037844387">
+          <joint name="roller_rr_4" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_4" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_5" pos="0.030999999999999996 0 0.0536935750346352" zaxis="0.8660254037844387 1 -0.49999999999999994">
+          <joint name="roller_rr_5" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_5" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_6" pos="7.59281015471359e-18 0 0.062" zaxis="1.0 1 -1.2246467991473532e-16">
+          <joint name="roller_rr_6" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_6" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_7" pos="-0.030999999999999982 0 0.053693575034635205" zaxis="0.8660254037844388 1 0.4999999999999997">
+          <joint name="roller_rr_7" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_7" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_8" pos="-0.05369357503463518 0 0.031000000000000028" zaxis="0.5000000000000004 1 0.8660254037844384">
+          <joint name="roller_rr_8" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_8" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_9" pos="-0.062 0 1.1389215232070384e-17" zaxis="1.8369701987210297e-16 1 1.0">
+          <joint name="roller_rr_9" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_9" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_10" pos="-0.05369357503463519 0 -0.031000000000000007" zaxis="-0.5000000000000001 1 0.8660254037844386">
+          <joint name="roller_rr_10" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_10" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+        <body name="roller_rr_11" pos="-0.031000000000000028 0 -0.05369357503463518" zaxis="-0.8660254037844384 1 0.5000000000000004">
+          <joint name="roller_rr_11" type="hinge" axis="0 0 1" damping=".00002" armature=".000001" />
+          <geom name="roller_geom_rr_11" type="ellipsoid" size=".014 .014 .038" mass=".025" rgba=".055 .06 .07 1" contype="2" conaffinity="1" />
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <velocity name="drive_fl" joint="wheel_fl" kv="2" ctrlrange="-35 35" forcerange="-5 5" />
+    <velocity name="drive_fr" joint="wheel_fr" kv="2" ctrlrange="-35 35" forcerange="-5 5" />
+    <velocity name="drive_rl" joint="wheel_rl" kv="2" ctrlrange="-35 35" forcerange="-5 5" />
+    <velocity name="drive_rr" joint="wheel_rr" kv="2" ctrlrange="-35 35" forcerange="-5 5" />
+  </actuator>
+</mujoco>

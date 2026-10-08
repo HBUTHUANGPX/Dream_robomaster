@@ -1,0 +1,24 @@
+{
+  "说明": "2026-10-08 中文化后的历史文档校验值；原始快照校验值保留在 baseline-sha256.json。",
+  "文件": {
+    "README.md": "b9a20c3666a2be9e843258c554b71f415136c9219895e20437e34111437ae930",
+    "docs/friction_gripper_plan.md": "4ad86b418280fe2561a39f66ee586d5d02c5d03d19c567ee39e599df2460fec2",
+    "docs/omni-plan.md": "833f82d683c53e364772d2f5fcd0f171a81d1c1c788a570caa655597fd0f56bb",
+    "docs/rubiks_cube.md": "ebe1d7275abd2c56b9c57246ad372bcb6d0a012e7d9badd05ac6323b88a6565d",
+    "docs/controller-optimization.md": "720c18f84f26b7bb8886e23726e2dbb59b186d24110985d205047b714d271aae",
+    "docs/superpowers/plans/2026-10-08-rotating-armor.md": "9702aac1f9c08eeae9327c43a41c0970c5adc65436033c5f8f86bc1db7592a56",
+    "docs/superpowers/plans/2026-10-08-duel.md": "c4fb560ae3635cf8676cc76d8203edaa5e3f76974c015db7db373429b5e86d4d",
+    "docs/superpowers/plans/2026-10-08-duel-controls.md": "a954912945c617d2259bed401ae04961b2e5e902ee09d9ea1b78210429eb73e1",
+    "docs/design.md": "353d0af6e0bc67de8f2830f0497f3ba6b54d0d3145a55601dd2ba1db6d6676f0",
+    "docs/duel.md": "6fdb358aea89c4fcfb3b7012b7042369e39c6a731fff603bd77330dc1bfa6f7d",
+    "docs/dual_gripper_cube.md": "43b4f0a53525ed877143070330f73040479c91721c3389da2c7c436f13627527",
+    "docs/navigation.md": "eb6d15901635c1c1503239610ba0ec411e9726ec04cc270a553a692c9cbdeae2",
+    "docs/gripper_speed_plan.md": "1a2cbafc57448b233824b1b4b7cd827442f322a1433d73a479f62782e95f2e67",
+    "docs/navigation-plan.md": "780b3df18a639d9b1874f3f6301d3a20213634ef9b28d29d0a9412c1e7993dde",
+    "docs/controller-optimization-plan.md": "fa07bc7c7936960d4f93a9ff815ae51e5c6346a1323e19fae4ffac382ce0a4da",
+    "docs/tongji-reference.md": "35d905fbd743fe5f6ec83952d2cbb3eb3066e5877d2291c9963f6ee9a0d7f53a",
+    "docs/plan.md": "9bb57512dffb29e97a94bf477a69af16ac0522febc46b4a90cedf6b745419e89",
+    "docs/duel-design.md": "e7007467ee7344e24d2a7dc8cd8b0ed29c950416a119363a1fe0a172c408c6a6",
+    "docs/gripper_split_speed_plan.md": "448512643ecc46655bf0f5c028bf741aa99f141c711fc87d0cba4e79e1ae0bc4"
+  }
+}

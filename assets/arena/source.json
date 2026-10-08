@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/HBUTHUANGPX/Hbut_LC_sentry",
+  "commit": "c9a0b28e2f76ff7a8ac07ed4fb5f3ad1c776d068",
+  "source": "RMUS_map_ws/src/rmus_map_2/meshes/base_link.stl",
+  "sha256": "436b1093b58bba46418c1bc9235efece5b4065b30a6c7671429f473a9a67e333",
+  "bounds_m": [
+    [
+      -2.2888184503244702e-07,
+      -7.629394360719743e-08,
+      0.0
+    ],
+    [
+      15.020000457763672,
+      27.84000015258789,
+      2.4689998626708984
+    ]
+  ],
+  "triangles": 2976,
+  "collision": "Each original triangle extruded inward 3mm; geometry otherwise unchanged."
+}
