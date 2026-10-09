@@ -8,7 +8,9 @@
 #include <opencv2/imgproc.hpp>
 
 #include "rm/cube.hpp"
+#include "rm/mechanical.hpp"
 #include "rm/robot_search.hpp"
+#include "video.hpp"
 namespace {
 using namespace rm;
 using namespace rm::cube;
@@ -17,62 +19,6 @@ void write_json(const std::filesystem::path& p, const Json& j) {
   if (!out) throw std::runtime_error("Cannot write " + p.string());
   out << j.dump(2) << '\n';
 }
-struct Recorder {
-  int fd = -1;
-  pid_t pid = -1;
-  void open(const std::filesystem::path& output) {
-    int pipefd[2];
-    if (pipe(pipefd)) throw std::runtime_error("Recorder pipe failed");
-    pid = fork();
-    if (pid < 0) {
-      close(pipefd[0]);
-      close(pipefd[1]);
-      throw std::runtime_error("Recorder fork failed");
-    }
-    if (pid == 0) {
-      dup2(pipefd[0], STDIN_FILENO);
-      close(pipefd[0]);
-      close(pipefd[1]);
-      execlp("ffmpeg", "ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "bgr24",
-             "-s", "960x720", "-r", "30", "-i", "-", "-an", "-c:v", "libx264", "-preset", "fast",
-             "-crf", "19", "-pix_fmt", "yuv420p", "-movflags", "+faststart", output.c_str(),
-             static_cast<char*>(nullptr));
-      _exit(127);
-    }
-    close(pipefd[0]);
-    fd = pipefd[1];
-    signal(SIGPIPE, SIG_IGN);
-  }
-  void write(const cv::Mat& frame) {
-    size_t total = frame.total() * frame.elemSize(), offset = 0;
-    while (offset < total) {
-      auto n = ::write(fd, frame.data + offset, total - offset);
-      if (n < 0 && errno == EINTR) continue;
-      if (n <= 0) throw std::runtime_error("FFmpeg frame pipe failed");
-      offset += n;
-    }
-  }
-  void release() {
-    if (fd >= 0) {
-      close(fd);
-      fd = -1;
-    }
-    if (pid > 0) {
-      int status = 0;
-      while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
-      }
-      pid = -1;
-      if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-        throw std::runtime_error("FFmpeg failed encoding video");
-    }
-  }
-  ~Recorder() {
-    try {
-      release();
-    } catch (...) {
-    }
-  }
-};
 struct App {
   std::filesystem::path root, rx_bundle;
   bool dual, paused = false;
@@ -233,6 +179,9 @@ struct App {
 int main(int argc, char** argv) {
   try {
     auto root = rm::repo_root(argc, argv);
+    for (int i = 1; i < argc; ++i)
+      if (std::string_view(argv[i]) == "--mechanical")
+        return rm::cube::mechanical_main(root, argc, argv);
     bool rpc = false, dual = false, solve = false, record = false, viewer = false;
     double speed = 1, playback = 4;
     bool plan_only = false;

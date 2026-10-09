@@ -76,6 +76,8 @@ RX已验证提速参数 `--speed 4 --wrist-speed 16 --jaw-speed 32`，同一62�
 结果基于明确的数值接触参数，不是实物硬件验证。
 准备条件、新命令和历史单层结果见 [RX 接入指南](docs/rx-narrow-tip.md)。
 
+连续接触机构原型使用 `./rm cube --mechanical --scramble "R U F" --solve --record`。卡脚和弹簧预紧维持内部装配，转动不切换weld、不重设位姿；目前是固定核心试验台，见[机械魔方说明](docs/mechanical-cube.md)。
+
 ## 按任务查阅
 
 - [首次使用、环境条件和远程访问](docs/getting-started.md)

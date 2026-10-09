@@ -5,7 +5,7 @@ add_library(rm_kociemba STATIC third_party/kociemba/ckociemba/coordcube.c third_
 target_include_directories(rm_kociemba PUBLIC third_party/kociemba/ckociemba/include)
 target_compile_definitions(rm_kociemba PRIVATE _GNU_SOURCE)
 target_link_libraries(rm_kociemba PUBLIC m)
-add_library(rm_cube_core src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
+add_library(rm_cube_core src/mechanical.cpp src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
 target_include_directories(rm_cube_core PUBLIC include)
 target_link_libraries(rm_cube_core PUBLIC rm_sim Eigen3::Eigen LibXml2::LibXml2 rm_kociemba Threads::Threads)
 add_executable(rm_cube src/main.cpp src/viewer.cpp)
@@ -60,3 +60,9 @@ target_link_libraries(rm_cube_rx_tip_probe PRIVATE rm_cube_core)
 # 原始 RX 资产不随仓库分发，显式传入 bundle 后运行物理验收。
 add_executable(rm_cube_rx_physics_tests tests/test_rx_physics.cpp)
 target_link_libraries(rm_cube_rx_physics_tests PRIVATE rm_cube_core)
+
+# 连续卡脚接触机构仍处于独立物理验证阶段，不替换既有还原入口。
+add_executable(rm_cube_mechanical_probe EXCLUDE_FROM_ALL tests/mechanical/probe.cpp)
+target_link_libraries(rm_cube_mechanical_probe PRIVATE rm_cube_core)
+add_executable(rm_cube_mechanical_sweep EXCLUDE_FROM_ALL tests/mechanical/sweep.cpp)
+target_link_libraries(rm_cube_mechanical_sweep PRIVATE rm_cube_core)
