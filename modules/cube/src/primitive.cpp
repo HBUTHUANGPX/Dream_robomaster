@@ -71,6 +71,14 @@ RobotState robot_snapshot(const Cube& c) {
   s.orientation = orientation_index(c.orientation);
   if (!c.robot_ready) return s;
   if (!c.active_face.empty()) throw std::invalid_argument("Finish current layer before planning");
+  if (c.rx) {
+    int core = c.id(mjOBJ_BODY, "core");
+    const Mat delta = c.orientation.transpose() * c.body_rotation(core);
+    double angle = std::acos(std::clamp((delta.trace() - 1) / 2, -1., 1.));
+    if ((c.body_position(core) - Vec(0, 0, .22)).norm() > .001 || angle > .02)
+      throw std::invalid_argument("RX cube slipped from robot alignment; angle=" +
+                                  std::to_string(angle));
+  }
   for (int h = 0; h < 2; ++h) {
     std::string hand = h == 0 ? "A" : "B";
     double target = c.data->ctrl[c.id(mjOBJ_ACTUATOR, hand + "_yaw_drive")] / (pi / 2);

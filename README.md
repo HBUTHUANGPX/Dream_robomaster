@@ -70,6 +70,11 @@
 搜索默认最多使用三个线程；用 `--search-threads 1` 可切换为串行搜索。物理动作仍按顺序执行。
 命令、成本配置和最优性边界见[双夹爪搜索指南](docs/cube-primitive-search.md)。
 
+RX 窄指尖的 55 mm 魔方已接入同一命令行入口。显式传入 `--dual --rx-bundle PATH` 才启用 RX，默认仍为 Robotiq。
+RX 已完成20步打乱的完整物理仿真还原：62个动作、196.18秒执行时间；另有34个物理案例通过。
+结果基于明确的数值接触参数，不是实物硬件验证。
+准备条件、新命令和历史单层结果见 [RX 接入指南](docs/rx-narrow-tip.md)。
+
 ## 按任务查阅
 
 - [首次使用、环境条件和远程访问](docs/getting-started.md)
@@ -78,7 +83,7 @@
 - [导航操作、定位和数据导出](docs/modules/navigation.md)
 - [对战操作、视觉和射击](docs/modules/duel.md)
 - [魔方操作、双夹爪和录像](docs/modules/cube.md)
-- [RX 窄指尖设计与单层验证](docs/rx-narrow-tip.md)
+- [RX 窄指尖接入与历史单层验证](docs/rx-narrow-tip.md)
 - [双夹爪十二元动作搜索、预算和成本](docs/cube-primitive-search.md)
 - [开发、目录和测试](docs/development.md)
 - [迁移记录与已验证的功能](docs/migration.md)

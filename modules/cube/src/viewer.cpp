@@ -28,7 +28,7 @@ int interactive_viewer(Cube& cube, const std::filesystem::path& root,
   } input;
   mjv_defaultCamera(&input.camera);
   input.camera.lookat[2] = cube.dual ? .22 : .105;
-  input.camera.distance = cube.dual ? .69 : .24;
+  input.camera.distance = cube.rx ? .36 : cube.dual ? .69 : .24;
   input.camera.azimuth = 135;
   input.camera.elevation = -30;
   glfwSetWindowUserPointer(window, &input);
@@ -65,6 +65,10 @@ int interactive_viewer(Cube& cube, const std::filesystem::path& root,
   });
   mjvOption option;
   mjv_defaultOption(&option);
+  if (cube.rx) {
+    option.geomgroup[3] = 0;
+    option.sitegroup[4] = 0;
+  }
   mjvScene scene;
   mjv_defaultScene(&scene);
   mjv_makeScene(cube.model, &scene, 4000);

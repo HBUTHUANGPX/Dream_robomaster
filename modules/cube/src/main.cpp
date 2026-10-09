@@ -74,19 +74,20 @@ struct Recorder {
   }
 };
 struct App {
-  std::filesystem::path root;
+  std::filesystem::path root, rx_bundle;
   bool dual, paused = false;
   double speed;
   std::optional<double> ws, js;
   std::unique_ptr<Cube> cube;
   std::unique_ptr<Renderer> renderer;
-  App(std::filesystem::path r, bool d, double s, std::optional<double> w, std::optional<double> j)
-      : root(std::move(r)), dual(d), speed(s), ws(w), js(j) {
+  App(std::filesystem::path r, bool d, double s, std::optional<double> w, std::optional<double> j,
+      std::filesystem::path bundle = {})
+      : root(std::move(r)), rx_bundle(std::move(bundle)), dual(d), speed(s), ws(w), js(j) {
     reset();
   }
   void reset() {
     renderer.reset();
-    cube = std::make_unique<Cube>(root, dual, speed, ws, js);
+    cube = std::make_unique<Cube>(root, dual, speed, ws, js, rx_bundle);
     paused = false;
   }
   cv::Mat frame(bool closeup = false) {
@@ -97,16 +98,38 @@ struct App {
     camera.lookat[1] = dual && !closeup ? -.025 : 0;
     camera.lookat[2] = dual ? (closeup ? .22 : .195) : .105;
     camera.distance = dual ? (closeup ? .155 : .69) : .24;
+    if (cube->rx) {
+      camera.lookat[0] = camera.lookat[1] = 0;
+      camera.lookat[2] = .22;
+      camera.distance = closeup ? .16 : .36;
+    }
     camera.azimuth = 135;
     camera.elevation = -30;
+    if (cube->rx) {
+      mjvOption option;
+      mjv_defaultOption(&option);
+      option.geomgroup[3] = 0;
+      option.sitegroup[4] = 0;
+      return renderer->render(cube->data, camera, &option);
+    }
     return renderer->render(cube->data, camera);
   }
   Json search_defaults = Json::object();
   SearchOptions options(const Json& args) const {
     Json merged = search_defaults;
     merged.update(args);
-    return search_options(merged,
-                          PrimitiveCosts::defaults(cube->wrist_speed, cube->jaw_speed, cube->fast));
+    auto costs = PrimitiveCosts::defaults(cube->wrist_speed, cube->jaw_speed, cube->fast);
+    if (cube->rx) {
+      // RX 的90°和180°均使用3秒腕部斜坡；稳定等待不随运行速度缩放。
+      for (int a = 0; a < 12; ++a) {
+        const int kind = a % 6;
+        const double duration = kind < 4 ? 3 / cube->wrist_speed + .5
+                                         : 2 / cube->jaw_speed + .5 + (kind == 5 ? .08 : 0);
+        costs.duration[a].fill(duration);
+        if (kind < 4) costs.duration[a][1] += .15 + .08;
+      }
+    }
+    return search_options(merged, costs);
   }
   void robot_moves(const std::vector<std::string>& moves, const Json& args) {
     auto o = options(args);
@@ -216,7 +239,7 @@ int main(int argc, char** argv) {
     Json search_args = Json::object();
     std::optional<double> ws, js;
     std::string scramble = "R U F' L2 D B R' U2 F D'";
-    std::filesystem::path output = root / "output/native-cube", exportxml;
+    std::filesystem::path output = root / "output/native-cube", exportxml, rx_bundle;
     for (int i = 1; i < argc; i++) {
       std::string a = argv[i];
       auto value = [&]() {
@@ -237,7 +260,10 @@ int main(int argc, char** argv) {
         rpc = true;
       else if (a == "--dual")
         dual = true;
-      else if (a == "--headless") {
+      else if (a == "--rx-bundle") {
+        rx_bundle = value();
+        if (rx_bundle.empty()) throw std::invalid_argument("--rx-bundle requires a nonempty path");
+      } else if (a == "--headless") {
       } else if (a == "--viewer")
         viewer = true;
       else if (a == "--solve" || a == "--restore")
@@ -288,6 +314,10 @@ int main(int argc, char** argv) {
                      "[--wrist-speed 8 --jaw-speed 32] [--playback 4] [--output 输出目录]\n"
                      "rm_cube --root 仓库路径 --rpc [--dual]\n"
                      "窗口模式使用 --viewer，需要图形桌面。--dual 启用双夹爪。\n"
+                     "--dual --rx-bundle PATH 使用RX夹爪与55毫米魔方；默认仍为Robotiq。\n"
+                     "PATH须为含free_sweep.xml的原包mujoco_linkage_v5目录，不自动查找。\n"
+                     "RX建议保守速度：--speed 1 --wrist-speed 1 --jaw-speed 1；"
+                     "腕部斜坡3秒、夹爪2秒，各另等待0.5秒。\n"
                      "--record 需要 FFmpeg。--solve 读取当前状态并求解。\n"
                      "双夹爪默认使用十二元动作搜索：--search-ms 1000 --objective "
                      "execution_time|action_count\n"
@@ -300,7 +330,12 @@ int main(int argc, char** argv) {
     }
     if (!std::isfinite(playback) || playback <= 0 || playback > 1000)
       throw std::invalid_argument("Invalid playback rate");
-    App app(root, dual, speed, ws, js);
+    if (!rx_bundle.empty()) {
+      if (!dual) throw std::invalid_argument("--rx-bundle requires --dual");
+      if (!std::filesystem::is_regular_file(rx_bundle / "free_sweep.xml"))
+        throw std::invalid_argument("RX bundle must contain free_sweep.xml: " + rx_bundle.string());
+    }
+    App app(root, dual, speed, ws, js, rx_bundle);
     if (plan_only && rpc)
       throw std::invalid_argument("--plan-only is a CLI option; use RPC plan command");
     app.search_defaults = search_args;
@@ -343,13 +378,20 @@ int main(int argc, char** argv) {
     }
     try {
       for (auto& m : moves) app.cube->turn(m, capture);
-      write_json(output / "controller_profile.json", {{"speed", speed},
-                                                      {"wrist_speed", app.cube->wrist_speed},
-                                                      {"jaw_speed", app.cube->jaw_speed},
-                                                      {"timestep_s", app.cube->model->opt.timestep},
-                                                      {"fast_parallel_fingers", app.cube->fast},
-                                                      {"video_playback", playback},
-                                                      {"grasp_model", "friction only"}});
+      write_json(output / "controller_profile.json",
+                 {{"speed", speed},
+                  {"gripper", dual ? (app.cube->rx ? "rx_narrow_tip" : "robotiq_2f85") : "none"},
+                  {"rx_bundle", app.rx_bundle.string()},
+                  {"cube_side_m", 3 * app.cube->cube_pitch},
+                  {"wrist_speed", app.cube->wrist_speed},
+                  {"jaw_speed", app.cube->jaw_speed},
+                  {"timestep_s", app.cube->model->opt.timestep},
+                  {"cone", app.cube->model->opt.cone == mjCONE_ELLIPTIC ? "elliptic" : "pyramidal"},
+                  {"impratio", app.cube->model->opt.impratio},
+                  {"iterations", app.cube->model->opt.iterations},
+                  {"fast_parallel_fingers", app.cube->fast},
+                  {"video_playback", playback},
+                  {"grasp_model", "friction only"}});
       std::string state = app.cube->facelets();
       std::optional<RobotSearchResult> robot_result;
       auto opts = app.options(Json::object());

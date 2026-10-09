@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "rm/robot_search.hpp"
+#include "rm/rx_gripper.hpp"
 extern "C" {
 #include "cubiecube.h"
 #include "facecube.h"
@@ -16,16 +17,20 @@ static std::string name(int i) {
   return "piece_" + (i < 10 ? std::string("0") : std::string()) + std::to_string(i);
 }
 Cube::Cube(const std::filesystem::path& root, bool isdual, double s, std::optional<double> ws,
-           std::optional<double> js)
+           std::optional<double> js, const std::filesystem::path& rx_bundle)
     : dual(isdual),
-      fast(js.has_value() && *js > 1),
+      fast(rx_bundle.empty() && js.has_value() && *js > 1),
+      rx(!rx_bundle.empty()),
+      cube_pitch(rx ? .055 / 3 : pitch),
       speed(s),
       wrist_speed(ws.value_or(s)),
       jaw_speed(js.value_or(s)) {
   for (double v : {speed, wrist_speed, jaw_speed})
     if (!std::isfinite(v) || v <= 0 || v > 1000)
       throw std::invalid_argument("Speeds must be finite, positive, at most 1000");
-  xml = build_scene(root, dual, fast);
+  if (rx && !dual) throw std::invalid_argument("RX grippers require --dual");
+  if (rx) required_open_gap = std::sqrt(2.) * (3 * cube_pitch + .0002) + .004;
+  xml = build_scene(root, dual, fast, rx_bundle);
   auto cache = root / ".cache/native-cube";
   std::filesystem::create_directories(cache);
   std::string pattern = (cache / "scene-XXXXXX.xml").string();
@@ -45,6 +50,7 @@ Cube::Cube(const std::filesystem::path& root, bool isdual, double s, std::option
   }
   model = sim->model;
   data = sim->data;
+  if (rx) initialize_rx_grippers(model, data);
   for (int x = -1; x <= 1; x++)
     for (int y = -1; y <= 1; y++)
       for (int z = -1; z <= 1; z++)
@@ -86,7 +92,7 @@ void Cube::attach(int i, const std::string& parent, bool ideal) {
       b = piece_ids.at(i), core = id(mjOBJ_BODY, "core");
   Mat r = body_rotation(p),
       ori = ideal ? (body_rotation(core) * orientations[i]).eval() : body_rotation(b);
-  Vec pos = ideal ? (body_position(core) + body_rotation(core) * (pitch * slots[i])).eval()
+  Vec pos = ideal ? (body_position(core) + body_rotation(core) * (cube_pitch * slots[i])).eval()
                   : body_position(b);
   Vec rel = r.transpose() * (pos - body_position(p));
   Mat rr = r.transpose() * ori;
@@ -105,6 +111,39 @@ void Cube::attach(int i, const std::string& parent, bool ideal) {
 void Cube::step(const Callback& cb) {
   mj_step(model, data);
   mj_forward(model, data);
+  if (rx) {
+    for (int i = 0; i < model->nq; ++i)
+      if (!std::isfinite(data->qpos[i])) throw std::runtime_error("RX non-finite position");
+    for (auto hand : {"A", "B"}) {
+      int a = id(mjOBJ_ACTUATOR, std::string(hand) + "_fingers_actuator");
+      rx_peak_motor_torque = std::max(rx_peak_motor_torque, std::abs(data->actuator_force[a]));
+    }
+    for (int i = 0; robot_ready && i < 6; ++i)
+      rx_peak_cube_motor_force =
+          std::max(rx_peak_cube_motor_force, std::abs(data->actuator_force[i]));
+    for (int i = 0; i < data->ncon; ++i) {
+      const auto& contact = data->contact[i];
+      if (contact.geom[0] < 0 || contact.geom[1] < 0) continue;
+      int g1 = contact.geom[0], g2 = contact.geom[1];
+      int h1 = geom_hand[g1], h2 = geom_hand[g2];
+      if ((h1 >= 0 && geom_cube[g2]) || (h2 >= 0 && geom_cube[g1]))
+        rx_max_contact_penetration = std::max(rx_max_contact_penetration, -contact.dist);
+      auto extension = [&](int geom) {
+        const char* name = mj_id2name(model, mjOBJ_BODY, model->geom_bodyid[geom]);
+        return name && std::string_view(name).ends_with("_extension");
+      };
+      if (h1 >= 0 && h2 >= 0 && (h1 != h2 || extension(g1) || extension(g2))) {
+        mjtNum force[6] = {};
+        mj_contactForce(model, data, i, force);
+        if (contact.dist < -.00001 || force[0] > .01) {
+          clearance["forbidden_contacts"] = clearance["forbidden_contacts"].get<int>() + 1;
+          throw std::runtime_error("RX fingertip self/inter-hand collision");
+        }
+      }
+    }
+    ++rx_contact_steps;
+    if (robot_ready && !active_face.empty()) check_clearance(Action{"yaw", active_hand, 0, "face"});
+  }
   if (cb) cb(*this);
 }
 void Cube::advance(double sec, const Callback& cb) {
@@ -155,7 +194,7 @@ std::pair<double, double> Cube::pose_error(bool goal) const {
     Vec p = r.transpose() * (body_position(piece_ids[i]) - body_position(core));
     Mat m = r.transpose() * body_rotation(piece_ids[i]),
         want = goal ? Mat::Identity() : orientations[i];
-    pmax = std::max(pmax, (p - pitch * (goal ? initial_slots[i] : slots[i])).norm());
+    pmax = std::max(pmax, (p - cube_pitch * (goal ? initial_slots[i] : slots[i])).norm());
     double tr = (m.array() * want.array()).sum();
     amax = std::max(amax, std::acos(std::clamp((tr - 1) / 2, -1., 1.)));
   }
@@ -217,7 +256,7 @@ std::string Cube::facelets() const {
   std::vector<Vec> measured;
   std::vector<Mat> rots;
   for (int i = 0; i < 20; i++) {
-    Vec p = r.transpose() * (body_position(piece_ids[i]) - body_position(core)) / pitch;
+    Vec p = r.transpose() * (body_position(piece_ids[i]) - body_position(core)) / cube_pitch;
     Mat m = r.transpose() * body_rotation(piece_ids[i]);
     Vec rounded = p.array().round();
     Mat mr = m.array().round();
@@ -294,6 +333,8 @@ Json Cube::report() const {
   Json warnings = Json::array();
   for (int i = 0; i < mjNWARNING; i++) warnings.push_back(data->warning[i].number);
   Json r = {{"solved", is_solved()},
+            {"gripper", dual ? (rx ? "rx_narrow_tip" : "robotiq_2f85") : "none"},
+            {"cube_side_m", 3 * cube_pitch},
             {"simulation_time_s", data->time},
             {"moves", history},
             {"max_solved_position_error_m", p},
@@ -321,6 +362,7 @@ Json Cube::report() const {
               {"grasp_checks", grasp_checks.size()},
               {"cube_motor_force_max", force},
               {"core_position_m", {cp.x(), cp.y(), cp.z()}},
+              {"core_orientation", matrix_json(body_rotation(id(mjOBJ_BODY, "core")))},
               {"motion_speed_requested", speed},
               {"wrist_speed_requested", wrist_speed},
               {"jaw_speed_requested", jaw_speed},
@@ -329,6 +371,11 @@ Json Cube::report() const {
               {"current_action", current_action},
               {"grasp_model", "actuator-driven friction-only contact; no grasp weld"},
               {"rotation_clearance", clearance}});
+    if (rx)
+      r["rx_checks"] = {{"contact_steps", rx_contact_steps},
+                        {"max_contact_penetration_m", rx_max_contact_penetration},
+                        {"peak_gripper_motor_torque_nm", rx_peak_motor_torque},
+                        {"peak_cube_motor_force_during_execution", rx_peak_cube_motor_force}};
   }
   return r;
 }

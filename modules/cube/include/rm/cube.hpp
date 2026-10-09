@@ -33,7 +33,8 @@ Json replay_plan(const Plan& plan, Mat orientation = Mat::Identity());
 Plan compile_moves(const std::vector<std::string>& moves, Mat orientation = Mat::Identity());
 Plan optimize_plan(const Plan& plan, Mat orientation = Mat::Identity());
 Json plan_json(const Plan& plan);
-std::string build_scene(const std::filesystem::path& root, bool dual, bool fast = false);
+std::string build_scene(const std::filesystem::path& root, bool dual, bool fast = false,
+                        const std::filesystem::path& rx_bundle = {});
 std::string encode_facelets(const std::vector<Vec>& initial, const std::vector<Vec>& slots,
                             const std::vector<Mat>& orientations);
 void validate_facelets(const std::string& state);
@@ -48,9 +49,13 @@ struct Cube {
   std::vector<Mat> orientations;
   std::vector<int> piece_ids;
   std::map<char, double> targets;
-  std::string active_face;
+  std::string active_face, active_hand;
   std::vector<std::string> history;
-  bool dual, fast, robot_ready = false;
+  bool dual, fast, rx, robot_ready = false;
+  double cube_pitch;
+  double rx_peak_motor_torque = 0, rx_peak_cube_motor_force = 0;
+  double rx_max_contact_penetration = 0;
+  int rx_contact_steps = 0;
   double speed, wrist_speed, jaw_speed, progress = 0;
   Mat orientation = Mat::Identity();
   std::map<std::string, std::string> grasped{{"A", ""}, {"B", ""}};
@@ -63,7 +68,7 @@ struct Cube {
   using Callback = std::function<void(Cube&)>;
   Cube(const std::filesystem::path& root, bool dual = false, double speed = 1,
        std::optional<double> wrist_speed = std::nullopt,
-       std::optional<double> jaw_speed = std::nullopt);
+       std::optional<double> jaw_speed = std::nullopt, const std::filesystem::path& rx_bundle = {});
   int id(mjtObj type, const std::string& name) const;
   Mat body_rotation(int body) const;
   Vec body_position(int body) const;

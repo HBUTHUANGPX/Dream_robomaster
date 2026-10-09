@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "rm/cube.hpp"
+#include "rm/rx_gripper.hpp"
 namespace rm::cube {
 namespace {
 using Node = xmlNodePtr;
@@ -46,18 +47,18 @@ std::string piece_name(int i) {
 const char* colors[3][2] = {{"1 .30 .015 1", ".82 .035 .055 1"},
                             {".015 .63 .27 1", ".025 .19 .85 1"},
                             {"1 .77 .015 1", ".94 .95 .96 1"}};
-void geometry(Node body, const Vec& slot, const Vec& offset) {
+void geometry(Node body, const Vec& slot, const Vec& offset, double scale) {
   add(body, "geom",
       {{"type", "box"},
        {"pos", vec(offset)},
-       {"size", ".00965 .00965 .00965"},
+       {"size", vec(Vec::Constant(.00965 * scale))},
        {"mass", ".006"},
        {"rgba", ".025 .029 .035 1"}});
   for (int a = 0; a < 3; a++)
     if (slot[a]) {
-      Vec p = offset, z = Vec::Constant(.00825);
-      p[a] += slot[a] * .00985;
-      z[a] = .00025;
+      Vec p = offset, z = Vec::Constant(.00825 * scale);
+      p[a] += slot[a] * .00985 * scale;
+      z[a] = .00025 * scale;
       add(body, "geom",
           {{"type", "box"},
            {"pos", vec(p)},
@@ -180,25 +181,42 @@ void gripper(Node root, const std::filesystem::path& repo, const std::string& ha
   xmlFreeDoc(doc);
 }
 }  // namespace
-std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast) {
+std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast,
+                        const std::filesystem::path& rx_bundle) {
+  const bool rx = !rx_bundle.empty();
+  if (rx && (!dual || fast))
+    throw std::invalid_argument("RX requires dual, non-Robotiq controller");
+  const double scale = rx ? 55. / 60 : 1, pitch = rm::cube::pitch * scale;
   auto doc = xmlNewDoc(BAD_CAST "1.0");
   auto root = xmlNewNode(nullptr, BAD_CAST "mujoco");
   xmlDocSetRootElement(doc, root);
-  set(root, "model", dual ? "Native dual friction Robotiq cube" : "Native physical cube");
+  set(root, "model",
+      rx     ? "RX narrow fingertip friction cube"
+      : dual ? "Native dual friction Robotiq cube"
+             : "Native physical cube");
   add(root, "compiler", {{"angle", "radian"}, {"autolimits", "true"}});
   auto option = add(root, "option",
-                    {{"timestep", fast ? ".0001" : ".001"},
+                    {{"timestep", rx     ? ".0005"
+                                  : fast ? ".0001"
+                                         : ".001"},
                      {"integrator", "implicitfast"},
                      {"solver", "Newton"},
-                     {"iterations", "80"},
+                     {"iterations", rx ? "200" : "80"},
                      {"tolerance", "1e-10"},
                      {"gravity", "0 0 -9.81"}});
   if (dual) {
     set(option, "cone", "elliptic");
-    set(option, "impratio", fast ? "100" : "10");
+    set(option, "impratio", (rx || fast) ? "100" : "10");
   }
   auto defaults = add(root, "default");
-  add(defaults, "geom", {{"contype", "1"}, {"conaffinity", "2"}, {"friction", ".8 .002 .0001"}});
+  auto cube_geom = add(defaults, "geom",
+                       {{"contype", rx ? "16" : "1"},
+                        {"conaffinity", rx ? "15" : "2"},
+                        {"friction", ".8 .002 .0001"}});
+  if (rx) {
+    set(cube_geom, "solref", ".004 1");
+    set(cube_geom, "solimp", ".9999 .9999 .001 .5 2");
+  }
   add(defaults, "equality", {{"solref", ".004 1"}, {"solimp", ".99 .99 .001"}});
   auto visual = add(root, "visual");
   add(visual, "global", {{"offwidth", "1280"}, {"offheight", "720"}});
@@ -277,7 +295,7 @@ std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast)
          {"axis", vec(n)},
          {"damping", ".00002"},
          {"armature", ".000001"}});
-    geometry(center, n, n * pitch);
+    geometry(center, n, n * pitch, scale);
     add(actuators, "position",
         {{"name", "drive_" + f},
          {"joint", "hinge_" + f},
@@ -295,7 +313,7 @@ std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast)
           auto name = piece_name(index++);
           auto body = add(world, "body", {{"name", name}, {"pos", vec(origin + pitch * slot)}});
           add(body, "freejoint", {{"name", name + "_free"}});
-          geometry(body, slot, Vec::Zero());
+          geometry(body, slot, Vec::Zero(), scale);
           std::vector<std::string> parents = {"core"};
           for (char f : faces) parents.push_back("center_" + std::string(1, f));
           for (auto& parent : parents) {
@@ -326,7 +344,10 @@ std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast)
            {"polycoef", "0 0 0 0 0"},
            {"solref", ".003 1"},
            {"solimp", ".999 .999 .001"}});
-    for (auto hand : {"A", "B"}) gripper(root, repo, hand, fast);
+    if (rx)
+      append_rx_grippers(root, rx_bundle);
+    else
+      for (auto hand : {"A", "B"}) gripper(root, repo, hand, fast);
   }
   if (fast) {
     visit(eq->children, [&](Node n) {
