@@ -35,7 +35,7 @@ stop 停止当前用户在指定仓库启动的所有网页服务，包括单独
 
 导航单独启动还可指定：--localization prior|slam --power-budget W。
 魔方窗口：robomaster run cube -- --viewer；双夹爪模式再加 --dual。
-魔方无窗口：robomaster run cube -- --headless --duration 2。
+魔方无窗口：robomaster run cube -- --headless --scramble R --solve。
 启动仿真时，根目录必须包含 assets/，原生程序默认位于该目录的 build/bin/。
 未指定 --root 时优先使用 ROBOMASTER_ROOT 环境变量，否则使用编译时的仓库目录。
 直接运行本启动器需要已编译的原生程序；./rm 会检查并准备构建。

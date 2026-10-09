@@ -117,7 +117,8 @@ int interactive_viewer(Cube& cube, const std::filesystem::path& root,
       try {
         if (key == 'Z' && cube.dual && !cube.robot_ready) cube.initialize_grasps(draw);
         if (cube.robot_ready)
-          cube.execute(optimize_plan(compile_moves(sequence, cube.orientation)), draw);
+          cube.execute(optimize_plan(compile_moves(sequence, cube.orientation), cube.orientation),
+                       draw);
         else
           for (auto& m : sequence) cube.turn(m, draw);
       } catch (const std::exception& e) {

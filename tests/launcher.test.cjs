@@ -49,13 +49,17 @@ case "$name:$\{1:-}" in
   cargo:--version) if [[ -f "$FIXTURE_ROOT/rust-installed" ]]; then echo 'cargo 1.85.0'; else echo "cargo \${FAKE_CARGO_VERSION:-1.85.0}"; fi; exit 0;;
   rustc:--version) if [[ -f "$FIXTURE_ROOT/rust-installed" ]]; then echo 'rustc 1.85.0'; elif [[ "\${FAKE_RUST_BROKEN:-}" == 1 ]]; then exit 1; else echo "rustc \${FAKE_RUST_VERSION:-1.85.0}"; fi; exit 0;;
   node:--version) echo "v\${FAKE_NODE_VERSION:-20.0.0}"; exit 0;;
-  pkg-config:*) [[ -z "\${MISSING_PACKAGE:-}" ]] || exit 1; echo '3.4.0'; exit 0;;
+  pkg-config:*) [[ -z "\${MISSING_PACKAGE:-}" ]] || exit 1; exit 0;;
   dpkg-query:*) echo 'install ok installed'; exit 0;;
   df:*) echo 'Filesystem 1024-blocks Used Available Capacity Mounted'; echo '/dev/test 20971520 0 20971520 0% /'; exit 0;;
   c++:*) cat >/dev/null; exit 0;;
 esac
 printf '%s\\n' "$name" "$@" >> "$TRACE"
 printf '\\n' >> "$TRACE"
+if [[ "\${FAKE_BUILD_OUTPUT:-}" == 1 && ( "$name" == cmake || "$name" == cargo ) ]]; then
+  printf '%s %s 标准输出\\n' "$name" "\${1:-}"
+  printf '%s %s 标准错误\\n' "$name" "\${1:-}" >&2
+fi
 if [[ "$name" == curl ]]; then
   output=''; installer=false
   while [[ $# -gt 0 ]]; do
@@ -68,6 +72,8 @@ if [[ "$name" == curl ]]; then
   exit 0
 fi
 if [[ "$name" == cmake && "\${1:-}" == --build ]]; then exit "\${FAIL_BUILD:-0}"; fi
+if [[ "$name" == cmake && "\${1:-}" == --preset ]]; then exit "\${FAIL_CONFIGURE:-0}"; fi
+if [[ "$name" == cargo && "\${1:-}" == build ]]; then exit "\${FAIL_CARGO_BUILD:-0}"; fi
 exit 0
 `;
   for (const tool of ['cmake', 'ninja', 'cargo', 'rustc', 'node', 'pkg-config', 'c++', 'dpkg-query', 'df', 'apt-get', 'curl'])
@@ -82,6 +88,12 @@ fi
 printf '%s\\n' "\${0##*/}" "$@" >> "$TRACE"
 printf '\\n' >> "$TRACE"
 for arg in "$@"; do if [[ "$arg" == --unknown ]]; then echo '未知参数：--unknown' >&2; exit 2; fi; done
+for arg in "$@"; do
+  if [[ "$arg" == --rpc ]]; then
+    printf '%s\\n' '{"ok":true,"result":{"solved":true}}' '{"ok":false,"error":"未知请求"}'
+    printf '原生进程诊断\\n' >&2
+  fi
+done
 exit "\${FAIL_WORKER:-0}"
 `;
   executable(path.join(root, 'target/release/robomaster'), worker);
@@ -196,6 +208,41 @@ test('魔方仅在无参数时启用窗口，显式参数保持原样', t => {
   r = f.run(['cube', '--headless', '--scramble', "R U R'"] , {DISPLAY: ''});
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(r.calls.at(-1), ['robomaster', 'run', 'cube', '--root', f.root, '--', '--headless', '--scramble', "R U R'"]);
+});
+test('魔方 RPC 的标准输出只保留逐行 JSON，构建与原生诊断写入标准错误', t => {
+  const f = fixture(t);
+  const r = f.run(['cube', '--rpc'], {DISPLAY: '', FAKE_BUILD_OUTPUT: '1'});
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(r.stdout.trim().split('\n').map(line => JSON.parse(line)), [
+    {ok: true, result: {solved: true}}, {ok: false, error: '未知请求'},
+  ]);
+  for (const phase of ['cmake --preset', 'cmake --build', 'cargo build']) {
+    assert.ok(r.stderr.includes(`${phase} 标准输出`), r.stderr);
+    assert.ok(r.stderr.includes(`${phase} 标准错误`), r.stderr);
+  }
+  assert.match(r.stderr, /正在检查 C\+\+ 构建配置/);
+  assert.match(r.stderr, /原生进程诊断/);
+  assert.doesNotMatch(r.stderr, /"ok":/);
+});
+test('魔方 RPC 构建失败时保持空标准输出，不启动原生进程并保留失败码', t => {
+  const f = fixture(t);
+  for (const extra of [{FAIL_CONFIGURE: '7'}, {FAIL_BUILD: '7'}, {FAIL_CARGO_BUILD: '7'}]) {
+    const r = f.run(['cube', '--rpc'], {...extra, DISPLAY: '', FAKE_BUILD_OUTPUT: '1'});
+    assert.equal(r.status, 7, r.stderr);
+    assert.equal(r.stdout, '');
+    assert.match(r.stderr, /cmake --preset 标准输出/);
+    assert.ok(!r.calls.some(c => c[0] === 'robomaster'));
+  }
+});
+test('非 RPC 命令保持构建日志原有的输出流', t => {
+  const f = fixture(t);
+  const r = f.run(['build'], {FAKE_BUILD_OUTPUT: '1'});
+  assert.equal(r.status, 0, r.stderr);
+  for (const phase of ['cmake --preset', 'cmake --build', 'cargo build']) {
+    assert.ok(r.stdout.includes(`${phase} 标准输出`), r.stdout);
+    assert.ok(r.stderr.includes(`${phase} 标准错误`), r.stderr);
+  }
+  assert.match(r.stdout, /构建完成/);
 });
 test('窗口命令缺少 DISPLAY 时先报错，底盘支持显式无窗口模式', t => {
   const f = fixture(t);

@@ -27,6 +27,7 @@ Node.js 版本要求：18 或更高。仅测试需要 Node.js。
 默认地址：导航 http://127.0.0.1:8765；自瞄对战 http://127.0.0.1:8766。
 服务端口示例：./rm start --navigation-port 18765 --duel-port 18766。
 单项端口示例：./rm navigation --port 18765。
+魔方协议入口：./rm cube --rpc。标准输出只写逐行 JSON；构建和诊断写标准错误。
 停止命令可在另一个终端执行。它使用已有启动器，不检查依赖或重新构建。
 准备命令可能需要 sudo。日常命令不会安装系统包。启动命令不会结束已有服务。
 HELP
@@ -69,6 +70,7 @@ fi
 source "$root/tools/doctor.sh"
 rm_prepare_path
 cd "$root"
+build_output_fd=1
 case "$command_name" in
   start) rm_check_assets navigation; rm_check_assets duel ;;
   navigation|duel) rm_check_assets "$command_name" ;;
@@ -76,6 +78,7 @@ case "$command_name" in
     rm_check_assets cube
     if [[ $# == 0 ]]; then set -- --viewer; fi
     for argument in "$@"; do
+      if [[ "$argument" == --rpc ]]; then build_output_fd=2; fi
       if [[ "$argument" == --viewer ]]; then rm_check_display; fi
       if [[ "$argument" == --dual ]]; then rm_check_assets cube-dual; fi
     done ;;
@@ -93,12 +96,14 @@ rm_check_build
 if [[ "$command_name" == test ]]; then rm_check_node; fi
 mkdir -p "$root/.cache/tmp"
 export TMPDIR="$root/.cache/tmp"
-printf '正在检查 C++ 构建配置。\n'
-cmake --preset native
-printf '正在增量构建 C++ 程序。\n'
-cmake --build --preset native
-printf '正在增量构建 Rust 启动器。\n'
-cargo build --workspace --release --locked
+{
+  printf '正在检查 C++ 构建配置。\n'
+  cmake --preset native
+  printf '正在增量构建 C++ 程序。\n'
+  cmake --build --preset native
+  printf '正在增量构建 Rust 启动器。\n'
+  cargo build --workspace --release --locked
+} >&"$build_output_fd"
 case "$command_name" in
   start) exec "$root/target/release/robomaster" up --root "$root" "$@" ;;
   navigation|duel) exec "$root/target/release/robomaster" serve "$command_name" --root "$root" "$@" ;;
@@ -111,7 +116,7 @@ case "$command_name" in
     printf '正在运行 Rust 测试。\n'
     cargo test --workspace --locked
     printf '正在运行网页与入口测试。\n'
-    node --test tests/duel_web.test.cjs tests/launcher.test.cjs
+    node --test tests/duel_web.test.cjs tests/launcher.test.cjs modules/cube/tests/interfaces.test.cjs
     printf '正在检查维护文档。\n'
     node tools/check-docs.mjs
     printf '全部测试通过。\n' ;;

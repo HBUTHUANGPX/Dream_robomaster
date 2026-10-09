@@ -177,6 +177,22 @@ ssh -N -o ExitOnForwardFailure=yes -L 8765:127.0.0.1:8765 -L 8766:127.0.0.1:8766
 该命令执行结束后返回终端。
 双夹爪执行和录像需要额外参数，见[魔方说明](modules/cube.md)。
 
+## 接入逐行 JSON 协议
+
+此步骤供需要从程序发送魔方请求的用户使用。
+先完成前面的准备环境步骤，再在仓库根目录执行：
+
+~~~bash
+mkdir -p output
+printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-rpc.log
+~~~
+
+终端应显示一行 JSON。响应的 `ok` 字段应为 `true`。
+输入结束后，程序退出。这个示例不需要图形桌面。
+构建提示和诊断保存在 `output/cube-rpc.log`，不会进入协议输出。
+客户端应分别读取标准输出和标准错误，不使用 `2>&1` 合并两条输出流。
+日志有内容不表示失败。若程序退出失败或响应的 `ok` 为 `false`，按[协议排错步骤](troubleshooting.md#协议客户端无法解析响应)处理。
+
 ## 更新代码后
 
 1. 在运行主机的仓库目录执行 `./rm stop`。

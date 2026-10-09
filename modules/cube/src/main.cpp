@@ -125,7 +125,7 @@ struct App {
                                                         : std::string())));
       if (moves.empty()) throw std::invalid_argument("Supply move or moves");
       if (cube->robot_ready)
-        cube->execute(optimize_plan(compile_moves(moves, cube->orientation)));
+        cube->execute(optimize_plan(compile_moves(moves, cube->orientation), cube->orientation));
       else
         for (auto& m : moves) cube->turn(m);
       return cube->report();
@@ -156,7 +156,7 @@ struct App {
         cube->initialize_grasps();
       else if (action == "execute") {
         auto moves = split_moves(args.at("moves").get<std::string>());
-        cube->execute(optimize_plan(compile_moves(moves, cube->orientation)));
+        cube->execute(optimize_plan(compile_moves(moves, cube->orientation), cube->orientation));
       } else
         throw std::invalid_argument(
             "Gripper action must be initialize or execute; raw unsupported actions are rejected");
