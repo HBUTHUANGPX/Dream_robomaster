@@ -63,13 +63,13 @@ void diagnose(Cube& c) {
 }
 
 bool run_case(const std::filesystem::path& root, const std::filesystem::path& bundle,
-              const Case& test) {
+              const Case& test, double wrist_speed, double jaw_speed) {
   const auto began = Clock::now();
   std::unique_ptr<Cube> cube;
   size_t step = 0;
   std::string phase = "construct", expected = solved;
   try {
-    cube = std::make_unique<Cube>(root, true, 1, std::nullopt, std::nullopt, bundle);
+    cube = std::make_unique<Cube>(root, true, 1, wrist_speed, jaw_speed, bundle);
     auto& c = *cube;
     phase = "initialize_grasps";
     c.initialize_grasps(check_physics);
@@ -106,12 +106,13 @@ bool run_case(const std::filesystem::path& root, const std::filesystem::path& bu
   }
 }
 
-bool check_margin(const std::filesystem::path& root, const std::filesystem::path& bundle) {
+bool check_margin(const std::filesystem::path& root, const std::filesystem::path& bundle,
+                  double wrist_speed, double jaw_speed) {
   const auto began = Clock::now();
   std::unique_ptr<Cube> cube;
   std::string phase = "construct";
   try {
-    cube = std::make_unique<Cube>(root, true, 1, std::nullopt, std::nullopt, bundle);
+    cube = std::make_unique<Cube>(root, true, 1, wrist_speed, jaw_speed, bundle);
     auto& c = *cube;
     phase = "initialize_grasps";
     c.initialize_grasps(check_physics);
@@ -215,25 +216,45 @@ int main(int argc, char** argv) {
   try {
     if (argc < 3)
       throw std::invalid_argument(
-          "Usage: test_rx_physics root bundle [--check-margin | primitive names...]");
+          "Usage: test_rx_physics root bundle [--wrist-speed N] [--jaw-speed N] "
+          "[--check-margin | primitive names...]");
     const std::filesystem::path root = argv[1], bundle = argv[2];
     if (bundle.empty() || !std::filesystem::exists(bundle))
       throw std::invalid_argument("RX bundle does not exist: " + bundle.string());
-    if (argc > 3 && std::string(argv[3]) == "--check-margin") {
-      if (argc != 4) throw std::invalid_argument("--check-margin does not accept primitive names");
-      return check_margin(root, bundle) ? 0 : 1;
+    double wrist_speed = 1, jaw_speed = 1;
+    bool margin = false;
+    Case custom{"custom", {}};
+    for (int i = 3; i < argc; ++i) {
+      const std::string arg = argv[i];
+      if (arg == "--wrist-speed" || arg == "--jaw-speed") {
+        if (++i == argc) throw std::invalid_argument("Missing speed value");
+        const std::string value = argv[i];
+        size_t used = 0;
+        const double speed = std::stod(value, &used);
+        if (used != value.size() || !std::isfinite(speed) || speed <= 0 || speed > 1000)
+          throw std::invalid_argument("Speed must be finite and in (0,1000]");
+        (arg == "--wrist-speed" ? wrist_speed : jaw_speed) = speed;
+      } else if (arg == "--check-margin") {
+        margin = true;
+      } else {
+        custom.actions.push_back(parse_primitive(arg));
+      }
+    }
+    std::cout << "wrist_speed=" << wrist_speed << " jaw_speed=" << jaw_speed << '\n';
+    if (margin) {
+      if (!custom.actions.empty())
+        throw std::invalid_argument("--check-margin does not accept primitive names");
+      return check_margin(root, bundle, wrist_speed, jaw_speed) ? 0 : 1;
     }
     std::vector<Case> tests;
-    if (argc > 3) {
-      Case custom{"custom", {}};
-      for (int i = 3; i < argc; ++i) custom.actions.push_back(parse_primitive(argv[i]));
+    if (!custom.actions.empty()) {
       tests.push_back(std::move(custom));
     } else {
       tests = default_cases();
     }
     size_t failures = 0;
     for (const auto& test : tests)
-      if (!run_case(root, bundle, test)) ++failures;
+      if (!run_case(root, bundle, test, wrist_speed, jaw_speed)) ++failures;
     std::cout << "cases=" << tests.size() << " failures=" << failures
               << " elapsed_s=" << elapsed(began) << '\n';
     return failures ? 1 : 0;
