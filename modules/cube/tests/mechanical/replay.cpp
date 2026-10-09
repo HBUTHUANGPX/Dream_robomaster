@@ -93,8 +93,18 @@ int main(int argc, char** argv) {
     };
     auto action = saved.at("action");
     std::string hand = action.at("hand"), mode = action.at("mode");
-    int actuator = mj_name2id(m, mjOBJ_ACTUATOR, (hand + "_yaw_drive").c_str());
-    double start = d->ctrl[actuator], target = action.at("target"), began = d->time;
+    bool jaw = action.at("kind") == "jaw";
+    if ((hand != "A" && hand != "B") || (!jaw && action.at("kind") != "yaw"))
+      throw std::invalid_argument("Replay requires a jaw or yaw action for A/B");
+    double target = action.at("target");
+    if (jaw) {
+      if (target != 0 && target != 115) throw std::invalid_argument("Invalid jaw command");
+      target = target == 115 ? -1.20 : -2.25;
+    }
+    int actuator =
+        mj_name2id(m, mjOBJ_ACTUATOR, (hand + (jaw ? "_fingers_actuator" : "_yaw_drive")).c_str());
+    if (actuator < 0 || core < 0) throw std::invalid_argument("Replay requires an RX cube scene");
+    double start = d->ctrl[actuator], began = d->time;
     Mat expected_core;
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j) expected_core(i, j) = saved["robot_orientation"][i][j];
@@ -234,6 +244,16 @@ int main(int argc, char** argv) {
     file << report.dump(2);
     file.close();
     if (!file) throw std::runtime_error("Cannot write replay report");
+    // 仅供后续独立诊断；不作为连续录像的续录点。
+    mj_getState(m, d, state.data(), spec);
+    saved["state"] = state;
+    saved["parameters"] = parameters;
+    saved["robot_orientation"] = matrix_json(expected_core);
+    saved["source"] = "diagnostic_replay_not_continuous_recording";
+    std::ofstream end_state(output / "end_state.json");
+    end_state << saved.dump();
+    end_state.close();
+    if (!end_state) throw std::runtime_error("Cannot write diagnostic end state");
     Renderer renderer(m);
     mjvCamera camera;
     mjv_defaultCamera(&camera);

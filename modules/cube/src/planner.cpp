@@ -172,7 +172,10 @@ Plan compile_moves(const std::vector<std::string>& moves, Mat orientation,
     std::string hand = "A";
     if (allow_b_face_turns && n.y() < -.5)
       hand = "B";
-    else if (n.x() < -0.5)
+    else if (allow_b_face_turns && n.y() > .5) {
+      reorient("A", 2);
+      hand = "B";
+    } else if (n.x() < -0.5)
       reorient("B", 2);
     else if (n.z() > .5)
       reorient("B", -1);

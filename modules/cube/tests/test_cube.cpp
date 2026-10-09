@@ -103,8 +103,18 @@ int main(int argc, char** argv) {
                     "Presented B face unnecessarily reoriented cube");
             for (const auto& a : plan)
               require(a.kind == "checkpoint" || a.hand == "B", "Direct B plan commands wrong hand");
+          } else if (q * Vec::Unit(axis) * sign == Vec(0, 1, 0)) {
+            require(count_whole(plan) == 1 &&
+                        replay["orientation"] == matrix_json(wrist_rotation("A", pi) * q),
+                    "Opposite B face must use one A half-turn");
+            for (const auto& a : plan) {
+              if (a.kind == "yaw" && a.mode == "whole")
+                require(a.hand == "A" && a.target == pi, "Incorrect A whole half-turn");
+              if (a.kind == "yaw" && a.mode == "face")
+                require(a.hand == "B", "Opposite B face must turn with B");
+            }
           } else {
-            require(plan == legacy, "B option changed a face not already presented to B");
+            require(plan == legacy, "B option changed a face outside world Y axis");
           }
         }
     }
