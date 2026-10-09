@@ -8,7 +8,9 @@
 #include <opencv2/imgproc.hpp>
 #include <sstream>
 
+#include "mechanical_rx.hpp"
 #include "rm/cube.hpp"
+#include "rm/rx_gripper.hpp"
 #include "video.hpp"
 
 namespace {
@@ -25,6 +27,10 @@ Json settings = {{"shell_gap_m", .00005},
                  {"turn_duration_s", 1.5},
                  {"timestep_s", .0005},
                  {"max_torque_nm", .03},
+                 {"rx_jaw_torque_nm", .3},
+                 {"rx_tip_friction", 1.2},
+                 {"rx_bearing_friction_nm", .002},
+                 {"rx_detent_torque_nm", .04},
                  {"record_fps", 0.}};
 double value(const char* key) { return settings.at(key).get<double>(); }
 void load_settings(const std::filesystem::path& path) {
@@ -229,9 +235,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
   const auto began = std::chrono::steady_clock::now();
   Json report = {{"passed", false},
                  {"model", "experimental_contact_retention"},
-                 {"constraint_switches", 0},
+                 {"internal_constraint_switches", 0},
                  {"steps", Json::array()}};
-  std::filesystem::path out = root / "output/cube-mechanical/current", config;
+  std::filesystem::path out = root / "output/cube-mechanical/current", config, rx_bundle;
   std::string sequence = "R U F";
   bool solve = false, record = false, prepared = false;
   try {
@@ -250,6 +256,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         sequence = next();
       else if (arg == "--mechanical-config")
         config = next();
+      else if (arg == "--rx-bundle")
+        rx_bundle = next();
       else if (arg == "--solve")
         solve = true;
       else if (arg == "--record")
@@ -257,8 +265,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       else if (arg == "--help" || arg == "-h") {
         std::cout << "机械魔方原型：./rm cube --mechanical [--scramble \"R U F\"] [--solve] "
                      "[--record] [--output 输出目录] [--mechanical-config "
-                     "参数JSON]"
-                     "\n固定核心试验台；六个中心轴驱动，棱块角块仅靠接触卡脚保持。尚未接入RX夹爪。"
+                     "参数JSON] [--rx-bundle RX目录]"
+                     "\n默认使用固定核心试验台；指定RX目录则使用自由核心与摩擦夹爪。"
+                     "棱角块靠卡脚保持；RX模式包含被动磁吸定位近似。"
                      "录像为1倍速，需要EGL和FFmpeg。\n";
         return 0;
       } else
@@ -277,7 +286,11 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::filesystem::create_directories(out);
     prepared = true;
     std::ofstream scene_file(out / "scene.xml");
-    scene_file << scene();
+    const bool rx = !rx_bundle.empty();
+    auto xml = scene();
+    scene_file << (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
+                                            value("rx_tip_friction"))
+                      : xml);
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");
     Simulation sim(out / "scene.xml");
@@ -286,9 +299,28 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     report["equalities"] = m->neq;
     report["actuators"] = m->nu;
     report["geoms"] = m->ngeom;
-    report["fixed_core_test_rig"] = true;
-    if (m->neq != 0)
-      throw std::runtime_error("Mechanical model must not contain equality constraints");
+    report["fixed_core_test_rig"] = !rx;
+    report["gripper"] = rx ? "rx_friction" : "none";
+    report["passive_detent"] = rx ? "torque=-amplitude*sin(4*angle)-0.0005*velocity" : "none";
+    if (m->neq != (rx ? 9 : 0))
+      throw std::runtime_error("Unexpected mechanical equality constraints");
+    if (rx) {
+      initialize_rx_grippers(m, d);
+      for (auto h : {"A", "B"}) {
+        int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(h) + "_fingers_actuator").c_str());
+        m->actuator_forcerange[2 * a] = -value("rx_jaw_torque_nm");
+        m->actuator_forcerange[2 * a + 1] = value("rx_jaw_torque_nm");
+      }
+    }
+    const int core = rx ? mj_name2id(m, mjOBJ_BODY, "mechanical_core") : -1;
+    auto core_position = [&]() -> Vec {
+      return rx ? Vec(Eigen::Map<const Vec>(d->xpos + 3 * core)) : Vec(0, 0, .1);
+    };
+    auto core_rotation = [&]() -> Mat {
+      return rx ? Mat(Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->xmat +
+                                                                                     9 * core))
+                : Mat::Identity();
+    };
     std::vector<Vec> slots;
     std::vector<Mat> orientations;
     for (const auto& p : parts) {
@@ -303,16 +335,22 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       for (size_t i = 0; i < parts.size(); ++i) {
         int b = mj_name2id(m, mjOBJ_BODY, parts[i].name.c_str()),
             site = mj_name2id(m, mjOBJ_SITE, (parts[i].name + "_center").c_str());
-        position = std::max(position, (Eigen::Map<const Vec>(d->site_xpos + 3 * site) -
-                                       Vec(0, 0, .1) - pitch_m * slots[i])
-                                          .norm());
+        position = std::max(
+            position, (core_rotation().transpose() *
+                           (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position()) -
+                       pitch_m * slots[i])
+                          .norm());
         Mat r = Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->xmat + 9 * b);
+        double piece_angle = std::acos(std::clamp(
+            ((orientations[i].transpose() * core_rotation().transpose() * r).trace() - 1) / 2, -1.,
+            1.));
         errors.push_back(
             {{"piece", parts[i].name},
+             {"orientation_error_rad", piece_angle},
              {"expected", xyz(pitch_m * slots[i])},
-             {"actual", xyz(Eigen::Map<const Vec>(d->site_xpos + 3 * site) - Vec(0, 0, .1))}});
-        angle = std::max(angle, std::acos(std::clamp(
-                                    ((orientations[i].transpose() * r).trace() - 1) / 2, -1., 1.)));
+             {"actual", xyz(core_rotation().transpose() *
+                            (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position()))}});
+        angle = std::max(angle, piece_angle);
       }
       report["pieces"] = errors;
       return Json{{"position_error_m", position},
@@ -328,7 +366,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       mjvCamera cam;
       mjv_defaultCamera(&cam);
       cam.lookat[2] = .1;
-      cam.distance = name == "internal" ? .07 : .15;
+      cam.distance = name == "internal" ? .07 : rx ? .4 : .15;
       cam.azimuth = 130;
       cam.elevation = -25;
       mjvOption opt;
@@ -352,11 +390,50 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         throw std::runtime_error("Cannot write image");
     };
     int ticks = 0, frames = 0;
+    double peak_tip_normal = 0, peak_tip_tangent = 0, peak_turn_tangent = 0;
     double next_frame = 0;
     auto advance = [&](double t) {
       for (int k = 0; k < std::lround(t / m->opt.timestep); ++k) {
+        if (rx) {
+          // 固定周期势能的负梯度，模拟被动磁吸定位；不读取规划目标。
+          for (char f : faces) {
+            int j = mj_name2id(m, mjOBJ_JOINT, ("hinge_" + std::string(1, f)).c_str());
+            int v = m->jnt_dofadr[j];
+            d->qfrc_applied[v] =
+                -value("rx_detent_torque_nm") * std::sin(4 * d->qpos[m->jnt_qposadr[j]]) -
+                .0005 * d->qvel[v];
+          }
+        }
         mj_step(m, d);
         ++ticks;
+        if (rx && ticks % 10 == 0) {
+          for (int i = 0; i < d->ncon; ++i) {
+            const auto& contact = d->contact[i];
+            const char* a = mj_id2name(m, mjOBJ_GEOM, contact.geom[0]);
+            const char* b = mj_id2name(m, mjOBJ_GEOM, contact.geom[1]);
+            if (!a || !b) continue;
+            auto tip = [](const char* n) { return std::string_view(n).ends_with("_tip"); };
+            auto shell = [](const char* n) { return std::string_view(n).ends_with("_shell"); };
+            if (!((tip(a) && shell(b)) || (tip(b) && shell(a)))) continue;
+            mjtNum f[6];
+            mj_contactForce(m, d, i, f);
+            peak_tip_normal = std::max(peak_tip_normal, f[0]);
+            peak_tip_tangent = std::max(peak_tip_tangent, std::hypot(f[1], f[2]));
+            if (report.contains("current_action") &&
+                report["current_action"].value("kind", "") == "yaw")
+              peak_turn_tangent = std::max(peak_turn_tangent, std::hypot(f[1], f[2]));
+          }
+          report["peak_tip_contact_normal_n"] = peak_tip_normal;
+          report["peak_tip_contact_tangent_n"] = peak_tip_tangent;
+          report["peak_turn_tip_contact_tangent_n"] = peak_turn_tangent;
+        }
+        if (rx && !d->eq_active[mj_name2id(m, mjOBJ_EQUALITY, "mechanical_loading_fixture")] &&
+            (core_position() - Vec(0, 0, .1)).norm() > .005) {
+          report["slip_state"] = measure();
+          report["slip_state"]["core_position"] = xyz(core_position());
+          snapshot("slip");
+          throw std::runtime_error("RX lost cube support");
+        }
         if (value("record_fps") > 0 && d->time + 1e-9 >= next_frame) {
           mj_forward(m, d);
           std::ostringstream name;
@@ -369,7 +446,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         if (ticks % 100 == 0)
           for (const auto& p : parts) {
             int site = mj_name2id(m, mjOBJ_SITE, (p.name + "_center").c_str());
-            double r = (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - Vec(0, 0, .1)).norm();
+            double r = (core_rotation().transpose() *
+                        (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position()))
+                           .norm();
             if (std::abs(r - pitch_m * p.slot.norm()) > .005) {
               report["escape_piece"] = p.name;
               report["escape_state"] = measure();
@@ -390,7 +469,156 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::cout << "settled " << report["settled"] << std::endl;
     if (report["settled"]["position_error_m"].get<double>() > .0005)
       throw std::runtime_error("Assembly lost retention at rest");
+    Mat robot_orientation = Mat::Identity();
+    std::map<std::string, bool> closed{{"A", false}, {"B", false}};
+    auto tip_contacts = [&](const std::string& hand) {
+      Json pads = Json::object();
+      for (auto side : {"left", "right"}) {
+        int tip = mj_name2id(m, mjOBJ_GEOM, (hand + "_" + side + "_tip").c_str());
+        double normal = 0;
+        for (int i = 0; i < d->ncon; ++i) {
+          const auto& c = d->contact[i];
+          int other = c.geom[0] == tip ? c.geom[1] : c.geom[1] == tip ? c.geom[0] : -1;
+          if (other < 0) continue;
+          const char* name = mj_id2name(m, mjOBJ_GEOM, other);
+          if (!name || !std::string(name).ends_with("_shell")) continue;
+          mjtNum force[6];
+          mj_contactForce(m, d, i, force);
+          normal += force[0];
+        }
+        pads[side] = normal;
+      }
+      return pads;
+    };
+    auto grip_ready = [&](const std::string& h) {
+      auto p = tip_contacts(h);
+      return p["left"].get<double>() > .01 && p["right"].get<double>() > .01;
+    };
+    auto gap = [&](const std::string& h) {
+      int a = mj_name2id(m, mjOBJ_GEOM, (h + "_left_tip").c_str()),
+          b = mj_name2id(m, mjOBJ_GEOM, (h + "_right_tip").c_str());
+      Vec delta = Eigen::Map<const Vec>(d->geom_xpos + 3 * a) -
+                  Eigen::Map<const Vec>(d->geom_xpos + 3 * b),
+          dir = delta.normalized();
+      double radius = 0;
+      for (int g : {a, b}) {
+        Mat r =
+            Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->geom_xmat + 9 * g);
+        radius += (r.transpose() * dir).cwiseAbs().dot(Eigen::Map<const Vec>(m->geom_size + 3 * g));
+      }
+      return delta.norm() - radius;
+    };
+    auto command = [&](const std::string& name, double target, double duration) {
+      int a = mj_name2id(m, mjOBJ_ACTUATOR, name.c_str());
+      if (a < 0) throw std::runtime_error("Missing RX actuator: " + name);
+      double start = d->ctrl[a];
+      int count = std::max(1L, std::lround(duration / m->opt.timestep));
+      for (int k = 1; k <= count; ++k) {
+        double u = double(k) / count;
+        d->ctrl[a] = start + (target - start) * u * u * u * (10 + u * (-15 + 6 * u));
+        advance(m->opt.timestep);
+        if (name.ends_with("_yaw_drive")) {
+          for (int i = 0; i < d->ncon; ++i) {
+            const auto& c = d->contact[i];
+            auto owner = [&](int g) {
+              int body = m->geom_bodyid[g];
+              const char* n = mj_id2name(m, mjOBJ_BODY, body);
+              std::string b = n ? n : "";
+              return b.starts_with("A_")                                 ? 1
+                     : b.starts_with("B_")                               ? 2
+                     : b.starts_with("piece_") || b == "mechanical_core" ? 3
+                                                                         : 0;
+            };
+            int a = owner(c.geom[0]), b = owner(c.geom[1]);
+            bool bad = (a == 1 && b == 2) || (a == 2 && b == 1);
+            for (int h = 1; h <= 2; ++h)
+              if (!closed[h == 1 ? "A" : "B"] && ((a == h && b == 3) || (b == h && a == 3)))
+                bad = true;
+            if (bad) {
+              mjtNum f[6];
+              mj_contactForce(m, d, i, f);
+              if (f[0] > .01) throw std::runtime_error("RX forbidden rotation contact");
+            }
+          }
+        }
+      }
+      advance(.15);
+    };
+    auto jaw = [&](const std::string& h, bool close) {
+      command(h + "_fingers_actuator", close ? -1.20 : -2.25, .5);
+      report["jaw_checks"].push_back({{"hand", h},
+                                      {"closed", close},
+                                      {"gap_m", gap(h)},
+                                      {"forces_n", tip_contacts(h)},
+                                      {"time_s", d->time}});
+      closed[h] = close;
+      if (close ? !grip_ready(h) : gap(h) < .055 * std::sqrt(2.) + .001)
+        throw std::runtime_error("RX jaw contact/clearance failed: " + h);
+    };
+    auto update_expected = [&](const std::string& move) {
+      auto [f, c] = parse_move(move);
+      auto [axis, sign] = face_axis(f);
+      Mat rot = rotation(axis, -sign * c * pi / 2).array().round();
+      for (size_t i = 0; i < parts.size(); ++i)
+        if (slots[i][axis] == sign) {
+          slots[i] = rot * slots[i];
+          orientations[i] = rot * orientations[i];
+        }
+    };
+    auto check_pose = [&](const std::string& label) {
+      auto state = measure();
+      state["move"] = label;
+      state["core_position"] = xyz(core_position());
+      double core_angle = std::acos(
+          std::clamp(((robot_orientation.transpose() * core_rotation()).trace() - 1) / 2, -1., 1.));
+      state["core_orientation_error_rad"] = core_angle;
+      report["steps"].push_back(state);
+      std::cout << state << std::endl;
+      snapshot("step_" + std::to_string(report["steps"].size()));
+      if (state["position_error_m"].get<double>() > .0005 ||
+          state["orientation_error_rad"].get<double>() > .02)
+        throw std::runtime_error("RX mechanical pose mismatch: " + label);
+      if ((core_position() - Vec(0, 0, .1)).norm() > .001 || core_angle > .02)
+        throw std::runtime_error("RX core slipped: " + label);
+      for (auto h : {"A", "B"})
+        if (closed[h] && !grip_ready(h))
+          throw std::runtime_error("RX grip lost: " + std::string(h));
+    };
+    if (rx) {
+      jaw("A", true);
+      jaw("B", true);
+      d->eq_active[mj_name2id(m, mjOBJ_EQUALITY, "mechanical_loading_fixture")] = 0;
+      report["loading_fixture_releases"] = 1;
+      advance(.3);
+      check_pose("grasp");
+    }
     auto execute_moves = [&](const std::vector<std::string>& moves) {
+      if (rx) {
+        auto plan = compile_moves(moves, robot_orientation);
+        for (const auto& a : plan) {
+          report["current_action"] = a.json();
+          if (a.kind == "jaw")
+            jaw(a.hand, a.target != 0);
+          else if (a.kind == "grasp" && !grip_ready(a.hand))
+            throw std::runtime_error("RX lost fingertip contact");
+          else if (a.kind == "yaw") {
+            int actuator = mj_name2id(m, mjOBJ_ACTUATOR, (a.hand + "_yaw_drive").c_str());
+            double start = d->ctrl[actuator];
+            command(a.hand + "_yaw_drive", a.target, value("turn_duration_s"));
+            int joint = mj_name2id(m, mjOBJ_JOINT, (a.hand + "_yaw").c_str());
+            if (std::abs(d->qpos[m->jnt_qposadr[joint]] - a.target) > .006)
+              throw std::runtime_error("RX wrist tracking failed");
+            if (a.mode == "whole")
+              robot_orientation = wrist_rotation(a.hand, a.target - start) * robot_orientation;
+          } else if (a.kind == "layer_lock") {
+            update_expected(a.move);
+            check_pose(a.move);
+          } else if (a.kind == "checkpoint")
+            check_pose(a.move + " checkpoint");
+          report["actions"].push_back(a.json());
+        }
+        return;
+      }
       for (const auto& move : moves) {
         report["current_move"] = move;
         auto [f, c] = parse_move(move);
@@ -430,9 +658,12 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         if (p.slot.squaredNorm() < 2) continue;
         int b = mj_name2id(m, mjOBJ_BODY, p.name.c_str()),
             site = mj_name2id(m, mjOBJ_SITE, (p.name + "_center").c_str());
-        Vec position = (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - Vec(0, 0, .1)) / pitch_m;
+        Vec position = (core_rotation().transpose() *
+                        (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position())) /
+                       pitch_m;
         Vec rounded = position.array().round();
         Mat rotation =
+                core_rotation().transpose() *
                 Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->xmat + 9 * b),
             rounded_rotation = rotation.array().round();
         if ((position - rounded).cwiseAbs().maxCoeff() > .02 ||
@@ -453,6 +684,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       execute_moves(solution);
     }
     if (value("record_fps") > 0) advance(.5);
+    if (rx) check_pose("final");
     report["final_facelets"] = physical_facelets();
     report["solved"] = report["final_facelets"] == solved;
     if (solve && !report["solved"].get<bool>())

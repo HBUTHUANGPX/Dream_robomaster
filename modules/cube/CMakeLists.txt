@@ -5,7 +5,7 @@ add_library(rm_kociemba STATIC third_party/kociemba/ckociemba/coordcube.c third_
 target_include_directories(rm_kociemba PUBLIC third_party/kociemba/ckociemba/include)
 target_compile_definitions(rm_kociemba PRIVATE _GNU_SOURCE)
 target_link_libraries(rm_kociemba PUBLIC m)
-add_library(rm_cube_core src/mechanical.cpp src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
+add_library(rm_cube_core src/mechanical.cpp src/mechanical_rx.cpp src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
 target_include_directories(rm_cube_core PUBLIC include)
 target_link_libraries(rm_cube_core PUBLIC rm_sim Eigen3::Eigen LibXml2::LibXml2 rm_kociemba Threads::Threads)
 add_executable(rm_cube src/main.cpp src/viewer.cpp)

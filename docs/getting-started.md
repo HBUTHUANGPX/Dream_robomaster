@@ -202,7 +202,7 @@ RX 当前采用腕部 3 秒、夹爪 2 秒的基准斜坡时长，每次另等�
 本次还调整了数值接触参数，不能把完整还原归因于指尖几何改善，也不能当作实物性能。
 搜索结果仅为预算内已找到的最佳解，不保证全局最优，也不支持动作重叠。
 
-完成原生依赖准备后，可用 `./rm cube --mechanical --scramble "R U F" --solve --record` 验证连续卡脚接触机构。该模式需要EGL，录像需要FFmpeg；它是固定核心试验台，操作、输出和失败处理见[机械魔方说明](mechanical-cube.md)。
+完成原生依赖准备后，可用 `./rm cube --mechanical --scramble "R U F" --solve --record` 验证连续卡脚接触机构。该模式需要EGL，录像需要FFmpeg；默认使用固定核心试验台，操作、输出和失败处理见[机械魔方说明](mechanical-cube.md)。需要RX驱动时，按[连续接触模型的夹爪接入](mechanical-rx.md)准备资产并追加 `--rx-bundle PATH`。
 
 ## 接入逐行 JSON 协议
 

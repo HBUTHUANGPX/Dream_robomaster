@@ -83,7 +83,7 @@ RPC 也通过启动参数选择 RX：`./rm cube --rpc --dual --rx-bundle PATH`�
 `./rm cube --mechanical --scramble "R U F" --solve --record` 启用独立的球芯、卡脚与弹簧预紧模型。
 该模式由六个中心轴驱动，棱块和角块通过接触保持装配；执行期间不切换内部约束或改写部件位姿。
 求解前从实际位姿读取54面贴状态，转动后再次核验实际状态。
-当前核心固定，尚未接入RX和交互窗口。参数与验证命令见[机械魔方说明](../mechanical-cube.md)。
+默认核心固定；追加 `--rx-bundle PATH` 启用自由核心与[RX摩擦夹持](../mechanical-rx.md)。当前不支持交互窗口。基础参数见[机械魔方说明](../mechanical-cube.md)。
 
 ## 物理与求解边界
 
