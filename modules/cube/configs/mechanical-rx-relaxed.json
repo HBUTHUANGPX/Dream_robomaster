@@ -1,0 +1,8 @@
+{
+  "internal_contact_impedance": 0.99,
+  "rx_detent_torque_nm": 0.08,
+  "rx_alignment_position_m": 0.002,
+  "rx_alignment_angle_rad": 0.08726646259971647,
+  "rx_core_position_m": 0.002,
+  "alignment_regrasp_attempts": 0
+}

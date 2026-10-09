@@ -1,0 +1,33 @@
+{
+  "source_archive": "RX_ASSY_V2_with_gripper.zip",
+  "source_archive_sha256": "a21d25f43194ec1e9d2f01219fe43a34f5127a00034540ceb5b3a39586d88db4",
+  "source_bundle": "RX_ASSY_V2_with_gripper/mujoco_linkage_v5",
+  "source": "用户提供的原始压缩包；按用户要求纳入版本管理",
+  "license_status": "原包未附明确许可证；不新增许可授权，保留原权利归属",
+  "files": {
+    "mujoco_linkage_v5/free_sweep.xml": "6734d47fb2dd9bfd02c65dd72062a9a2989bb75428ecc9412db7496543ee1246",
+    "mujoco_linkage_v5/meshes/r_finger1_link.obj": "d89ff35526e3d055892a48a0eb6696232028f96e53682a65cfc864daf1cd1eea",
+    "mujoco_linkage_v5/meshes/r_finger2_link.obj": "eb26470fa4adec830da9096bdb80d0014f037796a072fb4725466d97c9292a79",
+    "mujoco_linkage_v5/meshes/l_finger1_link.obj": "08e0fa24bffd27d923848acd60d8ae19b0f29fb1719905c464fb7e3034ff2d6e",
+    "mujoco_linkage_v5/meshes/l_finger2_link.obj": "8263dac8dc93cd472c2269257219c8bf097a54007916dffb4159c99b89650995",
+    "mujoco_linkage_v5/meshes/l_mechanism_base.obj": "7df0580a3cadfca0713c4ba953f8d68652419bc8307b0ae81ac53d4ccaa6a104",
+    "mujoco_linkage_v5/meshes/l_mechanism_motor.obj": "7e80dfecead6f85934b9a3b60000dd15aceca00ddc6bc567a2805fb4a01e070a",
+    "mujoco_linkage_v5/meshes/l_mechanism_positive_outer.obj": "6c831a2c0c9c1acd7d5efe4b4649fc3eddf0b033b987996e1b0f79d6f6bc4230",
+    "mujoco_linkage_v5/meshes/l_mechanism_positive_inner.obj": "4c91e83e549a1cd2b2fc376576d21c4637ea953d912ea411ede00128383ab38c",
+    "mujoco_linkage_v5/meshes/l_mechanism_positive_rod.obj": "4283b6e39fa9ee76e4667e89f022823ee01c0497af79d8a3ceafc1d36994d0bb",
+    "mujoco_linkage_v5/meshes/l_mechanism_negative_outer.obj": "d2f29b3a5fcf39d5d570dc0c869e84c9499d9022fc24163484f102e9ab6cb441",
+    "mujoco_linkage_v5/meshes/l_mechanism_negative_inner.obj": "800a0ff30c1a2b7fdecacb5e95eb4647fc7ffbd4620a29614e02a7cbf1549b44",
+    "mujoco_linkage_v5/meshes/l_mechanism_negative_rod.obj": "6b036987192bb98277c4ef1098a18c1c322b5b66a8790622ed8bb8611240aedc",
+    "mujoco_linkage_v5/meshes/r_mechanism_base.obj": "0592456d5ce3399fc0967ef00655807f0d9d341a92d079d7f84acfe3d65ffb96",
+    "mujoco_linkage_v5/meshes/r_mechanism_motor.obj": "80d3dd6bce16a16a6aaf4d5dc600a866a7e8bf5a26627c9179881cd0a05287e3",
+    "mujoco_linkage_v5/meshes/r_mechanism_positive_outer.obj": "5d17b4fa11e6a0cbe19fa121a7e796ea0048f122a4dac51c8252d9bf4054ab11",
+    "mujoco_linkage_v5/meshes/r_mechanism_positive_inner.obj": "e0299415ef2e8f6c450ee5a0436fd3f0988622f6420c55df045fee49849502ec",
+    "mujoco_linkage_v5/meshes/r_mechanism_positive_rod.obj": "e536c979c210cd8272b9f5706d6d422637cdeccf361d33aa3829e85d669d59a7",
+    "mujoco_linkage_v5/meshes/r_mechanism_negative_outer.obj": "90553cb3c57a186104cdace9081e355783bc196cdb9cd654b1805942d51e6e0f",
+    "mujoco_linkage_v5/meshes/r_mechanism_negative_inner.obj": "55df7a2fcc212f15946ad2a7fd7740b941aa6416fd26385024ca177161e199bd",
+    "mujoco_linkage_v5/meshes/r_mechanism_negative_rod.obj": "321127baf2a63b62762422b6d8b31ab5ff1b19c2caf839d403b5d8b02f1a85f7",
+    "mujoco_linkage_v5/mechanism_manifest.json": "2dacc9fc5bc136b64a76676170f4ad385f8f62771c9fecd38002df99ae990a7a",
+    "provenance/original-files.sha256.json": "be3d7096b1496d41894e10a16f0d2c08549aa2844480b773132a8f096ea37205",
+    "provenance/original-README_ZH.txt": "976537f682fbd71ee9eead0d10d6ec77b39fc09885e887c730718b3eb4e3100e"
+  }
+}

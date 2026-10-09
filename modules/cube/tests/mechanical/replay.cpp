@@ -135,6 +135,18 @@ int main(int argc, char** argv) {
       }
       pieces.push_back({b, site, slot, orientation});
     }
+    auto piece_errors = [&](const Piece& p) {
+      double ep = (rotation_of(core).transpose() *
+                       (Eigen::Map<const Vec>(d->site_xpos + 3 * p.site) - position()) -
+                   (.055 / 3) * p.slot)
+                      .norm();
+      double er = std::acos(std::clamp(
+          ((p.rotation.transpose() * rotation_of(core).transpose() * rotation_of(p.body)).trace() -
+           1) /
+              2,
+          -1., 1.));
+      return std::pair{ep, er};
+    };
     const int ramp = static_cast<int>(ramp_steps);
     Json report = {{"mode", "diagnostic_replay"},
                    {"acceptance", "pose_only"},
@@ -193,13 +205,22 @@ int main(int argc, char** argv) {
                                   {"geom0", contact_name(d->contact[worst].geom[0])},
                                   {"geom1", contact_name(d->contact[worst].geom[1])}};
       }
-      if (k % 20 == 0 || force > 100)
+      if (k % 20 == 0 || force > 100) {
+        double pos = 0, angle = 0;
+        for (const auto& p : pieces) {
+          auto [ep, er] = piece_errors(p);
+          pos = std::max(pos, ep);
+          angle = std::max(angle, er);
+        }
         report["trace"].push_back(
             {{"time_s", d->time},
              {"contacts", d->ncon},
              {"max_normal_n", force},
+             {"position_error_m", pos},
+             {"orientation_error_rad", angle},
              {"min_distance_m", min_distance},
              {"core_position", {position().x(), position().y(), position().z()}}});
+      }
       escaped = (position() - Vec(0, 0, .1)).norm() > .005;
       if (escaped || d->ncon > 1000) {
         report["stopped_early"] = true;
@@ -212,15 +233,7 @@ int main(int argc, char** argv) {
     double pos_error = 0, angle_error = 0;
     report["pieces"] = Json::array();
     for (const auto& p : pieces) {
-      double ep = (rotation_of(core).transpose() *
-                       (Eigen::Map<const Vec>(d->site_xpos + 3 * p.site) - position()) -
-                   (.055 / 3) * p.slot)
-                      .norm();
-      double er = std::acos(std::clamp(
-          ((p.rotation.transpose() * rotation_of(core).transpose() * rotation_of(p.body)).trace() -
-           1) /
-              2,
-          -1., 1.));
+      auto [ep, er] = piece_errors(p);
       pos_error = std::max(pos_error, ep);
       angle_error = std::max(angle_error, er);
       report["pieces"].push_back({{"name", mj_id2name(m, mjOBJ_BODY, p.body)},

@@ -49,7 +49,7 @@ RX 已完成20步打乱的完整物理仿真还原及34个物理案例检查；�
 
 ```bash
 ./rm cube --dual \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --headless --scramble "R U F' L2 D B R' U2 F D' L B2 U' R2 F2 D L' U B' R" --solve \
   --search-ms 3000 --search-threads 3 \
   --speed 1 --wrist-speed 1 --jaw-speed 1 \
@@ -70,7 +70,7 @@ RPC 也通过启动参数选择 RX：`./rm cube --rpc --dual --rx-bundle PATH`�
 
 ```bash
 ./rm cube --dual \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --viewer --speed 1 --wrist-speed 1 --jaw-speed 1
 ```
 

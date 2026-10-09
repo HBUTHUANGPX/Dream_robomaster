@@ -145,7 +145,7 @@ RX当前提速配置通过两组20步完整还原和35个物理案例，条件�
 | 现象 | 检查与处理 |
 | --- | --- |
 | 提示 `--rx-bundle requires --dual` | 同时传入 `--dual` 和显式原包目录 |
-| 提示缺少 `free_sweep.xml` 或源网格 | 路径须指向原包的 `mujoco_linkage_v5`；保留解压结构，不传压缩包或其上层目录 |
+| 提示缺少 `free_sweep.xml` 或源网格 | 使用 `--rx-bundle assets/rx_gripper/mujoco_linkage_v5`；运行 `node tools/check-rx-assets.mjs`，恢复缺失或修改的Git资产 |
 | RX 命令提示缺少 Robotiq 资产 | 当前 `./rm` 对 `--dual` 仍检查默认资产；恢复完整仓库的 `assets/robotiq_2f85/`，不删除检查步骤 |
 | 计划找到，但报位姿、跟踪、支撑或禁触失败 | 停止本次执行；保留终端错误、`failure.json` 及本次已有的动作和运动记录，交由维护者核对滑移；不提高误差阈值或关闭检测来获得通过 |
 | 运行速度与 Robotiq 不同 | RX默认斜坡为腕部3秒、夹爪2秒，各另等待0.15秒；可使用已验证的 `--speed 4 --wrist-speed 16 --jaw-speed 32`，见[提速配置](rx-narrow-tip.md#已验证的提速配置) |
@@ -170,7 +170,7 @@ RX当前提速配置通过两组20步完整还原和35个物理案例，条件�
 
 `--mechanical` 默认使用固定核心和中心轴驱动；追加 `--rx-bundle PATH` 后使用自由核心和RX摩擦夹持，见[夹爪排错](mechanical-rx.md#判据与排错)。该入口不接受 `--dual`、`--viewer` 或 `--rpc`。
 散开、卡住或色块读取未对齐时，保留本次 `report.json` 和最后图像；先检查几何扫描，再检查预紧与接触。
-不要增加误差容限或切换回weld来获得通过。具体步骤见[机械魔方排错](mechanical-cube.md#失败处理)。
+过程容差实验必须记录参数，并保留最终验收；不要切换回weld来获得通过。具体步骤见[机械魔方排错](mechanical-cube.md#失败处理)。
 
 ## 下载或构建失败
 

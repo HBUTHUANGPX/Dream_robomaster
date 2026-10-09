@@ -1,6 +1,6 @@
 # RX 窄指尖接触几何
 
-本目录保存新增指尖的设计记录，不包含用户提供的 RX 原厂网格。
+本目录保存新增指尖的设计记录；原始网格和MJCF见[RX运行资产](../rx_gripper/README.md)。
 来源压缩包、MJCF 校验值、局部坐标、质量假设和接触参数见 [design.json](design.json)。
 构造和验证程序位于[魔方模块的诊断目录](../../modules/cube/tests/rx_tip)。
 当前命令行入口、准备条件和历史单层验收见[RX 接入指南](../../docs/rx-narrow-tip.md)。
@@ -26,7 +26,7 @@
 ## 接入与验收范围
 
 显式指定 `./rm cube --dual --rx-bundle PATH` 可将本设计用于55 mm魔方的完整还原流程。
-`PATH` 须指向用户原包的 `mujoco_linkage_v5`，其中包含 `free_sweep.xml` 及所引用的网格。
+`PATH` 可直接使用仓库内的 `assets/rx_gripper/mujoco_linkage_v5`。
 默认双夹爪仍是 Robotiq，不自动选择 RX 包。可复制命令见[完整还原入口](../../docs/rx-narrow-tip.md#完整还原入口)。
 
 现有八组单层通过数据属于历史验证，只证明对应单层探针的检查项目。

@@ -1,0 +1,175 @@
+{
+  "profile": "contact_v5_linkage",
+  "geometry": {
+    "link_length_m": 0.044999996632222095,
+    "rod_length_m": 0.0357943041426583,
+    "motor_ref_rad": -0.8389783259706423,
+    "closed_arm_rad": -0.32908777329837313
+  },
+  "source_sha256": "9e5a86f80c10e33ac41e5eef5cbee31d6425a45a7411f9c4549735f3b9a7bd06",
+  "closure_contract": "0=open;1=closed. Production motor endpoints -2.25,0 rad.",
+  "calibration_status": "CAD-derived mechanism; motor zero/axis branch inferred from pad closure and monotonic opening, not hardware measured.",
+  "limitations": [
+    "Bearing centers rounded/inferred from tessellated CAD; no separate STEP assembly supplied.",
+    "Moving metal part density assumed2700kg/m3; parent mass/inertia residual preserves vendor assembly at CAD reference.",
+    "Production kp2/kd0.1 used;0.6Nm torque cap is an explicit simulation assumption, not hardware force calibration.",
+    "Internal mechanism collision exclusions avoid CAD bearing overlap; opposing pads and external collisions remain enabled."
+  ],
+  "hands": {
+    "l": {
+      "source_mesh_sha256": "2adae961fecbc41296a183ca8a179674dd1ae832b17c32fa70dd665cfdaead26",
+      "faces_preserved": 112760,
+      "moving_mass_kg": 0.04582511224769622,
+      "total_mass_kg": 0.238589,
+      "parts": {
+        "motor": [
+          3,
+          8,
+          98,
+          107
+        ],
+        "positive_outer": [
+          7,
+          9,
+          10,
+          11
+        ],
+        "negative_outer": [
+          1,
+          14,
+          96,
+          106
+        ],
+        "positive_inner": [
+          5,
+          6,
+          12
+        ],
+        "negative_inner": [
+          2,
+          95,
+          101,
+          102,
+          103,
+          104,
+          105
+        ],
+        "positive_rod": [
+          4
+        ],
+        "negative_rod": [
+          13
+        ]
+      }
+    },
+    "r": {
+      "source_mesh_sha256": "584526b946b7967e5007159c2262daf993e00aa8cc277f065563db0ae1f65c84",
+      "faces_preserved": 112760,
+      "moving_mass_kg": 0.04582511224769622,
+      "total_mass_kg": 0.238589,
+      "parts": {
+        "motor": [
+          3,
+          8,
+          98,
+          107
+        ],
+        "positive_outer": [
+          7,
+          9,
+          10,
+          11
+        ],
+        "negative_outer": [
+          1,
+          14,
+          96,
+          106
+        ],
+        "positive_inner": [
+          5,
+          6,
+          12
+        ],
+        "negative_inner": [
+          2,
+          95,
+          101,
+          102,
+          103,
+          104,
+          105
+        ],
+        "positive_rod": [
+          4
+        ],
+        "negative_rod": [
+          13
+        ]
+      }
+    }
+  },
+  "motor_range_rad": [
+    -2.25,
+    0.0
+  ],
+  "actuator_force_limit_Nm": 0.6,
+  "scene_sha256": "16c77788cf69409e15cc483b5f54cc45883250ec32ce242f473f572f2f0269a8",
+  "aperture_curve": [
+    {
+      "closure": 0.0,
+      "motor_rad": -2.25,
+      "gap_mm": 83.02187413016071
+    },
+    {
+      "closure": 0.1,
+      "motor_rad": -2.025,
+      "gap_mm": 77.55694583408467
+    },
+    {
+      "closure": 0.2,
+      "motor_rad": -1.8,
+      "gap_mm": 69.83128076347047
+    },
+    {
+      "closure": 0.30000000000000004,
+      "motor_rad": -1.575,
+      "gap_mm": 60.54356918673717
+    },
+    {
+      "closure": 0.4,
+      "motor_rad": -1.35,
+      "gap_mm": 50.441669008329356
+    },
+    {
+      "closure": 0.5,
+      "motor_rad": -1.125,
+      "gap_mm": 40.20034259492438
+    },
+    {
+      "closure": 0.6000000000000001,
+      "motor_rad": -0.8999999999999999,
+      "gap_mm": 30.342444849268478
+    },
+    {
+      "closure": 0.7000000000000001,
+      "motor_rad": -0.6749999999999998,
+      "gap_mm": 21.222079883529506
+    },
+    {
+      "closure": 0.8,
+      "motor_rad": -0.44999999999999996,
+      "gap_mm": 13.052599077366976
+    },
+    {
+      "closure": 0.9,
+      "motor_rad": -0.2250000000000001,
+      "gap_mm": 5.953693329919439
+    },
+    {
+      "closure": 1.0,
+      "motor_rad": 0.0,
+      "gap_mm": -2.1375262670986217e-11
+    }
+  ]
+}

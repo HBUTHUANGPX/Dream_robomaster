@@ -55,36 +55,18 @@ RX 连杆夹爪与 55 mm 魔方已接入 `./rm cube --dual --rx-bundle PATH`。
 运行主机使用 Ubuntu 22.04 x86_64。工作目录为包含 `rm` 的仓库根目录。
 先按[首次使用](getting-started.md#准备环境)执行 `./rm setup --with-tests`。
 需要 C++ 编译器、MuJoCo、EGL、OpenCV 和 `ffmpeg`；不需要 Python。
-准备流程会安装 FFmpeg。解压原包还需要 `unzip`，先执行 `command -v unzip` 检查。
-若没有该命令，在 Ubuntu 终端执行 `sudo apt-get install unzip`；没有管理员权限时请管理员安装。
-完整保留仓库资产。当前 `./rm` 对 `--dual` 仍检查 Robotiq 资产，即使同时指定 RX 包。
+准备流程会安装 FFmpeg。完整保留仓库资产；当前 `./rm` 对 `--dual` 仍检查 Robotiq 资产。
 无窗口录像仍要求 EGL 可用。环境问题见[故障处理](troubleshooting.md)。
 
-RX 原资产由用户提供，不随源码重新分发。
-将 `RX_ASSY_V2_with_gripper.zip` 放在下载目录，并校验来源：
+RX运行资产现随Git保存在 `assets/rx_gripper/mujoco_linkage_v5`，无需另行解压下载包。
+来源与许可状态见[资产说明](../assets/rx_gripper/README.md)。
+在仓库根目录使用Node.js 18或更新版本校验：
 
 ```bash
-sha256sum "$HOME/Downloads/RX_ASSY_V2_with_gripper.zip"
+node tools/check-rx-assets.mjs
 ```
 
-历史单层验证使用的值为 `a21d25f43194ec1e9d2f01219fe43a34f5127a00034540ceb5b3a39586d88db4`。
-若不同，不直接沿用本页成绩；先确认资产版本。
-
-解压资产：
-
-```bash
-mkdir -p .deps/rx-gripper
-unzip -q -n "$HOME/Downloads/RX_ASSY_V2_with_gripper.zip" -d .deps/rx-gripper
-```
-
-检查解压后的入口文件：
-
-```bash
-test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xml
-```
-
-命令退出码为零才表示入口文件存在；还须保留同目录及相对路径引用的全部网格。
-若文件不存在，检查压缩包层级，不用其他XML代替。
+预期24个文件校验通过，且场景网格引用完整。失败时检查Git资产是否缺失或被修改。
 程序不改写源资产。将生成物写入一个新的结果目录，避免覆盖之前的记录。
 完整还原使用下节入口，不需要构建单层诊断目标。
 
@@ -96,7 +78,7 @@ test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xm
 
 ```bash
 ./rm cube --dual \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --headless --scramble "R U F' L2 D B R' U2 F D' L B2 U' R2 F2 D L' U B' R" --solve \
   --search-ms 3000 --search-threads 3 \
   --speed 1 --wrist-speed 1 --jaw-speed 1 \
@@ -138,7 +120,7 @@ RPC标准输出仅为逐行JSON，诊断写标准错误；接口格式见[魔方
 
 ```bash
 ./rm cube --dual \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --headless --scramble "R U F' L2 D B R' U2 F D' L B2 U' R2 F2 D L' U B' R" --solve \
   --search-ms 3000 --speed 4 --wrist-speed 16 --jaw-speed 32 \
   --record --playback 1 --output output/rx-pauses/demo
@@ -196,7 +178,7 @@ RPC标准输出仅为逐行JSON，诊断写标准错误；接口格式见[魔方
 
 ```bash
 build/bin/rm_cube_rx_physics_tests "$PWD" \
-  "$PWD/.deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5" \
+  "$PWD/assets/rx_gripper/mujoco_linkage_v5" \
   --wrist-speed 16 --jaw-speed 32
 ```
 
@@ -303,7 +285,7 @@ TMPDIR="$PWD/.cache/tmp" cmake --build build --target rm_cube_rx_physics_tests
 
 ```bash
 build/bin/rm_cube_rx_physics_tests "$PWD" \
-  "$PWD/.deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5"
+  "$PWD/assets/rx_gripper/mujoco_linkage_v5"
 ```
 
 预期末行包含 `cases=35 failures=0`，进程退出码为0。
@@ -314,7 +296,7 @@ build/bin/rm_cube_rx_physics_tests "$PWD" \
 
 ```bash
 build/bin/rm_cube_rx_physics_tests "$PWD" \
-  "$PWD/.deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5" --check-margin
+  "$PWD/assets/rx_gripper/mujoco_linkage_v5" --check-margin
 ```
 
 预期输出 `PASS check-margin` 且退出码为0。此案例故意给出错误的承载手身份，必须触发禁触；没有正距离承载接触时也会失败，不允许跳过前提。
@@ -323,7 +305,7 @@ build/bin/rm_cube_rx_physics_tests "$PWD" \
 
 ```bash
 ./rm cube --dual \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --viewer --speed 1 --wrist-speed 1 --jaw-speed 1
 ```
 
@@ -351,7 +333,7 @@ TMPDIR="$PWD/.cache/tmp" cmake --build build \
 
 ```bash
 build/bin/rm_cube_rx_tip_geometry \
-  .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  assets/rx_gripper/mujoco_linkage_v5 \
   output/rx-tip-validation A
 ```
 
@@ -359,7 +341,7 @@ build/bin/rm_cube_rx_tip_geometry \
 
 ```bash
 build/bin/rm_cube_rx_tip_geometry \
-  .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  assets/rx_gripper/mujoco_linkage_v5 \
   output/rx-tip-validation B
 ```
 

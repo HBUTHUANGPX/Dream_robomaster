@@ -194,7 +194,7 @@ ssh -N -o ExitOnForwardFailure=yes -L 8765:127.0.0.1:8765 -L 8766:127.0.0.1:8766
 
 RX 窄指尖与 55 mm 魔方已接入 `./rm cube --dual --rx-bundle PATH`。
 默认不启用 RX，也不会自动查找资产包。
-先按 [RX 准备条件](rx-narrow-tip.md#准备条件)取得并校验用户提供的原包，再按[完整还原入口](rx-narrow-tip.md#完整还原入口)运行。
+RX运行资产已随Git保存，先按 [RX 准备条件](rx-narrow-tip.md#准备条件)校验 `assets/rx_gripper/`，再按[完整还原入口](rx-narrow-tip.md#完整还原入口)运行。
 该入口已完成两组20步打乱的完整物理仿真还原。推荐命令使用3000毫秒预算和三个搜索线程。
 限时搜索再次运行时可能选择不同计划。
 RX 当前采用腕部 3 秒、夹爪 2 秒的基准斜坡时长，每次另等待 0.15 秒。

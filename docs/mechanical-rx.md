@@ -29,20 +29,21 @@ RX自身保留八个连杆闭环 `connect`。一个外部上料 `weld` 仅在初
 ## 准备与运行
 
 在仓库根目录操作。先按[首次准备](getting-started.md)安装原生依赖、EGL和录像所需的FFmpeg。
-RX资产不随源码分发，按[RX资产准备](rx-narrow-tip.md#准备条件)校验并解压原包，保留全部网格。
+RX资产已随Git保存在 `assets/rx_gripper/`，来源与许可状态见[资产说明](../assets/rx_gripper/README.md)。
 
 先检查指定的资产目录：
 
 ```bash
-test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xml
+node tools/check-rx-assets.mjs
 ```
 
-退出码须为零。若本地原包在其他位置，用实际路径替换下方的 `--rx-bundle` 参数。
+校验需要Node.js 18或更新版本，预期24个文件全部通过。
+失败时先恢复缺失或修改的Git资产，不依赖旧输出目录。
 执行单层打乱、读取物理状态、求解并还原：
 
 ```bash
 ./rm cube --mechanical \
-  --rx-bundle .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5 \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --scramble R --solve --record \
   --output output/cube-mechanical/rx-solve
 ```
@@ -50,6 +51,35 @@ test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xm
 只验证上料、夹持和承重时，将 `--scramble R --solve` 换为 `--moves ""`。
 输出的 `demo.mp4` 为1倍速。仿真计算明显慢于录像长度；请观察终端打印的仿真时间。
 每次验证使用新的输出目录，避免把旧报告当作本次结果。
+
+## 完整二十步实验
+
+完成上述依赖准备和资产校验后，在仓库根目录执行：
+
+```bash
+./rm cube --mechanical \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --mechanical-config modules/cube/configs/mechanical-rx-relaxed.json \
+  --scramble "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2" \
+  --solve --record \
+  --output output/cube-mechanical/rx-full-20-relaxed
+```
+
+该参数文件记录放宽过程容差的实验；完整还原尚未验收通过。
+若目录已存在，先换一个新的输出路径。运行耗时可能为数小时，等待进程结束后再查看报告。
+正常结束须退出码0、`report.json` 中 `passed:true` 与 `solved:true` 同时成立。
+失败时保留本次报告和录像，按下方排错表检查；不要把已有录像当成成功结果。
+前台运行可按 `Ctrl+C` 停止；中断录像可能不完整。
+
+成功后可使用已纳入Git的字幕脚本，仍在仓库根目录执行：
+
+```bash
+node modules/cube/tools/annotate-mechanical-video.mjs output/cube-mechanical/rx-full-20-relaxed
+```
+
+脚本需要Node.js 18或更新版本、支持字幕滤镜的FFmpeg和 `Noto Sans CJK SC` 字体。
+Ubuntu缺少字体时安装 `fonts-noto-cjk`。脚本仅接受验收成功的报告，输出1倍速 `complete.mp4`。
+缺少报告、动作检查点不匹配或编码失败时停止处理，检查本次结果和依赖。
 
 ## 参数
 
@@ -62,12 +92,31 @@ test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xm
 | `rx_bearing_friction_nm` | `0.002` | 中心轴恒定摩擦阻力 |
 | `rx_detent_torque_nm` | `0.04` | 被动定位力矩的峰值 |
 | `turn_duration_s` | `1.5` | 手腕目标轨迹时长，含单层、整块和空腕旋转 |
-| `alignment_timeout_s` | `2` | 位姿检查未通过时的额外静置上限；0表示立即失败 |
+| `alignment_timeout_s` | `2` | 每轮对齐确认的静置上限；0关闭等待和重夹，未对齐立即失败 |
+| `alignment_regrasp_attempts` | `2` | 每个检查点最多重新夹持次数，整数0至2；0关闭重夹恢复 |
+| `rx_alignment_position_m` | `0.0005` | RX动作过程中的最大块体位置误差，须大于0且小于0.005米 |
+| `rx_alignment_angle_rad` | `0.02` | RX动作过程中的块体与核心角误差，须大于0且小于π/4 |
+| `rx_core_position_m` | `0.001` | RX动作过程中的核心位移，须大于0且小于0.005米 |
 
 夹爪开合轨迹为0.5秒，动作后等待0.15秒。当前不沿用旧RX后端的16倍、32倍速度配置。
 这些参数尚未进行实物标定。更大的夹紧力可能挤歪机构，更小的力可能在转层时打滑。
 额外静置保持所有执行器目标不变，每0.05秒检查一次，连续三次达到原精度要求后继续。
-该过程计入仿真时间和录像。超时仍判失败，报告的 `alignment_waits` 保留初值及全部采样。
+该过程计入仿真时间和录像。报告的 `alignment_waits` 保留初值及全部采样。
+初始已对齐时直接继续，不增加等待或辅助动作。
+
+首轮等待失败后，仅对轻微错位尝试有界重新夹持。每次开始前须双爪闭合，另一手有双指承载接触。
+全块位置误差须不超过1.5毫米，块体与核心角误差各不超过0.05弧度，核心位移不超过1毫米。
+优先打开并闭合当前动作手的另一手；当前动作手不明确时先选A，第二次换手。
+每次只调用原夹爪开合轨迹，不转腕、不进退、不重设位姿或内部约束。
+开合前后检查支撑手接触，并保留原开口净空、闭爪接触和运行中支撑检查。
+每次重夹后重新使用 `alignment_timeout_s` 上限确认，每0.05秒连续三次通过原阈值才继续。
+等待期间启用禁触检查；重夹或等待异常立即停止。超过次数或不满足恢复条件仍报对齐超时。
+将等待时间设为0可关闭额外等待及重夹；非零确认时间不足三个采样周期时，重夹也不能通过确认。
+
+`report.actions` 仍只列规划动作。实际辅助开合另存 `alignment_regrasps`，
+包含每次恢复及各开合动作的起止仿真时间、初末位姿、完成状态和恢复结果。
+等待与开合期间的 `current_action` 分别标为 `alignment_wait` 和 `jaw`，
+避免将辅助阶段接触力计入转腕峰值；成功后恢复原动作，异常保留失败阶段。
 
 ## 判据与排错
 
@@ -77,9 +126,18 @@ test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xm
 
 检查 `jaw_checks` 中双指法向力、开口宽度，以及 `steps` 中的内部位姿和核心误差。
 `peak_turn_tip_contact_tangent_n` 记录转腕期间采样到的指尖切向接触力峰值，用于检查摩擦传力。
-内部位置误差阈值为0.5毫米，姿态误差阈值为0.02弧度。
-检查点另限制核心平移1毫米、姿态0.02弧度，并要求闭合夹爪两侧均有承载接触。
+过程检查默认限制内部位置误差0.5毫米、姿态误差0.02弧度、核心平移1毫米。
+可用上述三个参数放宽过程检查；闭合夹爪两侧仍须有承载接触。
+打乱结束读取色块前及最终检查，仍使用位置0.5毫米、姿态0.02弧度、核心平移1毫米的验收标准。
+打乱结束读取色块前及最终检查，还要求棱角块的最大单坐标位置误差不超过块间距的2%，约0.367毫米。
+字段为 `facelet_position_component_error_m`，不统计中心块，与色块读取器的部件范围一致。
+原全块位置范数、姿态及核心条件继续生效，物理色块读取器本身的严格条件不变。
+该准备检查也可触发上述等待与有界重夹，不能用四舍五入掩盖错位。
+
 腕轴跟踪误差阈值为0.006弧度；开爪净空须大于55毫米乘以根号2，再加1毫米。
+
+长序列放宽实验使用块体位置2毫米、块体与核心角度5°、核心位移2毫米，并关闭自动重夹。
+这些值是实验容差，尚未证明长序列可完成；不放宽脱块、失去支撑及数值异常检查。
 
 | 报错 | 处理 |
 | --- | --- |
@@ -88,9 +146,9 @@ test -f .deps/rx-gripper/RX_ASSY_V2_with_gripper/mujoco_linkage_v5/free_sweep.xm
 | `RX core slipped` | 整块位置或朝向不符合预期；检查摩擦和换手承重 |
 | `RX jaw contact/clearance failed` | 闭爪未形成双边接触，或开爪不足以原地回腕 |
 | `RX forbidden rotation contact` | 回腕触碰魔方或两只夹爪发生承载碰撞 |
-| `RX alignment timeout` | 静置后仍未达到精度要求；检查换手滑移、定位力矩和卡脚受力 |
+| `RX alignment timeout` | 有界等待与允许的重夹后仍未达到原精度；检查 `alignment_waits`、`alignment_regrasps` 和换手受力 |
 
-不要通过放宽阈值、重新开启上料固定或重设位姿把失败改成成功。
+过程容差实验须记录实际参数；不能修改已失败报告、重新开启上料固定或重设位姿来宣称成功。
 旧RX后端的长序列通过记录不能代表这个连续接触模型已通过。
 
 ## 单步故障复现
@@ -160,3 +218,6 @@ B直接执行 `F2` 打乱、读取物理色块、求解并执行 `F2` 还原的�
 输出目录为 `output/cube-mechanical/rx-b-half-regression/`，报告中 `passed`、`solved` 均为真。
 该案例使用内部接触阻抗0.99，其余为默认参数；仿真约11.1秒，未录像。
 本次全套回归通过20项C++、19项Rust、34项Node测试，文档检查通过60个文件。
+
+有界重夹、读取前准备检查和可配置过程容差已构建并通过全套回归，完整二十步物理验收尚未通过。
+局部重新夹持诊断的改善不代表完整连续打乱及求解已通过。

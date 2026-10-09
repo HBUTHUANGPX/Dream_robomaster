@@ -28,6 +28,10 @@ Json settings = {{"shell_gap_m", .00005},
                  {"timestep_s", .0005},
                  {"internal_contact_impedance", .9999},
                  {"alignment_timeout_s", 2.},
+                 {"alignment_regrasp_attempts", 2},
+                 {"rx_alignment_position_m", .0005},
+                 {"rx_alignment_angle_rad", .02},
+                 {"rx_core_position_m", .001},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_tip_friction", 1.2},
@@ -52,6 +56,9 @@ void load_settings(const std::filesystem::path& path) {
     } else if (!v.is_number() || !std::isfinite(v.get<double>()) ||
                (key != "preload_reference_m" && v.get<double>() < 0))
       throw std::invalid_argument("Invalid numeric parameter");
+    if (key == "alignment_regrasp_attempts" &&
+        (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
+      throw std::invalid_argument("alignment_regrasp_attempts must be an integer in [0,2]");
     settings[key] = v;
   }
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
@@ -59,6 +66,10 @@ void load_settings(const std::filesystem::path& path) {
     throw std::invalid_argument("Invalid timing or torque");
   if (value("internal_contact_impedance") <= 0 || value("internal_contact_impedance") >= 1)
     throw std::invalid_argument("Contact impedance must be between zero and one");
+  if (value("rx_alignment_position_m") <= 0 || value("rx_alignment_position_m") >= .005 ||
+      value("rx_alignment_angle_rad") <= 0 || value("rx_alignment_angle_rad") >= pi / 4 ||
+      value("rx_core_position_m") <= 0 || value("rx_core_position_m") >= .005)
+    throw std::invalid_argument("Invalid RX alignment tolerance");
   for (int i = 0; i < 3; ++i)
     if (settings["cap_inner_m"][i].get<double>() >= settings["cap_outer_m"][i].get<double>() ||
         settings["cap_angle_deg"][i].get<double>() >= 60)
@@ -336,16 +347,17 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::map<char, double> targets;
     auto measure = [&]() {
       mj_forward(m, d);
-      double position = 0, angle = 0;
+      double position = 0, angle = 0, facelet_component = 0;
       Json errors = Json::array();
       for (size_t i = 0; i < parts.size(); ++i) {
         int b = mj_name2id(m, mjOBJ_BODY, parts[i].name.c_str()),
             site = mj_name2id(m, mjOBJ_SITE, (parts[i].name + "_center").c_str());
-        position = std::max(
-            position, (core_rotation().transpose() *
-                           (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position()) -
-                       pitch_m * slots[i])
-                          .norm());
+        Vec error = core_rotation().transpose() *
+                        (Eigen::Map<const Vec>(d->site_xpos + 3 * site) - core_position()) -
+                    pitch_m * slots[i];
+        position = std::max(position, error.norm());
+        if (parts[i].slot.squaredNorm() >= 2)
+          facelet_component = std::max(facelet_component, error.cwiseAbs().maxCoeff());
         Mat r = Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->xmat + 9 * b);
         double piece_angle = std::acos(std::clamp(
             ((orientations[i].transpose() * core_rotation().transpose() * r).trace() - 1) / 2, -1.,
@@ -360,6 +372,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       }
       report["pieces"] = errors;
       return Json{{"position_error_m", position},
+                  {"facelet_position_component_error_m", facelet_component},
                   {"orientation_error_rad", angle},
                   {"contacts", d->ncon},
                   {"time_s", d->time}};
@@ -572,7 +585,12 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           orientations[i] = rot * orientations[i];
         }
     };
-    auto check_pose = [&](const std::string& label, bool checkpoint = true) {
+    auto check_pose = [&](const std::string& label, bool checkpoint = true, bool readout = false) {
+      const double position_limit = readout ? .0005 : value("rx_alignment_position_m");
+      const double angle_limit = readout ? .02 : value("rx_alignment_angle_rad");
+      const double core_limit = readout ? .001 : value("rx_core_position_m");
+      const bool had_action = report.contains("current_action");
+      const Json pending_action = report.value("current_action", Json::object());
       auto read_pose = [&]() {
         auto state = measure();
         state["core_position"] = xyz(core_position());
@@ -581,15 +599,19 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         return state;
       };
       auto aligned = [&](const Json& state) {
-        return state["position_error_m"].get<double>() <= .0005 &&
-               state["orientation_error_rad"].get<double>() <= .02 &&
-               state["core_orientation_error_rad"].get<double>() <= .02 &&
-               (core_position() - Vec(0, 0, .1)).norm() <= .001;
+        return (!readout ||
+                state["facelet_position_component_error_m"].get<double>() <= pitch_m * .02) &&
+               state["position_error_m"].get<double>() <= position_limit &&
+               state["orientation_error_rad"].get<double>() <= angle_limit &&
+               state["core_orientation_error_rad"].get<double>() <= angle_limit &&
+               (core_position() - Vec(0, 0, .1)).norm() <= core_limit;
       };
       auto state = read_pose();
-      bool timed_out = false;
-      if (checkpoint && !aligned(state) && value("alignment_timeout_s") > 0) {
-        Json wait = {{"move", label}, {"initial", state}, {"samples", Json::array()}};
+      auto wait_alignment = [&]() {
+        report["current_action"] = {{"kind", "alignment_wait"}, {"move", label}};
+        report["alignment_waits"].push_back(
+            {{"move", label}, {"initial", state}, {"samples", Json::array()}});
+        auto& wait = report["alignment_waits"].back();
         std::cout << "waiting for alignment: " << label << ' ' << state << std::endl;
         double started = d->time;
         int stable = 0;
@@ -601,8 +623,65 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         }
         wait["duration_s"] = d->time - started;
         wait["passed"] = stable == 3;
-        report["alignment_waits"].push_back(wait);
-        timed_out = stable < 3;
+        return stable == 3;
+      };
+      bool timed_out = false;
+      if (checkpoint && !aligned(state) && value("alignment_timeout_s") > 0) {
+        timed_out = !wait_alignment();
+        const std::string first = pending_action.value("hand", "") == "A" ? "B" : "A";
+        for (int attempt = 0;
+             timed_out && attempt < settings["alignment_regrasp_attempts"].get<int>(); ++attempt) {
+          const std::string hand = attempt == 0 ? first : first == "A" ? "B" : "A";
+          const std::string support = hand == "A" ? "B" : "A";
+          if (!closed["A"] || !closed["B"] || !grip_ready(support) ||
+              state["position_error_m"].get<double>() > .0015 ||
+              state["orientation_error_rad"].get<double>() > .05 ||
+              state["core_orientation_error_rad"].get<double>() > .05 ||
+              (core_position() - Vec(0, 0, .1)).norm() > .001)
+            break;
+          report["alignment_regrasps"].push_back({{"move", label},
+                                                  {"hand", hand},
+                                                  {"start_time_s", d->time},
+                                                  {"initial", state},
+                                                  {"actions", Json::array()},
+                                                  {"passed", false}});
+          auto& recovery = report["alignment_regrasps"].back();
+          try {
+            for (bool close : {false, true}) {
+              report["current_action"] = {{"kind", "jaw"},
+                                          {"hand", hand},
+                                          {"target", close ? 115 : 0},
+                                          {"mode", "alignment_regrasp"},
+                                          {"move", label}};
+              recovery["actions"].push_back({{"action", report["current_action"]},
+                                             {"start_time_s", d->time},
+                                             {"initial", read_pose()},
+                                             {"completed", false}});
+              auto& action = recovery["actions"].back();
+              try {
+                if (!grip_ready(support)) throw std::runtime_error("RX grip lost: " + support);
+                jaw(hand, close);
+                if (!grip_ready(support)) throw std::runtime_error("RX grip lost: " + support);
+                action["completed"] = true;
+              } catch (...) {
+                action["end_time_s"] = d->time;
+                action["final"] = read_pose();
+                throw;
+              }
+              action["end_time_s"] = d->time;
+              action["final"] = read_pose();
+            }
+            state = read_pose();
+            timed_out = !wait_alignment();
+            recovery["passed"] = !timed_out && grip_ready("A") && grip_ready("B");
+          } catch (...) {
+            recovery["end_time_s"] = d->time;
+            recovery["final"] = read_pose();
+            throw;
+          }
+          recovery["end_time_s"] = d->time;
+          recovery["final"] = state;
+        }
       }
       state["move"] = label;
       double core_angle = state["core_orientation_error_rad"];
@@ -612,14 +691,20 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       // 单手换向后还未重新夹紧；记录瞬态偏差，转层前仍执行完整验收。
       if (!checkpoint) return;
       if (timed_out) throw std::runtime_error("RX alignment timeout: " + label);
-      if (state["position_error_m"].get<double>() > .0005 ||
-          state["orientation_error_rad"].get<double>() > .02)
+      if (state["position_error_m"].get<double>() > position_limit ||
+          state["orientation_error_rad"].get<double>() > angle_limit)
         throw std::runtime_error("RX mechanical pose mismatch: " + label);
-      if ((core_position() - Vec(0, 0, .1)).norm() > .001 || core_angle > .02)
+      if ((core_position() - Vec(0, 0, .1)).norm() > core_limit || core_angle > angle_limit)
         throw std::runtime_error("RX core slipped: " + label);
+      if (!aligned(state))
+        throw std::runtime_error("RX physical readout alignment failed: " + label);
       for (auto h : {"A", "B"})
         if (closed[h] && !grip_ready(h))
           throw std::runtime_error("RX grip lost: " + std::string(h));
+      if (had_action)
+        report["current_action"] = pending_action;
+      else
+        report.erase("current_action");
     };
     if (rx) {
       jaw("A", true);
@@ -737,6 +822,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     };
     report["scramble"] = requested;
     execute_moves(requested);
+    if (rx) check_pose("scramble readout", true, true);
     report["scrambled_facelets"] = physical_facelets();
     if (solve) {
       auto solution = solve_facelets(report["scrambled_facelets"].get<std::string>(), root);
@@ -744,7 +830,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       execute_moves(solution);
     }
     if (value("record_fps") > 0) advance(.5, rx);
-    if (rx) check_pose("final");
+    if (rx) check_pose("final", true, true);
     report["final_facelets"] = physical_facelets();
     report["solved"] = report["final_facelets"] == solved;
     if (solve && !report["solved"].get<bool>())

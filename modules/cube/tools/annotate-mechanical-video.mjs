@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {spawnSync} from 'node:child_process';
+const dir=path.resolve(process.argv[2]);
+const report=JSON.parse(fs.readFileSync(path.join(dir,'report.json'),'utf8'));
+if(!report.passed||!report.solved||!report.frames)throw Error('需要已完成且通过物理还原验收的录像');
+const checkpoints=report.steps.filter(s=>s.move.endsWith(' checkpoint'));
+const moves=[...report.scramble,...report.solution];
+if(checkpoints.length!==moves.length||checkpoints.some((s,i)=>s.move!==moves[i]+' checkpoint'))throw Error('录像检查点与打乱、求解序列不一致');
+const timestamp=t=>{const n=Math.round(t*100);return `${Math.floor(n/360000)}:${String(Math.floor(n/6000)%60).padStart(2,'0')}:${String(Math.floor(n/100)%60).padStart(2,'0')}.${String(n%100).padStart(2,'0')}`;};
+const duration=report.frames/(report.parameters.record_fps||30);
+const rows=[];
+const line=(a,b,text,style='Caption')=>rows.push(`Dialogue: 0,${timestamp(a)},${timestamp(b)},${style},,0,0,0,,${text}`);
+line(0,duration,`RX摩擦夹爪 · ${report.scramble.length}步打乱与求解还原 · 1倍速`,'Title');
+let start=report.steps[0].time_s;
+line(0,start,'夹持与上料：建立接触后解除外部固定');
+for(let i=0;i<moves.length;i++){
+ const solving=i>=report.scramble.length;
+ const count=solving?i-report.scramble.length+1:i+1;
+ const total=solving?report.solution.length:report.scramble.length;
+ line(start,checkpoints[i].time_s,`${solving?'还原':'打乱'} ${count}/${total} · ${moves[i]}`);
+ start=checkpoints[i].time_s;
+}
+line(start,duration,'已还原 · 实际物理状态核验通过');
+const header=`[Script Info]\nScriptType: v4.00+\nPlayResX: 800\nPlayResY: 600\nWrapStyle: 2\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Title,Noto Sans CJK SC,21,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,1,0,8,10,10,12,1\nStyle: Caption,Noto Sans CJK SC,22,&H00FFFFFF,&H00FFFFFF,&H00000000,&H90000000,0,0,0,0,100,100,0,0,3,1,0,2,10,10,20,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n`;
+fs.writeFileSync(path.join(dir,'timeline.ass'),header+rows.join('\n')+'\n');
+fs.writeFileSync(path.join(dir,'video-summary.json'),JSON.stringify({scramble:report.scramble,solution:report.solution,scramble_finished_s:checkpoints[report.scramble.length-1].time_s,duration_s:duration,playback:1,passed:report.passed,solved:report.solved},null,2));
+const result=spawnSync('ffmpeg',['-y','-v','error','-i','demo.mp4','-vf','drawbox=x=0:y=0:w=iw:h=48:color=black:t=fill,subtitles=timeline.ass','-c:v','libx264','-preset','fast','-crf','19','-pix_fmt','yuv420p','-movflags','+faststart','complete.mp4'],{cwd:dir,stdio:'inherit'});
+if(result.status!==0)throw Error('视频标注失败');
+console.log(path.join(dir,'complete.mp4'));
