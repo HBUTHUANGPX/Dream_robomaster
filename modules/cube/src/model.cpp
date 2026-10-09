@@ -335,7 +335,7 @@ std::string build_scene(const std::filesystem::path& repo, bool dual, bool fast,
          {"body1", "core"},
          {"solref", ".003 1"},
          {"solimp", ".999 .999 .001"},
-         {"torquescale", ".06"}});
+         {"torquescale", rx ? ".3" : ".06"}});
     for (char f : faces)
       add(eq, "joint",
           {{"name", "lock_" + std::string(1, f)},

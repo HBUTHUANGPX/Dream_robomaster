@@ -12,6 +12,7 @@ using Clock = std::chrono::steady_clock;
 struct Case {
   std::string name;
   std::vector<Primitive> actions;
+  bool fast_scramble = false;
 };
 
 double elapsed(Clock::time_point began) {
@@ -69,12 +70,23 @@ bool run_case(const std::filesystem::path& root, const std::filesystem::path& bu
   size_t step = 0;
   std::string phase = "construct", expected = solved;
   try {
-    cube = std::make_unique<Cube>(root, true, 1, wrist_speed, jaw_speed, bundle);
+    cube = std::make_unique<Cube>(root, true, test.fast_scramble ? 4 : 1, wrist_speed, jaw_speed,
+                                  bundle);
     auto& c = *cube;
+    if (test.fast_scramble) {
+      phase = "fast_scramble";
+      const auto moves = split_moves("R U F' L2 D B R' U2 F D' L B2 U' R2 F2 D L' U B' R");
+      const double start = c.data->time;
+      for (const auto& move : moves) c.turn(move);
+      expected = replay_facelet_moves(solved, moves);
+      if (c.data->time - start > 10 ||
+          (c.body_position(c.id(mjOBJ_BODY, "core")) - Vec(0, 0, .22)).norm() > .00005)
+        throw std::runtime_error("Fast scramble too slow or loading fixture oscillating");
+    }
     phase = "initialize_grasps";
     c.initialize_grasps(check_physics);
     check_physics(c);
-    if (c.facelets() != expected) throw std::runtime_error("Initial physical cube is not solved");
+    if (c.facelets() != expected) throw std::runtime_error("Initial physical cube state mismatch");
     for (auto action : test.actions) {
       ++step;
       phase = primitive_name(action);
@@ -207,6 +219,7 @@ std::vector<Case> default_cases() {
       }
     }
   }
+  tests.push_back({"fast_scramble_handoff", {Primitive::B_N90, Primitive::B_P90}, true});
   return tests;
 }
 }  // namespace

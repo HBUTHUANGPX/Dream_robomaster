@@ -71,8 +71,8 @@
 命令、成本配置和最优性边界见[双夹爪搜索指南](docs/cube-primitive-search.md)。
 
 RX 窄指尖的 55 mm 魔方已接入同一命令行入口。显式传入 `--dual --rx-bundle PATH` 才启用 RX，默认仍为 Robotiq。
-RX已验证提速参数 `--wrist-speed 16 --jaw-speed 32`，同一62动作序列从196.18秒缩短至44.555秒，见[提速配置](docs/rx-narrow-tip.md#已验证的提速配置)。
-RX 已完成20步打乱的完整物理仿真还原：62个动作、196.18秒执行时间；另有34个物理案例通过。
+RX已验证提速参数 `--speed 4 --wrist-speed 16 --jaw-speed 32`，同一62动作序列从196.18秒缩短至20.695秒，见[提速配置](docs/rx-narrow-tip.md#已验证的提速配置)。
+当前提速配置通过两组20步完整还原及35个物理案例。
 结果基于明确的数值接触参数，不是实物硬件验证。
 准备条件、新命令和历史单层结果见 [RX 接入指南](docs/rx-narrow-tip.md)。
 

@@ -123,10 +123,10 @@ struct App {
       // RX 的90°和180°均使用3秒腕部斜坡；稳定等待不随运行速度缩放。
       for (int a = 0; a < 12; ++a) {
         const int kind = a % 6;
-        const double duration = kind < 4 ? 3 / cube->wrist_speed + .5
-                                         : 2 / cube->jaw_speed + .5 + (kind == 5 ? .08 : 0);
+        const double duration = kind < 4 ? 3 / cube->wrist_speed + .15
+                                         : 2 / cube->jaw_speed + .15 + (kind == 5 ? .08 : 0);
         costs.duration[a].fill(duration);
-        if (kind < 4) costs.duration[a][1] += .15 + .08;
+        if (kind < 4) costs.duration[a][1] += .03 + .08;
       }
     }
     return search_options(merged, costs);
@@ -317,7 +317,9 @@ int main(int argc, char** argv) {
                      "--dual --rx-bundle PATH 使用RX夹爪与55毫米魔方；默认仍为Robotiq。\n"
                      "PATH须为含free_sweep.xml的原包mujoco_linkage_v5目录，不自动查找。\n"
                      "RX建议保守速度：--speed 1 --wrist-speed 1 --jaw-speed 1；"
-                     "腕部斜坡3秒、夹爪2秒，各另等待0.5秒。\n"
+                     "腕部斜坡3秒、夹爪2秒，各另等待0.15秒。\n"
+                     "RX提速配置：--speed 4 --wrist-speed 16 --jaw-speed 32；"
+                     "--speed 同时缩放RX装载打乱斜坡。\n"
                      "--record 需要 FFmpeg。--solve 读取当前状态并求解。\n"
                      "双夹爪默认使用十二元动作搜索：--search-ms 1000 --objective "
                      "execution_time|action_count\n"

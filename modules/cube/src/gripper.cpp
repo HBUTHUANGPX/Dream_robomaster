@@ -127,7 +127,7 @@ void Cube::move_actuator(const std::string& name, double target, double duration
                            {"peak_actuator_force", peakf},
                            {"initial_aperture_m", gap0}});
   data->ctrl[a] = target;
-  advance(rx ? .5 : .15, cb);
+  advance(.15, cb);
   if (j >= 0 &&
       std::abs(data->qpos[model->jnt_qposadr[j]] - target) > (joint.ends_with("yaw") ? .006 : .001))
     throw std::runtime_error(joint + " failed tracking");
@@ -294,7 +294,7 @@ void Cube::lock(const std::string& move, const Callback& cb, int wrist_quarters)
   model->eq_data[mjNEQDATA * eq] = expected;
   data->eq_active[eq] = 1;
   for (int i : selected) attach(i, "core", true);
-  advance(.15, cb);
+  advance(rx ? .03 : .15, cb);
   active_face.clear();
   active_hand.clear();
   history.push_back(move);

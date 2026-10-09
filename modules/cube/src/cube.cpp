@@ -162,7 +162,8 @@ void Cube::turn(const std::string& move, const Callback& cb) {
   for (int i : selected) attach(i, "center_" + active_face);
   int act = id(mjOBJ_ACTUATOR, "drive_" + active_face);
   double start = targets[f], end = start - c * pi / 2;
-  int steps = std::lround((std::abs(c) == 1 ? .75 : 1.05) / model->opt.timestep);
+  int steps = std::max(
+      1L, std::lround((std::abs(c) == 1 ? .75 : 1.05) / (rx ? speed : 1) / model->opt.timestep));
   for (int k = 1; k <= steps; k++) {
     progress = double(k) / steps;
     double u = progress, smooth = u * u * u * (10 + u * (-15 + 6 * u));
