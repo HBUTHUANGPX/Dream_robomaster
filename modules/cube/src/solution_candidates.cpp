@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cstdint>
 #include <cstring>
 #include <exception>
@@ -9,6 +10,7 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+#include <thread>
 
 extern "C" {
 #include "coordcube.h"
@@ -17,23 +19,29 @@ extern "C" {
 }
 
 namespace rm::cube {
+// 不透明凭证：只由完成校验及发布的 prepare 创建，不保存可写表指针。
+class CandidateTables {};
+
 namespace {
 using Clock = std::chrono::steady_clock;
 constexpr char order[] = "URFDLB";
 const std::string solved = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
-std::recursive_timed_mutex search_mutex;
+std::mutex publish_mutex;
+std::atomic<bool> tables_published{false};
 
 struct Context {
   Clock::time_point deadline;
   const std::function<bool(const std::vector<std::string>&)>& callback;
   CandidateSearchStats stats;
   std::exception_ptr error;
+  const std::atomic<bool>* cancel;
 };
 
 int cancelled(void* raw) {
   auto& ctx = *static_cast<Context*>(raw);
   if (Clock::now() >= ctx.deadline) ctx.stats.timed_out = true;
-  return ctx.stats.timed_out || bool(ctx.error);
+  if (ctx.cancel && ctx.cancel->load(std::memory_order_relaxed)) ctx.stats.cancelled = true;
+  return ctx.stats.timed_out || ctx.stats.cancelled || bool(ctx.error);
 }
 
 int deliver(const int* axes, const int* powers, int length, void* raw) noexcept {
@@ -81,11 +89,11 @@ const Table tables[] = {
     {"Slice_Flip_Prun", Slice_Flip_Prun, sizeof(Slice_Flip_Prun), 0x1c4c07f828a483f4ULL},
 };
 
-bool load_tables(const std::filesystem::path& root, Context& ctx) {
-  // 全部验证完成后才发布，超时或失败不会留下部分初始化的全局表。
-  std::vector<std::vector<unsigned char>> data;
+bool read_tables(const std::filesystem::path& root, Clock::time_point deadline,
+                 std::vector<std::vector<unsigned char>>& data) {
+  // 全部验证完成后才发布，超时或失败不会发布部分初始化的全局表。
   for (const auto& table : tables) {
-    if (cancelled(&ctx)) return false;
+    if (Clock::now() >= deadline) return false;
     const auto path = root / "modules/cube/third_party/kociemba/cprunetables" / table.name;
     std::error_code error;
     if (!std::filesystem::is_regular_file(path, error) ||
@@ -96,7 +104,7 @@ bool load_tables(const std::filesystem::path& root, Context& ctx) {
     auto& bytes = data.emplace_back(table.size);
     uint64_t hash = 14695981039346656037ULL;
     for (size_t offset = 0; offset < bytes.size();) {
-      if (cancelled(&ctx)) return false;
+      if (Clock::now() >= deadline) return false;
       const auto count = std::min<size_t>(4096, bytes.size() - offset);
       if (!input.read(reinterpret_cast<char*>(bytes.data() + offset), count))
         throw std::runtime_error("求解表读取失败: " + path.string());
@@ -106,28 +114,62 @@ bool load_tables(const std::filesystem::path& root, Context& ctx) {
       }
       offset += count;
     }
-    if (cancelled(&ctx)) return false;
+    if (Clock::now() >= deadline) return false;
     if (hash != table.checksum)
       throw std::runtime_error("求解表校验失败: " + path.string());
   }
-  if (cancelled(&ctx)) return false;
-  // 原始 short 表采用小端编码；转换不改变剪枝表中的字节。
-  const uint16_t endian = 1;
-  for (size_t i = 0; i < std::size(tables); ++i) {
-    if (i < 8 && *reinterpret_cast<const unsigned char*>(&endian) != 1)
-      for (size_t j = 0; j < data[i].size(); j += 2) std::swap(data[i][j], data[i][j + 1]);
-    std::memcpy(tables[i].target, data[i].data(), tables[i].size);
-  }
-  PRUNING_INITED = 1;
-  return !cancelled(&ctx);
+  if (Clock::now() >= deadline) return false;
+  return true;
 }
 }  // namespace
 
-CandidateSearchStats enumerate_solutions(
-    const std::string& facelets, const std::filesystem::path& root,
-    Clock::time_point deadline,
-    const std::function<bool(const std::vector<std::string>&)>& on_solution) {
-  Context ctx{deadline, on_solution, {}, {}};
+std::shared_ptr<const CandidateTables> prepare_candidate_tables(const std::filesystem::path& root,
+                                                                Clock::time_point deadline) {
+  if (Clock::now() >= deadline) return {};
+  std::vector<std::vector<unsigned char>> data;
+  if (!read_tables(root, deadline, data)) return {};
+  auto session = std::make_shared<const CandidateTables>();
+  if (!tables_published.load(std::memory_order_acquire)) {
+    std::unique_lock<std::mutex> lock(publish_mutex, std::defer_lock);
+    // 短间隔尝试保证等待锁也受单调截止时间限制，不依赖平台的定时锁时钟。
+    while (!lock.try_lock()) {
+      const auto now = Clock::now();
+      if (now >= deadline) return {};
+      std::this_thread::sleep_until(std::min(deadline, now + std::chrono::microseconds(50)));
+    }
+    if (Clock::now() >= deadline) return {};
+    if (!tables_published.load(std::memory_order_relaxed)) {
+      // 仅首发线程可写。中途超时不发布标志，也不交付会话；下次完整覆盖。
+      // 枚举不可能观察尚未发布的表。legacy 初始化不得与此路径并发。
+      const uint16_t endian = 1;
+      for (size_t i = 0; i < std::size(tables); ++i) {
+        for (size_t offset = 0; offset < data[i].size();) {
+          if (Clock::now() >= deadline) return {};
+          const auto count = std::min<size_t>(4096, data[i].size() - offset);
+          if (i < 8 && *reinterpret_cast<const unsigned char*>(&endian) != 1)
+            for (size_t j = offset; j < offset + count; j += 2)
+              std::swap(data[i][j], data[i][j + 1]);
+          std::memcpy(static_cast<unsigned char*>(tables[i].target) + offset,
+                      data[i].data() + offset, count);
+          offset += count;
+        }
+      }
+      if (Clock::now() >= deadline) return {};
+      PRUNING_INITED = 1;
+      // release 发布涵盖 C 表与普通 int 标志；之后二者均不再写入。
+      tables_published.store(true, std::memory_order_release);
+    }
+  }
+  if (Clock::now() >= deadline) return {};
+  return session;
+}
+
+namespace {
+CandidateSearchStats enumerate_impl(
+    const std::string& facelets, const std::filesystem::path* root, Clock::time_point deadline,
+    const std::function<bool(const std::vector<std::string>&)>& on_solution,
+    const std::atomic<bool>* cancel) {
+  Context ctx{deadline, on_solution, {}, {}, cancel};
   if (cancelled(&ctx)) return ctx.stats;
   if (!on_solution) throw std::invalid_argument("候选回调不能为空");
   std::array<int, 6> counts{};
@@ -141,23 +183,42 @@ CandidateSearchStats enumerate_solutions(
     if (counts[i] != 9 || facelets[i * 9 + 4] != order[i])
       throw std::invalid_argument("魔方面贴纸数量或中心颜色非法");
   std::string input = facelets;
-  std::unique_ptr<facecube_t, decltype(&std::free)> fc(get_facecube_fromstring(input.data()), std::free);
+  std::unique_ptr<facecube_t, decltype(&std::free)> fc(get_facecube_fromstring(input.data()),
+                                                       std::free);
   std::unique_ptr<cubiecube_t, decltype(&std::free)> cc(toCubieCube(fc.get()), std::free);
   if (verify(cc.get()) != 0) throw std::invalid_argument("魔方状态不可能还原");
   if (cancelled(&ctx)) return ctx.stats;
   if (facelets == solved) {
     deliver(nullptr, nullptr, 0, &ctx);
   } else {
-    std::unique_lock<std::recursive_timed_mutex> lock(search_mutex, std::defer_lock);
-    if (!lock.try_lock_until(deadline)) {
-      ctx.stats.timed_out = true;
-      return ctx.stats;
+    std::shared_ptr<const CandidateTables> session;
+    if (root) {
+      session = prepare_candidate_tables(*root, deadline);
+      if (!session) {
+        ctx.stats.timed_out = true;
+        return ctx.stats;
+      }
     }
-    if (!load_tables(root, ctx)) return ctx.stats;
+    // 与首次发布建立 happens-before，C 层读取的表及 PRUNING_INITED 均已稳定。
+    if (!tables_published.load(std::memory_order_acquire)) throw std::logic_error("候选表尚未发布");
     enumerate_search(input.data(), cancelled, deliver, &ctx);
   }
   if (ctx.error) std::rethrow_exception(ctx.error);
   cancelled(&ctx);
   return ctx.stats;
+}
+}  // namespace
+
+CandidateSearchStats enumerate_solutions(
+    const std::string& facelets, const std::filesystem::path& root, Clock::time_point deadline,
+    const std::function<bool(const std::vector<std::string>&)>& on_solution) {
+  return enumerate_impl(facelets, &root, deadline, on_solution, nullptr);
+}
+
+CandidateSearchStats enumerate_solutions(
+    const std::string& facelets, const CandidateTables&, Clock::time_point deadline,
+    const std::function<bool(const std::vector<std::string>&)>& on_solution,
+    const std::atomic<bool>* cancel) {
+  return enumerate_impl(facelets, nullptr, deadline, on_solution, cancel);
 }
 }  // namespace rm::cube

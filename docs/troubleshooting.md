@@ -115,10 +115,12 @@ RPC 先检查 `ok` 和 `error`；`ok:true` 后还须检查规划结果的 `found
 | --- | --- |
 | `found:false`，`stop_reason` 为 `deadline` | 搜索预算包含首解、表读取和候选优化；增加 `--search-ms` 后重试，例如从 1000 改为 5000 |
 | 未还原状态使用 0 毫秒预算没有解 | 这是预期行为；设置正预算，不会强行调用旧求解器兜底 |
-| `stop_reason` 为 `memory_limit` | 图搜索工作内存受限；主机资源允许时增大 `--search-memory-mb`，例如改为 128；它不是进程 RSS 上限 |
+| `stop_reason` 为 `memory_limit` | 图预算由同一请求的工作线程分摊；可用 `--search-threads 1` 增加单线程可用额度，或在资源允许时增加 `--search-memory-mb`；它不是进程 RSS 上限 |
+| 搜索 CPU 占用较高 | 默认最多三个搜索线程；使用 `--search-threads 1`，或设置 RPC `threads:1` |
+| `threads_used` 小于请求值 | 工作线程数受 CPU 并行度和图内存预算限制；很小预算可能在准备阶段就截止。检查 `preparation_ms` 与 `stop_reason` |
 | 求解表缺失、长度错误或校验失败 | 从同一仓库版本恢复报错路径下的 `cprunetables` 文件，并确认读取权限；不会自动生成表，不要绕过校验 |
 | 成本配置被拒绝 | CLI 传文件路径，RPC 传内联对象；检查动作名、模式名及 0 到 3600 秒的数值；JSON 小数须带前导零 |
-| 搜索参数被拒绝 | CLI 须启用 `--dual` 且不使用 `--viewer`；检查目标、终态策略、预算范围和整数内存上限 |
+| 搜索参数被拒绝 | CLI 须启用 `--dual` 且不使用 `--viewer`；线程数须为 1、2 或 3 的整数；检查目标、终态策略、预算范围和整数内存上限 |
 | `overlap` 被拒绝 | 当前只支持串行动作；移除该字段，不把它设置为 `false` 来请求兼容 |
 | 末腕角非零或只闭合一侧 | 默认 `stable` 允许此终态；需要两腕归零且双闭合时用 `--terminal-policy home`，整体朝向仍任意 |
 | 改了成本但物理速度没变 | 成本只改变计划评价；控制速度由 `--wrist-speed` 和 `--jaw-speed` 设置 |

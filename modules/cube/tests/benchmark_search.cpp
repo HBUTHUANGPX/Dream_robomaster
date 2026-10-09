@@ -135,6 +135,7 @@ struct Config {
   unsigned count = 12;
   uint32_t seed = 20261009;
   double budget = 500;
+  int threads = 3;
   std::string mode = "both";
   bool prepare = false;
 };
@@ -168,6 +169,10 @@ Config arguments(int argc, char** argv) {
     else if (key == "--budget-ms") {
       c.budget = integer(value);
       need(c.budget <= 3600000, "预算超限");
+    } else if (key == "--threads") {
+      const unsigned threads = integer(value);
+      need(threads >= 1 && threads <= 3, "threads必须为1、2或3");
+      c.threads = int(threads);
     } else if (key == "--mode")
       c.mode = value;
     else
@@ -183,8 +188,9 @@ int main(int argc, char** argv) {
   try {
     if (argc == 2 && std::string(argv[1]) == "--help") {
       std::cout << "--root path --count 12 --budget-ms 500 --seed 20261009 --output path "
-                   "[--mode both|search|optimize] [--prepare-only]\n"
-                   "count为20步打乱数量；另加5个短边界。prepare-only只生成输入，不调用搜索。\n";
+                   "[--threads 1|2|3] [--mode both|search|optimize] [--prepare-only]\n"
+                   "count为20步打乱数量；另加5个短边界。prepare-only只生成输入，不调用搜索。\n"
+                   "threads默认3，仅用于search；optimize固定单线程，first_plan_ms为null。\n";
       return 0;
     }
     const Config c = arguments(argc, argv);
@@ -207,6 +213,9 @@ int main(int argc, char** argv) {
           {"count", c.count},
           {"budget_ms", c.budget},
           {"mode", c.mode},
+          {"threads", c.threads},
+          {"optimize_threads", 1},
+          {"first_plan_ms_source", "search: improvements[0].search_ms; optimize: unavailable"},
           {"generator", "mt19937_u32_mod18_reject_same_face_v1"},
           {"objective", "execution_time"},
           {"wall_excluded_from_objective", true},
@@ -248,6 +257,8 @@ int main(int argc, char** argv) {
         Json row = base;
         row["type"] = "result";
         row["api"] = mode;
+        row["threads"] = mode == "search" ? c.threads : 1;
+        row["first_plan_ms"] = nullptr;
         row["found"] = false;
         row["cost"] = nullptr;
         row["steps"] = nullptr;
@@ -255,15 +266,23 @@ int main(int argc, char** argv) {
         row["candidates"] = mode == "optimize" ? Json(1) : Json(nullptr);
         SearchOptions options;
         options.max_search_ms = c.budget;
+        // 固定序列优化不参与候选并行，避免把请求线程数误报成实际线程数。
+        options.threads = mode == "search" ? c.threads : 1;
         const auto began = Clock::now();
         try {
           std::optional<RobotPlan> plan;
           if (mode == "search") {
             auto r = search_robot_solution(state, {}, options, c.root);
             row["search_ms"] = r.search_ms;
+            row["threads_used"] = r.threads_used;
+            row["preparation_ms"] = r.preparation_ms;
+            row["worker_memory_limit_mb"] = r.worker_memory_limit_mb;
+            row["workers"] = r.workers;
             row["candidates"] = r.candidates;
             row["optimized_candidates"] = r.optimized_candidates;
             row["stop_reason"] = r.stop_reason;
+            if (!r.improvements.empty())
+              row["first_plan_ms"] = r.improvements.at(0).at("search_ms");
             if (r.found) plan = std::move(r.plan);
           } else {
             auto deadline = began + std::chrono::duration_cast<Clock::duration>(

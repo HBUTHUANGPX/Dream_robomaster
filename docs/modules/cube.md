@@ -5,6 +5,7 @@
 `rm_cube` 实现魔方 XML 生成、MuJoCo 推进、物理色块读取、通用求解、十二元动作搜索、接触反馈、渲染和 FFmpeg 录制。运行时不启动 Python 解释器。
 
 双夹爪无窗口 `solve` 和 RPC `solve`、`plan` 默认使用新搜索。
+纯软件求解默认最多三个线程，使用 `--search-threads 1|2|3` 设置。MuJoCo 操作仍留在创建线程。
 完整参数、成本配置、机械域与最优性边界见[十二元动作搜索指南](../cube-primitive-search.md)。
 
 ## 启动与运行

@@ -182,13 +182,14 @@ ssh -N -o ExitOnForwardFailure=yes -L 8765:127.0.0.1:8765 -L 8766:127.0.0.1:8766
 ~~~bash
 ./rm cube --headless --dual --scramble "R U" --plan-only \
   --search-ms 1000 --objective execution_time --terminal-policy stable \
-  --search-memory-mb 64 --output output/cube-first-plan
+  --search-memory-mb 64 --search-threads 3 --output output/cube-first-plan
 ~~~
 
 该命令创建模型并打乱，但不执行还原。
 成功时 `output/cube-first-plan/robot_plan.json` 的 `found` 为 `true`。
 没有解时命令失败退出；检查该文件的 `stop_reason` 和同目录的 `failure.json`。
 这不表示魔方无解，可能是搜索预算不足。
+默认最多三个搜索线程，受 CPU 和图内存预算限制。需要减少 CPU 占用时，改用 `--search-threads 1`。
 参数、执行步骤和成本配置见[双夹爪搜索指南](cube-primitive-search.md)。
 搜索结果仅为预算内已找到的最佳解，不保证全局最优，也不支持动作重叠。
 

@@ -1,6 +1,8 @@
 #include "rm/robot_search.hpp"
 
+#include <mutex>
 #include <queue>
+#include <thread>
 #include <unordered_set>
 
 #include "rm/solution_candidates.hpp"
@@ -18,7 +20,16 @@ struct Edge {
 using Graph = std::array<std::array<Edge, 12>, states>;
 const Graph* graph(Clock::time_point deadline) {
   static std::optional<Graph> cached;
-  if (cached) return &*cached;
+  static std::atomic<const Graph*> published{nullptr};
+  static std::mutex mutex;
+  if (auto ready = published.load(std::memory_order_acquire)) return ready;
+  std::unique_lock lock(mutex, std::defer_lock);
+  while (!lock.try_lock()) {
+    auto now = Clock::now();
+    if (now >= deadline) return nullptr;
+    std::this_thread::sleep_until(std::min(deadline, now + std::chrono::microseconds(50)));
+  }
+  if (auto ready = published.load(std::memory_order_acquire)) return ready;
   Graph next;
   for (int s = 0; s < states; ++s) {
     if (s % 16 == 0 && Clock::now() >= deadline) return nullptr;
@@ -38,6 +49,7 @@ const Graph* graph(Clock::time_point deadline) {
       }
   }
   cached = std::move(next);
+  published.store(&*cached, std::memory_order_release);
   return &*cached;
 }
 // 合并同奇偶的有符号腕角，保留朝向、夹爪和横腕约束。
@@ -74,7 +86,8 @@ std::optional<std::vector<double>> suffix_bounds(const Graph& graph,
                                                  const std::vector<std::pair<char, int>>& moves,
                                                  const SearchOptions& options,
                                                  Clock::time_point deadline,
-                                                 size_t available_memory) {
+                                                 size_t available_memory,
+                                                 const SearchFeedback* feedback) {
   const auto& incoming = relaxed_graph(graph);
   const size_t count = (moves.size() * 4 + 1) * relaxed_states;
   std::vector<double> distance(count, std::numeric_limits<double>::infinity());
@@ -88,7 +101,9 @@ std::optional<std::vector<double>> suffix_bounds(const Graph& graph,
     }
   size_t iterations = 0;
   while (!work.empty()) {
-    if ((iterations++ & 63) == 0 && Clock::now() >= deadline) return {};
+    if ((iterations++ & 63) == 0 &&
+        (Clock::now() >= deadline || (feedback && feedback->cancel.load())))
+      return {};
     const auto [cost, node] = work.top();
     work.pop();
     if (cost != distance[node]) continue;
@@ -121,6 +136,7 @@ std::optional<std::vector<double>> suffix_bounds(const Graph& graph,
   return distance;
 }
 void validate_options(const SearchOptions& o) {
+  if (o.threads < 1 || o.threads > 3) throw std::invalid_argument("threads must be in [1,3]");
   if (!std::isfinite(o.max_search_ms) || o.max_search_ms < 0 || o.max_search_ms > 3600000)
     throw std::invalid_argument("max_search_ms must be in [0,3600000]");
   if (o.memory_limit_mb < 4 || o.memory_limit_mb > 4096)
@@ -135,6 +151,13 @@ SearchOptions search_options(const Json& args, const PrimitiveCosts& costs) {
   SearchOptions o;
   o.costs = costs;
   o.max_search_ms = args.value("max_search_ms", 1000.);
+  if (args.contains("threads")) {
+    if (!args["threads"].is_number_integer())
+      throw std::invalid_argument("threads must be integer");
+    auto n = args["threads"].get<long long>();
+    if (n < 1 || n > 3) throw std::invalid_argument("threads must be in [1,3]");
+    o.threads = int(n);
+  }
   auto obj = args.value("objective", std::string("execution_time"));
   if (obj != "execution_time" && obj != "action_count")
     throw std::invalid_argument("objective must be execution_time or action_count");
@@ -158,7 +181,8 @@ SearchOptions search_options(const Json& args, const PrimitiveCosts& costs) {
 }
 std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& moves,
                                               const RobotState& start, const SearchOptions& o,
-                                              Clock::time_point deadline, double upper_bound) {
+                                              Clock::time_point deadline, double upper_bound,
+                                              const SearchFeedback* feedback) {
   validate_options(o);
   int initial = robot_state_id(start);
   if (moves.size() > 1000) throw std::invalid_argument("At most 1000 face moves");
@@ -179,7 +203,7 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
     p.stop_reason = "optimal";
     return p;
   }
-  if (Clock::now() >= deadline) return {};
+  if (Clock::now() >= deadline || (feedback && feedback->cancel.load())) return {};
   const Graph* g = graph(deadline);
   if (!g) return {};
   // 每个面动作保留模4的已完成转角，允许一个180°拆成两个90°。
@@ -197,7 +221,8 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
   const size_t bound_bytes = (moves.size() * 4 + 1) * relaxed_states * sizeof(double);
   const size_t base_bytes = n * sizeof(Label) + graph_bytes + bound_bytes;
   if (base_bytes > limit) throw std::runtime_error("Robot search memory limit reached");
-  auto bounds = suffix_bounds(*g, expected, o, deadline, limit - n * sizeof(Label) - graph_bytes);
+  auto bounds =
+      suffix_bounds(*g, expected, o, deadline, limit - n * sizeof(Label) - graph_bytes, feedback);
   if (!bounds) return {};
   auto h = [&](int node) {
     return (*bounds)[node / states * relaxed_states + relaxed_state(node % states)];
@@ -244,7 +269,13 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
     return incumbent;
   };
   while (!queue.empty()) {
-    if ((iterations++ & 63) == 0 && Clock::now() >= deadline) return stopped("deadline");
+    if ((iterations++ & 63) == 0) {
+      if (Clock::now() >= deadline) return stopped("deadline");
+      if (feedback) {
+        if (feedback->cancel.load()) return stopped("cancelled");
+        upper_bound = std::min(upper_bound, feedback->upper_bound.load());
+      }
+    }
     auto item = queue.top();
     queue.pop();
     auto& label = labels[item.node];
@@ -254,8 +285,8 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
         partial = stage % 4;
     if (size_t(progress) == moves.size() && goal(state)) {
       remember(item.node);
-      incumbent->optimal_for_sequence = true;
-      incumbent->stop_reason = "optimal";
+      incumbent->optimal_for_sequence = incumbent->cost <= upper_bound;
+      incumbent->stop_reason = incumbent->optimal_for_sequence ? "optimal" : "bound";
       incumbent->expanded = expanded;
       return incumbent;
     }
@@ -293,102 +324,190 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
 }
 RobotSearchResult search_robot_solution(const std::string& state, const RobotState& start,
                                         const SearchOptions& o, const std::filesystem::path& root) {
-  auto began = Clock::now();
+  const auto began = Clock::now();
   validate_options(o);
   robot_state_id(start);
   validate_facelets(state);
-  auto deadline = began + std::chrono::duration_cast<Clock::duration>(
-                              std::chrono::duration<double, std::milli>(o.max_search_ms));
+  const auto deadline = began + std::chrono::duration_cast<Clock::duration>(
+                                    std::chrono::duration<double, std::milli>(o.max_search_ms));
   RobotSearchResult result;
   result.start = start;
+  SearchFeedback feedback;
+  std::mutex mutex;
   std::unordered_set<std::string> seen;
-  auto running = [&] {
-    return result.stop_reason != "memory_limit" && Clock::now() < deadline &&
-           (!result.found || result.plan.cost > 0);
+  std::exception_ptr error;
+  std::atomic<bool> memory_limited{false};
+  struct Worker {
+    std::vector<size_t> frames;
+    size_t candidates = 0, optimized = 0;
+    bool memory_limited = false;
   };
-  auto consider = [&](const std::vector<std::string>& moves, Clock::time_point candidate_deadline) {
-    std::string key;
-    for (const auto& move : moves) {
-      key += move;
-      key += ' ';
+  std::vector<Worker> workers;
+  auto running = [&] { return !feedback.cancel.load() && Clock::now() < deadline; };
+  auto publish = [&](RobotPlan p) {
+    // 先独立检查，再在短临界区内发布；没有搜索队列或 MuJoCo 对象进入临界区。
+    if (replay_facelet_moves(state, primitive_moves(p.actions, start)) != solved)
+      throw std::runtime_error("Primitive solution failed independent replay");
+    std::lock_guard lock(mutex);
+    if (!result.found || p.cost < result.plan.cost ||
+        (p.cost == result.plan.cost && p.actions.size() < result.plan.actions.size())) {
+      result.found = true;
+      result.plan = std::move(p);
+      feedback.upper_bound.store(result.plan.cost);
+      result.improvements.push_back(
+          {{"search_ms", std::chrono::duration<double, std::milli>(Clock::now() - began).count()},
+           {"action_count", result.plan.actions.size()},
+           {"execution_s", result.plan.execution_s}});
+      if (result.plan.cost == 0) feedback.cancel.store(true);
     }
-    if (seen.contains(key)) return running() && Clock::now() < candidate_deadline;
-    ++result.candidates;
-    if (replay_facelet_moves(state, moves) != solved)
-      throw std::runtime_error("Candidate failed independent facelet replay");
-    auto p = optimize_robot_moves(
-        moves, start, o, candidate_deadline,
-        result.found ? result.plan.cost : std::numeric_limits<double>::infinity());
-    // 被时间分片中断的候选允许在其他坐标系重试。完整评估过的候选才去重。
-    if (Clock::now() < candidate_deadline || (p && p->optimal_for_sequence)) {
-      if (seen.size() >= 4096) seen.clear();
-      seen.insert(std::move(key));
-    }
-    if (p) {
-      if (p->stop_reason == "memory_limit") result.stop_reason = "memory_limit";
-      ++result.optimized_candidates;
-      if (!result.found || p->cost < result.plan.cost ||
-          (p->cost == result.plan.cost && p->actions.size() < result.plan.actions.size())) {
-        if (replay_facelet_moves(state, primitive_moves(p->actions, start)) != solved)
-          throw std::runtime_error("Primitive solution failed independent replay");
-        result.found = true;
-        result.plan = std::move(*p);
-        result.improvements.push_back(
-            {{"search_ms", std::chrono::duration<double, std::milli>(Clock::now() - began).count()},
-             {"action_count", result.plan.actions.size()},
-             {"execution_s", result.plan.execution_s}});
-      }
-    }
-    return running() && Clock::now() < candidate_deadline;
   };
   try {
-    if (state == solved)
-      consider({}, deadline);
-    else if (Clock::now() < deadline) {
-      // 三个两阶段主轴分别探索，恒等坐标系优先。
-      std::vector<size_t> frames;
-      std::array<bool, 3> axes{};
-      for (size_t frame = 0; frame < 24; ++frame) {
-        const auto& destination = cube_rotations()[frame].face_destination;
-        const size_t up =
-            std::find(destination.begin(), destination.end(), 'U') - destination.begin();
-        const size_t axis = up % 3;
-        if (!axes[axis]) {
-          axes[axis] = true;
-          frames.push_back(frame);
+    if (state == solved) {
+      result.threads_used = 1;
+      result.worker_memory_limit_mb = o.memory_limit_mb;
+      result.candidates = 1;
+      if (auto p = optimize_robot_moves({}, start, o, deadline)) {
+        result.optimized_candidates = 1;
+        publish(std::move(*p));
+      }
+    } else if (running()) {
+      // 表校验和图发布在创建线程前完成；随后工作线程只读共享数据。
+      auto tables = prepare_candidate_tables(root, deadline);
+      const auto* g = tables && running() ? graph(deadline) : nullptr;
+      if (g && running()) relaxed_graph(*g);
+      result.preparation_ms =
+          std::chrono::duration<double, std::milli>(Clock::now() - began).count();
+      if (g && running()) {
+        const unsigned hardware = std::max(1u, std::thread::hardware_concurrency());
+        const int count = std::min({o.threads, int(std::min(hardware, 3u)),
+                                    int(std::max<size_t>(1, o.memory_limit_mb / 8))});
+        result.threads_used = count;
+        result.worker_memory_limit_mb = o.memory_limit_mb / count;
+        SearchOptions worker_options = o;
+        worker_options.memory_limit_mb = result.worker_memory_limit_mb;
+        workers.resize(count);
+        std::array<bool, 3> axes{};
+        size_t frame_number = 0;
+        for (size_t frame = 0; frame < 24; ++frame) {
+          const auto& destination = cube_rotations()[frame].face_destination;
+          const size_t up =
+              std::find(destination.begin(), destination.end(), 'U') - destination.begin();
+          if (!axes[up % 3]) {
+            axes[up % 3] = true;
+            // 两线程时：一个持续探索恒等坐标系，另一个分时探索其余两个主轴。
+            workers[std::min(frame_number++, size_t(count - 1))].frames.push_back(frame);
+          }
+        }
+        if (count == 1 && o.max_search_ms < 250) workers[0].frames.resize(1);
+        auto run_worker = [&](int index) {
+          auto& worker = workers[index];
+          try {
+            auto consider = [&](const std::vector<std::string>& moves, Clock::time_point until) {
+              if (!running() || Clock::now() >= until) return false;
+              std::string key;
+              for (const auto& move : moves) {
+                key += move;
+                key += ' ';
+              }
+              {
+                std::lock_guard lock(mutex);
+                if (seen.contains(key)) return true;
+              }
+              ++worker.candidates;
+              if (replay_facelet_moves(state, moves) != solved)
+                throw std::runtime_error("Candidate failed independent facelet replay");
+              auto p = optimize_robot_moves(moves, start, worker_options, until,
+                                            feedback.upper_bound.load(), &feedback);
+              {
+                std::lock_guard lock(mutex);
+                // 只去重已完成的评估。进行中或受时间/内存打断的候选允许其他线程评估，
+                // 避免短分片抢占长分片的候选后超时，导致该候选永久漏评。
+                if ((p && p->optimal_for_sequence) ||
+                    (!p && Clock::now() < until && !feedback.cancel.load())) {
+                  if (seen.size() >= 4096) seen.clear();
+                  seen.insert(std::move(key));
+                }
+              }
+              if (p) {
+                ++worker.optimized;
+                if (p->stop_reason == "memory_limit") {
+                  worker.memory_limited = true;
+                  memory_limited.store(true);
+                }
+                publish(std::move(*p));
+              }
+              return !worker.memory_limited && running() && Clock::now() < until;
+            };
+            for (size_t i = 0; i < worker.frames.size() && running(); ++i) {
+              const auto now = Clock::now();
+              const auto remaining = deadline - now;
+              const auto until = worker.frames.size() == 1 || i + 1 == worker.frames.size()
+                                     ? deadline
+                                 : worker.frames.size() == 3 && i == 0 ? now + remaining * 3 / 5
+                                                                       : now + remaining / 2;
+              enumerate_solutions(
+                  conjugate_facelets(state, worker.frames[i]), *tables, until,
+                  [&](const auto& variant_moves) {
+                    const auto moves = map_moves_to_original(variant_moves, worker.frames[i]);
+                    if (!consider(moves, until)) return false;
+                    for (size_t j = 1; j < moves.size(); ++j) {
+                      auto [a, sa] = face_axis(moves[j - 1][0]);
+                      auto [b, sb] = face_axis(moves[j][0]);
+                      if (a == b && sa != sb) {
+                        auto reordered = moves;
+                        std::swap(reordered[j - 1], reordered[j]);
+                        if (!consider(reordered, until)) return false;
+                      }
+                    }
+                    return running() && Clock::now() < until;
+                  },
+                  &feedback.cancel);
+              if (worker.memory_limited) break;
+            }
+          } catch (const std::runtime_error& e) {
+            if (std::string(e.what()) == "Robot search memory limit reached") {
+              worker.memory_limited = true;
+              memory_limited.store(true);
+            } else {
+              std::lock_guard lock(mutex);
+              if (!error) error = std::current_exception();
+              feedback.cancel.store(true);
+            }
+          } catch (...) {
+            std::lock_guard lock(mutex);
+            if (!error) error = std::current_exception();
+            feedback.cancel.store(true);
+          }
+        };
+        std::vector<std::jthread> threads;
+        try {
+          for (int i = 1; i < count; ++i) threads.emplace_back(run_worker, i);
+          run_worker(0);
+        } catch (...) {
+          // 创建线程失败也先取消并 join，避免引用离开作用域的协调状态。
+          feedback.cancel.store(true);
+          threads.clear();
+          throw;
+        }
+        threads.clear();
+        if (error) std::rethrow_exception(error);
+        for (const auto& worker : workers) {
+          result.candidates += worker.candidates;
+          result.optimized_candidates += worker.optimized;
+          result.workers.push_back({{"frames", worker.frames},
+                                    {"candidates", worker.candidates},
+                                    {"optimized_candidates", worker.optimized},
+                                    {"memory_limited", worker.memory_limited}});
         }
       }
-      // 短预算优先获得并改进首解，避免重复支付其他坐标系的首解成本。
-      if (o.max_search_ms < 250) frames.resize(1);
-      for (size_t i = 0; i < frames.size() && running(); ++i) {
-        const auto remaining = deadline - Clock::now();
-        const auto frame_deadline = frames.size() == 1 ? deadline
-                                    : i == 0           ? Clock::now() + remaining * 3 / 5
-                                    : i == 1           ? Clock::now() + remaining / 2
-                                                       : deadline;
-        enumerate_solutions(conjugate_facelets(state, frames[i]), root, frame_deadline,
-                            [&](const auto& variant_moves) {
-                              const auto moves = map_moves_to_original(variant_moves, frames[i]);
-                              if (!consider(moves, frame_deadline)) return false;
-                              for (size_t j = 1; j < moves.size(); ++j) {
-                                auto [a, sa] = face_axis(moves[j - 1][0]);
-                                auto [b, sb] = face_axis(moves[j][0]);
-                                if (a == b && sa != sb) {
-                                  auto reordered = moves;
-                                  std::swap(reordered[j - 1], reordered[j]);
-                                  if (!consider(reordered, frame_deadline)) return false;
-                                }
-                              }
-                              return running();
-                            });
-      }
     }
-    if (result.stop_reason.empty())
-      result.stop_reason = Clock::now() >= deadline ? "deadline" : "candidate_search_finished";
   } catch (const std::runtime_error& e) {
     if (std::string(e.what()) != "Robot search memory limit reached") throw;
-    result.stop_reason = "memory_limit";
+    memory_limited.store(true);
   }
+  result.stop_reason = memory_limited.load()      ? "memory_limit"
+                       : Clock::now() >= deadline ? "deadline"
+                                                  : "candidate_search_finished";
   result.search_ms = std::chrono::duration<double, std::milli>(Clock::now() - began).count();
   return result;
 }
@@ -397,6 +516,11 @@ Json RobotSearchResult::json(const SearchOptions& o) const {
             {"objective", o.action_count ? "action_count" : "execution_time"},
             {"search_ms", search_ms},
             {"max_search_ms", o.max_search_ms},
+            {"threads_requested", o.threads},
+            {"threads_used", threads_used},
+            {"worker_memory_limit_mb", worker_memory_limit_mb},
+            {"preparation_ms", preparation_ms},
+            {"workers", workers},
             {"stop_reason", stop_reason},
             {"candidates", candidates},
             {"optimized_candidates", optimized_candidates},

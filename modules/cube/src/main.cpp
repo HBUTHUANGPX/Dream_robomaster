@@ -244,7 +244,12 @@ int main(int argc, char** argv) {
         solve = true;
       else if (a == "--search-ms")
         search_args["max_search_ms"] = numeric();
-      else if (a == "--objective")
+      else if (a == "--search-threads") {
+        double n = numeric();
+        if (n != std::floor(n) || n < 1 || n > 3)
+          throw std::invalid_argument("Invalid search thread count");
+        search_args["threads"] = int(n);
+      } else if (a == "--objective")
         search_args["objective"] = value();
       else if (a == "--terminal-policy")
         search_args["terminal_policy"] = value();
@@ -287,6 +292,7 @@ int main(int argc, char** argv) {
                      "双夹爪默认使用十二元动作搜索：--search-ms 1000 --objective "
                      "execution_time|action_count\n"
                      "--cost-profile 配置文件 --terminal-policy stable|home --search-memory-mb 64\n"
+                     "--search-threads 1|2|3 设置搜索线程数，默认 3；内存不足时自动减少。\n"
                      "--plan-only 只规划不执行还原。搜索耗时不计入目标；本版不支持动作重叠。\n";
         return 0;
       } else
