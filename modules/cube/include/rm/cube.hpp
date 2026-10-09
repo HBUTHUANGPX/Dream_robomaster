@@ -30,7 +30,8 @@ struct Action {
 };
 using Plan = std::vector<Action>;
 Json replay_plan(const Plan& plan, Mat orientation = Mat::Identity());
-Plan compile_moves(const std::vector<std::string>& moves, Mat orientation = Mat::Identity());
+Plan compile_moves(const std::vector<std::string>& moves, Mat orientation = Mat::Identity(),
+                   bool allow_b_face_turns = false);
 Plan optimize_plan(const Plan& plan, Mat orientation = Mat::Identity());
 Json plan_json(const Plan& plan);
 std::string build_scene(const std::filesystem::path& root, bool dual, bool fast = false,

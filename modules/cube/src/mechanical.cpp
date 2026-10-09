@@ -26,6 +26,8 @@ Json settings = {{"shell_gap_m", .00005},
                  {"preload_reference_m", -.0015},
                  {"turn_duration_s", 1.5},
                  {"timestep_s", .0005},
+                 {"internal_contact_impedance", .9999},
+                 {"alignment_timeout_s", 2.},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_tip_friction", 1.2},
@@ -55,6 +57,8 @@ void load_settings(const std::filesystem::path& path) {
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
       value("max_torque_nm") <= 0)
     throw std::invalid_argument("Invalid timing or torque");
+  if (value("internal_contact_impedance") <= 0 || value("internal_contact_impedance") >= 1)
+    throw std::invalid_argument("Contact impedance must be between zero and one");
   for (int i = 0; i < 3; ++i)
     if (settings["cap_inner_m"][i].get<double>() >= settings["cap_outer_m"][i].get<double>() ||
         settings["cap_angle_deg"][i].get<double>() >= 60)
@@ -222,7 +226,9 @@ std::string scene() {
     << value("timestep_s")
     << "' gravity='0 0 -9.81' integrator='implicitfast' solver='Newton' "
        "iterations='100' cone='elliptic' impratio='10'/><size memory='256M'/><default><geom "
-       "friction='.03 .0001 .00001' solref='.001 1' solimp='.9999 .9999 .0001' "
+       "friction='.03 .0001 .00001' solref='.001 1' solimp='"
+    << value("internal_contact_impedance") << ' ' << value("internal_contact_impedance")
+    << " .0001' "
        "condim='3'/></default><visual><global offwidth='800' offheight='600'/></visual><asset>"
     << assets.str()
     << "</asset><worldbody><light pos='.1 -.2 .5'/><geom type='sphere' pos='0 0 .1' size='.0107' "
@@ -392,7 +398,31 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     int ticks = 0, frames = 0;
     double peak_tip_normal = 0, peak_tip_tangent = 0, peak_turn_tangent = 0;
     double next_frame = 0;
-    auto advance = [&](double t) {
+    std::map<std::string, bool> closed{{"A", false}, {"B", false}};
+    auto check_rotation_contacts = [&]() {
+      for (int i = 0; i < d->ncon; ++i) {
+        const auto& c = d->contact[i];
+        auto owner = [&](int g) {
+          int body = m->geom_bodyid[g];
+          const char* n = mj_id2name(m, mjOBJ_BODY, body);
+          std::string b = n ? n : "";
+          return b.starts_with("A_")                                 ? 1
+                 : b.starts_with("B_")                               ? 2
+                 : b.starts_with("piece_") || b == "mechanical_core" ? 3
+                                                                     : 0;
+        };
+        int a = owner(c.geom[0]), b = owner(c.geom[1]);
+        bool bad = (a == 1 && b == 2) || (a == 2 && b == 1);
+        for (int h = 1; h <= 2; ++h)
+          if (!closed[h == 1 ? "A" : "B"] && ((a == h && b == 3) || (b == h && a == 3))) bad = true;
+        if (bad) {
+          mjtNum f[6];
+          mj_contactForce(m, d, i, f);
+          if (f[0] > .01) throw std::runtime_error("RX forbidden rotation contact");
+        }
+      }
+    };
+    auto advance = [&](double t, bool check_contacts = false) {
       for (int k = 0; k < std::lround(t / m->opt.timestep); ++k) {
         if (rx) {
           // 固定周期势能的负梯度，模拟被动磁吸定位；不读取规划目标。
@@ -405,6 +435,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           }
         }
         mj_step(m, d);
+        if (check_contacts) check_rotation_contacts();
         ++ticks;
         if (rx && ticks % 10 == 0) {
           for (int i = 0; i < d->ncon; ++i) {
@@ -470,7 +501,6 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     if (report["settled"]["position_error_m"].get<double>() > .0005)
       throw std::runtime_error("Assembly lost retention at rest");
     Mat robot_orientation = Mat::Identity();
-    std::map<std::string, bool> closed{{"A", false}, {"B", false}};
     auto tip_contacts = [&](const std::string& hand) {
       Json pads = Json::object();
       for (auto side : {"left", "right"}) {
@@ -512,37 +542,14 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       int a = mj_name2id(m, mjOBJ_ACTUATOR, name.c_str());
       if (a < 0) throw std::runtime_error("Missing RX actuator: " + name);
       double start = d->ctrl[a];
+      bool turning = name.ends_with("_yaw_drive");
       int count = std::max(1L, std::lround(duration / m->opt.timestep));
       for (int k = 1; k <= count; ++k) {
         double u = double(k) / count;
         d->ctrl[a] = start + (target - start) * u * u * u * (10 + u * (-15 + 6 * u));
-        advance(m->opt.timestep);
-        if (name.ends_with("_yaw_drive")) {
-          for (int i = 0; i < d->ncon; ++i) {
-            const auto& c = d->contact[i];
-            auto owner = [&](int g) {
-              int body = m->geom_bodyid[g];
-              const char* n = mj_id2name(m, mjOBJ_BODY, body);
-              std::string b = n ? n : "";
-              return b.starts_with("A_")                                 ? 1
-                     : b.starts_with("B_")                               ? 2
-                     : b.starts_with("piece_") || b == "mechanical_core" ? 3
-                                                                         : 0;
-            };
-            int a = owner(c.geom[0]), b = owner(c.geom[1]);
-            bool bad = (a == 1 && b == 2) || (a == 2 && b == 1);
-            for (int h = 1; h <= 2; ++h)
-              if (!closed[h == 1 ? "A" : "B"] && ((a == h && b == 3) || (b == h && a == 3)))
-                bad = true;
-            if (bad) {
-              mjtNum f[6];
-              mj_contactForce(m, d, i, f);
-              if (f[0] > .01) throw std::runtime_error("RX forbidden rotation contact");
-            }
-          }
-        }
+        advance(m->opt.timestep, turning);
       }
-      advance(.15);
+      advance(.15, turning);
     };
     auto jaw = [&](const std::string& h, bool close) {
       command(h + "_fingers_actuator", close ? -1.20 : -2.25, .5);
@@ -565,16 +572,46 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           orientations[i] = rot * orientations[i];
         }
     };
-    auto check_pose = [&](const std::string& label) {
-      auto state = measure();
+    auto check_pose = [&](const std::string& label, bool checkpoint = true) {
+      auto read_pose = [&]() {
+        auto state = measure();
+        state["core_position"] = xyz(core_position());
+        state["core_orientation_error_rad"] = std::acos(std::clamp(
+            ((robot_orientation.transpose() * core_rotation()).trace() - 1) / 2, -1., 1.));
+        return state;
+      };
+      auto aligned = [&](const Json& state) {
+        return state["position_error_m"].get<double>() <= .0005 &&
+               state["orientation_error_rad"].get<double>() <= .02 &&
+               state["core_orientation_error_rad"].get<double>() <= .02 &&
+               (core_position() - Vec(0, 0, .1)).norm() <= .001;
+      };
+      auto state = read_pose();
+      bool timed_out = false;
+      if (checkpoint && !aligned(state) && value("alignment_timeout_s") > 0) {
+        Json wait = {{"move", label}, {"initial", state}, {"samples", Json::array()}};
+        std::cout << "waiting for alignment: " << label << ' ' << state << std::endl;
+        double started = d->time;
+        int stable = 0;
+        while (d->time - started + .05 <= value("alignment_timeout_s") + 1e-8 && stable < 3) {
+          advance(.05, true);
+          state = read_pose();
+          wait["samples"].push_back(state);
+          stable = aligned(state) ? stable + 1 : 0;
+        }
+        wait["duration_s"] = d->time - started;
+        wait["passed"] = stable == 3;
+        report["alignment_waits"].push_back(wait);
+        timed_out = stable < 3;
+      }
       state["move"] = label;
-      state["core_position"] = xyz(core_position());
-      double core_angle = std::acos(
-          std::clamp(((robot_orientation.transpose() * core_rotation()).trace() - 1) / 2, -1., 1.));
-      state["core_orientation_error_rad"] = core_angle;
+      double core_angle = state["core_orientation_error_rad"];
       report["steps"].push_back(state);
       std::cout << state << std::endl;
       snapshot("step_" + std::to_string(report["steps"].size()));
+      // 单手换向后还未重新夹紧；记录瞬态偏差，转层前仍执行完整验收。
+      if (!checkpoint) return;
+      if (timed_out) throw std::runtime_error("RX alignment timeout: " + label);
       if (state["position_error_m"].get<double>() > .0005 ||
           state["orientation_error_rad"].get<double>() > .02)
         throw std::runtime_error("RX mechanical pose mismatch: " + label);
@@ -594,7 +631,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     }
     auto execute_moves = [&](const std::vector<std::string>& moves) {
       if (rx) {
-        auto plan = compile_moves(moves, robot_orientation);
+        auto plan = compile_moves(moves, robot_orientation, true);
         for (const auto& a : plan) {
           report["current_action"] = a.json();
           if (a.kind == "jaw")
@@ -602,14 +639,37 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           else if (a.kind == "grasp" && !grip_ready(a.hand))
             throw std::runtime_error("RX lost fingertip contact");
           else if (a.kind == "yaw") {
+            auto states = out / "diagnostic_states";
+            std::filesystem::create_directories(states);
+            auto save_state = [&](const std::string& prefix) {
+              std::vector<mjtNum> state(mj_stateSize(m, mjSTATE_INTEGRATION));
+              mj_getState(m, d, state.data(), mjSTATE_INTEGRATION);
+              std::ofstream saved(states /
+                                  (prefix + std::to_string(report["actions"].size()) + ".json"));
+              saved << Json{{"mode", "diagnostic_snapshot"},
+                            {"state_spec", int(mjSTATE_INTEGRATION)},
+                            {"state", state},
+                            {"parameters", settings},
+                            {"action", a.json()},
+                            {"robot_orientation", matrix_json(robot_orientation)}}
+                           .dump();
+              saved.close();
+              if (!saved) throw std::runtime_error("Cannot write diagnostic state");
+            };
+            save_state("before_");
+            double checked_at = d->time;
+            if (a.mode == "face") check_pose("before " + a.move);
+            if (d->time > checked_at) save_state("aligned_");
             int actuator = mj_name2id(m, mjOBJ_ACTUATOR, (a.hand + "_yaw_drive").c_str());
             double start = d->ctrl[actuator];
             command(a.hand + "_yaw_drive", a.target, value("turn_duration_s"));
             int joint = mj_name2id(m, mjOBJ_JOINT, (a.hand + "_yaw").c_str());
             if (std::abs(d->qpos[m->jnt_qposadr[joint]] - a.target) > .006)
               throw std::runtime_error("RX wrist tracking failed");
-            if (a.mode == "whole")
+            if (a.mode == "whole") {
               robot_orientation = wrist_rotation(a.hand, a.target - start) * robot_orientation;
+              check_pose("whole " + a.hand, false);
+            }
           } else if (a.kind == "layer_lock") {
             update_expected(a.move);
             check_pose(a.move);
@@ -683,7 +743,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       report["solution"] = solution;
       execute_moves(solution);
     }
-    if (value("record_fps") > 0) advance(.5);
+    if (value("record_fps") > 0) advance(.5, rx);
     if (rx) check_pose("final");
     report["final_facelets"] = physical_facelets();
     report["solved"] = report["final_facelets"] == solved;

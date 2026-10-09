@@ -142,7 +142,8 @@ Json replay_plan(const Plan& p, Mat q) {
           {"yaw_rad", {{"A", yaw[0]}, {"B", yaw[1]}}},
           {"jaw_command", {{"A", jaw[0]}, {"B", jaw[1]}}}};
 }
-Plan compile_moves(const std::vector<std::string>& moves, Mat orientation) {
+Plan compile_moves(const std::vector<std::string>& moves, Mat orientation,
+                   bool allow_b_face_turns) {
   checked(orientation);
   Mat q = orientation;
   Plan p;
@@ -168,7 +169,10 @@ Plan compile_moves(const std::vector<std::string>& moves, Mat orientation) {
     auto [f, c] = parse_move(m);
     auto [axis, sign] = face_axis(f);
     Vec n = q * Vec::Unit(axis) * sign;
-    if (n.x() < -0.5)
+    std::string hand = "A";
+    if (allow_b_face_turns && n.y() < -.5)
+      hand = "B";
+    else if (n.x() < -0.5)
       reorient("B", 2);
     else if (n.z() > .5)
       reorient("B", -1);
@@ -181,14 +185,14 @@ Plan compile_moves(const std::vector<std::string>& moves, Mat orientation) {
       reorient("A", 1);
       reorient("B", 1);
     }
-    p.push_back({"release", "A"});
-    p.push_back({"layer_unlock", "A", 0, "", m});
-    p.push_back({"grasp", "A", 0, "face", m});
-    p.push_back({"yaw", "A", -c * pi / 2, "face", m});
-    p.push_back({"layer_lock", "A", 0, "", m});
-    clear("A");
-    p.push_back({"yaw", "A", 0, "empty"});
-    engage("A");
+    p.push_back({"release", hand});
+    p.push_back({"layer_unlock", hand, 0, "", m});
+    p.push_back({"grasp", hand, 0, "face", m});
+    p.push_back({"yaw", hand, -c * pi / 2, "face", m});
+    p.push_back({"layer_lock", hand, 0, "", m});
+    clear(hand);
+    p.push_back({"yaw", hand, 0, "empty"});
+    engage(hand);
     p.push_back({"checkpoint", "", 0, "", m});
   }
   replay_plan(p, orientation);

@@ -66,3 +66,6 @@ add_executable(rm_cube_mechanical_probe EXCLUDE_FROM_ALL tests/mechanical/probe.
 target_link_libraries(rm_cube_mechanical_probe PRIVATE rm_cube_core)
 add_executable(rm_cube_mechanical_sweep EXCLUDE_FROM_ALL tests/mechanical/sweep.cpp)
 target_link_libraries(rm_cube_mechanical_sweep PRIVATE rm_cube_core)
+# 快照恢复仅用于独立故障复现，不是完整录像的执行入口。
+add_executable(rm_cube_mechanical_replay EXCLUDE_FROM_ALL tests/mechanical/replay.cpp)
+target_link_libraries(rm_cube_mechanical_replay PRIVATE rm_cube_core)

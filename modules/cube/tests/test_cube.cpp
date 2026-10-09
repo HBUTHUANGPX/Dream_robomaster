@@ -55,10 +55,58 @@ int main(int argc, char** argv) {
         if (!seen) orientations.push_back(q);
       }
     require(orientations.size() == 24, "Incorrect cube orientation group");
+    const Plan direct_f{{"release", "B"},
+                        {"layer_unlock", "B", 0, "", "F"},
+                        {"grasp", "B", 0, "face", "F"},
+                        {"yaw", "B", -pi / 2, "face", "F"},
+                        {"layer_lock", "B", 0, "", "F"},
+                        {"release", "B"},
+                        {"jaw", "B", 0},
+                        {"yaw", "B", 0, "empty"},
+                        {"jaw", "B", 115},
+                        {"grasp", "B", 0, "core"},
+                        {"checkpoint", "", 0, "", "F"}};
+    require(compile_moves({"F"}, Mat::Identity(), true) == direct_f,
+            "Initial F must turn B directly without whole rotations");
+    auto count_whole = [](const Plan& plan) {
+      return std::count_if(plan.begin(), plan.end(),
+                           [](const Action& a) { return a.kind == "yaw" && a.mode == "whole"; });
+    };
+    const auto prefix = split_moves("R U F2");
+    const auto prefix_b = compile_moves(prefix, Mat::Identity(), true);
+    require(count_whole(compile_moves(prefix)) == count_whole(prefix_b) + 2,
+            "B face turn must remove two whole rotations from R U F2");
+    require(replay_plan(prefix_b)["moves"] == prefix, "B prefix replay mismatch");
     for (auto& q : orientations) {
       auto p = compile_moves(moves, q);
       require(replay_plan(p, q) == replay_plan(optimize_plan(p, q), q),
               "Orientation optimizer mismatch");
+      require(p == compile_moves(moves, q, false), "Default planner behavior changed");
+      auto mixed = replay_plan(compile_moves(moves, q, true), q);
+      require(mixed["moves"] == moves && mixed["yaw_rad"]["A"] == 0 && mixed["yaw_rad"]["B"] == 0,
+              "Mixed-hand sequence replay or wrist reset mismatch");
+      for (char face : faces)
+        for (const auto* suffix : {"", "'", "2"}) {
+          const std::vector<std::string> single{std::string(1, face) + suffix};
+          const auto legacy = compile_moves(single, q);
+          const auto plan = compile_moves(single, q, true);
+          const auto replay = replay_plan(plan, q);
+          require(legacy == compile_moves(single, q, false), "Disabled B option changed plan");
+          require(replay["moves"] == single, "24 orientations x 18 moves replay mismatch");
+          require(replay["yaw_rad"]["A"] == 0 && replay["yaw_rad"]["B"] == 0,
+                  "B-enabled plan did not reset both wrists");
+          require(replay == replay_plan(optimize_plan(plan, q), q),
+                  "B-enabled optimizer changed replay");
+          auto [axis, sign] = face_axis(face);
+          if (q * Vec::Unit(axis) * sign == Vec(0, -1, 0)) {
+            require(count_whole(plan) == 0 && replay["orientation"] == matrix_json(q),
+                    "Presented B face unnecessarily reoriented cube");
+            for (const auto& a : plan)
+              require(a.kind == "checkpoint" || a.hand == "B", "Direct B plan commands wrong hand");
+          } else {
+            require(plan == legacy, "B option changed a face not already presented to B");
+          }
+        }
     }
     std::array<Vec, 6> initial = {Vec(1, -1, 1),  Vec(-1, 1, -1), Vec(1, -1, 1),
                                   Vec(-1, 1, -1), Vec(1, -1, 1),  Vec(-1, 1, -1)},
