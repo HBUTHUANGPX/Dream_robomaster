@@ -65,6 +65,10 @@
 使用 `./rm cube --rpc` 时，标准输出只写逐行 JSON，构建和诊断写入标准错误。
 接入示例见[逐行 JSON 协议步骤](docs/getting-started.md#接入逐行-json-协议)。
 
+双夹爪无窗口求解默认使用十二元动作搜索。可用 `--plan-only` 只规划，
+用 `--search-ms 1000` 设置搜索预算。搜索耗时不计入动作成本，当前不支持动作重叠。
+命令、成本配置和最优性边界见[双夹爪搜索指南](docs/cube-primitive-search.md)。
+
 ## 按任务查阅
 
 - [首次使用、环境条件和远程访问](docs/getting-started.md)
@@ -73,6 +77,7 @@
 - [导航操作、定位和数据导出](docs/modules/navigation.md)
 - [对战操作、视觉和射击](docs/modules/duel.md)
 - [魔方操作、双夹爪和录像](docs/modules/cube.md)
+- [双夹爪十二元动作搜索、预算和成本](docs/cube-primitive-search.md)
 - [开发、目录和测试](docs/development.md)
 - [迁移记录与已验证的功能](docs/migration.md)
 - [可选 CAD 转换](docs/modules/cad.md)

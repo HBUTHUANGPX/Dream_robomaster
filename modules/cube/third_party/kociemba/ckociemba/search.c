@@ -56,12 +56,14 @@ char* solutionToString(search_t* search, int length, int depthPhase1)
 }
 
 
-char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, const char* cache_dir)
+static char* search_solutions(char* facelets, int maxDepth, long timeOut, int useSeparator,
+                             const char* cache_dir, search_cancel_fn cancel,
+                             search_candidate_fn candidate, void* context)
 {
     search_t* search = (search_t*) calloc(1, sizeof(search_t));
-    facecube_t* fc;
-    cubiecube_t* cc;
-    coordcube_t* c;
+    facecube_t* fc = NULL;
+    cubiecube_t* cc = NULL;
+    coordcube_t* c = NULL;
 
     int s, i;
     int mv, n;
@@ -71,6 +73,11 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
     // +++++++++++++++++++++check for wrong input +++++++++++++++++++++++++++++
     int count[6] = {0};
 
+    if (!search) return NULL;
+    search->cancel = cancel;
+    search->candidate = candidate;
+    search->context = context;
+    if (cancel && cancel(context)) goto cleanup;
     if (PRUNING_INITED == 0) {
         initPruning(cache_dir);
     }
@@ -99,15 +106,13 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
 
     for (i = 0; i < 6; i++)
         if (count[i] != 9) {
-            free(search);
-            return NULL;
+            goto cleanup;
         }
 
     fc = get_facecube_fromstring(facelets);
     cc = toCubieCube(fc);
     if ((s = verify(cc)) != 0) {
-        free(search);
-        return NULL;
+        goto cleanup;
     }
 
     // +++++++++++++++++++++++ initialization +++++++++++++++++++++++++++++++++
@@ -134,6 +139,7 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
 
     // +++++++++++++++++++ Main loop ++++++++++++++++++++++++++++++++++++++++++
     do {
+        if (search->stopped || (cancel && cancel(context))) goto cleanup;
         do {
             if ((depthPhase1 - n > search->minDistPhase1[n + 1]) && !busy) {
 
@@ -146,12 +152,12 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
                 do {// increment axis
                     if (++search->ax[n] > 5) {
 
-                        if (time(NULL) - tStart > timeOut)
-                            return NULL;
+                        if (!cancel && time(NULL) - tStart > timeOut)
+                            goto cleanup;
 
                         if (n == 0) {
                             if (depthPhase1 >= maxDepth)
-                                return NULL;
+                                goto cleanup;
                             else {
                                 depthPhase1++;
                                 search->ax[n] = 0;
@@ -192,6 +198,11 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
                 if (s == depthPhase1
                         || (search->ax[depthPhase1 - 1] != search->ax[depthPhase1] && search->ax[depthPhase1 - 1] != search->ax[depthPhase1] + 3)) {
                     char* res;
+                    if (candidate) {
+                        if ((cancel && cancel(context)) ||
+                            !candidate(search->ax, search->po, s, context)) goto cleanup;
+                        continue;
+                    }
                     free((void*) fc);
                     free((void*) cc);
                     free((void*) c);
@@ -207,6 +218,24 @@ char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, con
 
         }
     } while (1);
+cleanup:
+    free(fc);
+    free(cc);
+    free(c);
+    free(search);
+    return NULL;
+}
+
+char* solution(char* facelets, int maxDepth, long timeOut, int useSeparator, const char* cache_dir)
+{
+    return search_solutions(facelets, maxDepth, timeOut, useSeparator, cache_dir, NULL, NULL, NULL);
+}
+
+void enumerate_search(char* facelets, search_cancel_fn cancel,
+                      search_candidate_fn candidate, void* context)
+{
+    if (!PRUNING_INITED || !cancel || !candidate) return;
+    search_solutions(facelets, 24, 0, 0, NULL, cancel, candidate, context);
 }
 
 int totalDepth(search_t* search, int depthPhase1, int maxDepth)
@@ -252,6 +281,10 @@ int totalDepth(search_t* search, int depthPhase1, int maxDepth)
     search->minDistPhase2[n + 1] = 1;// else failure for depthPhase2=1, n=0
     // +++++++++++++++++++ end initialization +++++++++++++++++++++++++++++++++
     do {
+        if (search->cancel && search->cancel(search->context)) {
+            search->stopped = 1;
+            return -1;
+        }
         do {
             if ((depthPhase1 + depthPhase2 - n > search->minDistPhase2[n + 1]) && !busy) {
 
@@ -308,8 +341,10 @@ int totalDepth(search_t* search, int depthPhase1, int maxDepth)
                 * 2 + search->parity[n + 1]));
         // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    } while (search->minDistPhase2[n + 1] != 0);
-    return depthPhase1 + depthPhase2;
+        /* 每个第一阶段叶节点只取首解，交付与续搜由第一阶段负责。 */
+        if (search->minDistPhase2[n + 1] == 0)
+            return depthPhase1 + depthPhase2;
+    } while (1);
 }
 
 void patternize(char* facelets, char* pattern, char* patternized)

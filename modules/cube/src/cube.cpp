@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include <sstream>
+
+#include "rm/robot_search.hpp"
 extern "C" {
 #include "cubiecube.h"
 #include "facecube.h"
@@ -169,6 +171,14 @@ void validate_facelets(const std::string& s) {
   for (int i = 0; i < 6; i++)
     if (std::count(s.begin(), s.end(), order[i]) != 9 || s[9 * i + 4] != order[i])
       throw std::invalid_argument("Need nine colors each and URFDLB centers");
+  std::string input = s;
+  auto fc = get_facecube_fromstring(input.data());
+  auto cc = toCubieCube(fc);
+  int result = verify(cc);
+  free(fc);
+  free(cc);
+  if (result != 0)
+    throw std::invalid_argument("Physically impossible cube (edge/corner orientation or parity)");
 }
 std::string encode_facelets(const std::vector<Vec>& initial, const std::vector<Vec>& slots,
                             const std::vector<Mat>& orientations) {
@@ -237,6 +247,12 @@ std::vector<std::string> solve_facelets(const std::string& state,
   std::string text(answer);
   free(answer);
   auto moves = split_moves(text);
+  if (replay_facelet_moves(state, moves) != solved)
+    throw std::runtime_error("Solver failed independent facelet replay");
+  return moves;
+}
+std::string replay_facelet_moves(const std::string& state, const std::vector<std::string>& moves) {
+  validate_facelets(state);
   // Independent facelet geometry replay; no use of the solver's cubie move tables.
   std::string check = state;
   std::array<Vec, 6> right = {Vec(1, 0, 0), Vec(0, 1, 0),  Vec(1, 0, 0),
@@ -271,8 +287,7 @@ std::vector<std::string> solve_facelets(const std::string& state,
     }
     check = next;
   }
-  if (check != solved) throw std::runtime_error("Solver failed independent facelet replay");
-  return moves;
+  return check;
 }
 Json Cube::report() const {
   auto [p, a] = pose_error(true);
@@ -293,13 +308,16 @@ Json Cube::report() const {
     r["facelets"] = nullptr;
   }
   if (dual) {
-    double force = 0;
+    double force = 0, primitive_time = 0;
+    for (const auto& action : executed)
+      if (action.contains("primitive")) primitive_time += action.value("actual_duration_s", 0.);
     for (int i = 0; i < 6; i++) force = std::max(force, std::abs(data->actuator_force[i]));
     Vec cp = body_position(id(mjOBJ_BODY, "core"));
     r.update({{"orientation", matrix_json(orientation)},
               {"grasped", grasped},
               {"robot_ready", robot_ready},
               {"primitive_actions", executed.size()},
+              {"primitive_execution_s", primitive_time},
               {"grasp_checks", grasp_checks.size()},
               {"cube_motor_force_max", force},
               {"core_position_m", {cp.x(), cp.y(), cp.z()}},

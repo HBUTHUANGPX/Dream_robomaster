@@ -116,7 +116,7 @@ case "$command_name" in
     printf '正在运行 Rust 测试。\n'
     cargo test --workspace --locked
     printf '正在运行网页与入口测试。\n'
-    node --test tests/duel_web.test.cjs tests/launcher.test.cjs modules/cube/tests/interfaces.test.cjs
+    node --test tests/duel_web.test.cjs tests/launcher.test.cjs modules/cube/tests/interfaces.test.cjs modules/cube/tests/search.test.cjs
     printf '正在检查维护文档。\n'
     node tools/check-docs.mjs
     printf '全部测试通过。\n' ;;

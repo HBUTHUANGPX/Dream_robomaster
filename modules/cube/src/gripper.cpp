@@ -209,23 +209,26 @@ void Cube::initialize_grasps(const Callback& cb) {
   robot_ready = true;
   advance(.15, cb);
 }
-void Cube::unlock(const std::string& move) {
+void Cube::unlock(const std::string& move, const std::string& hand) {
+  if (hand != "A" && hand != "B") throw std::invalid_argument("Unknown hand");
   if (!active_face.empty()) throw std::runtime_error("Layer already unlocked");
   auto [f, c] = parse_move(move);
   auto [axis, sign] = face_axis(f);
   Vec normal = body_rotation(id(mjOBJ_BODY, "core")) * Vec::Unit(axis) * sign;
-  if ((normal - Vec(1, 0, 0)).norm() > .025)
-    throw std::runtime_error("Face not aligned with A wrist");
+  if ((normal - (hand == "A" ? Vec(1, 0, 0) : Vec(0, -1, 0))).norm() > .025)
+    throw std::runtime_error("Face not aligned with selected wrist");
   active_face = std::string(1, f);
   for (int i = 0; i < 20; i++)
     if (slots[i][axis] == sign) attach(i, "center_" + active_face);
   data->eq_active[id(mjOBJ_EQUALITY, "lock_" + active_face)] = 0;
 }
-void Cube::lock(const std::string& move, const Callback& cb) {
+void Cube::lock(const std::string& move, const Callback& cb, int wrist_quarters) {
   auto [f, c] = parse_move(move);
   if (active_face != std::string(1, f)) throw std::runtime_error("Wrong layer lock");
   auto [axis, sign] = face_axis(f);
-  double expected = targets[f] - c * pi / 2;
+  if (wrist_quarters != 0 && (std::abs(wrist_quarters) > 2 || (wrist_quarters + c) % 4 != 0))
+    throw std::invalid_argument("Wrist turn disagrees with face move");
+  double expected = targets[f] + (wrist_quarters ? wrist_quarters : -c) * pi / 2;
   int j = id(mjOBJ_JOINT, "hinge_" + std::string(1, f));
   if (std::abs(data->qpos[model->jnt_qposadr[j]] - expected) > .02)
     throw std::runtime_error(move + ": physical layer did not turn");

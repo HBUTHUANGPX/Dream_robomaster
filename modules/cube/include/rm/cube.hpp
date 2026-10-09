@@ -86,8 +86,8 @@ struct Cube {
   void grasp(const std::string& hand, const std::string& mode, const Callback& callback = {});
   void release(const std::string& hand);
   void initialize_grasps(const Callback& callback = {});
-  void unlock(const std::string& move);
-  void lock(const std::string& move, const Callback& callback = {});
+  void unlock(const std::string& move, const std::string& hand = "A");
+  void lock(const std::string& move, const Callback& callback = {}, int wrist_quarters = 0);
   void execute(const Plan& plan, const Callback& callback = {});
 };
 int interactive_viewer(Cube& cube, const std::filesystem::path& root,

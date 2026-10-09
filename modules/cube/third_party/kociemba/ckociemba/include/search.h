@@ -1,6 +1,9 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+typedef int (*search_cancel_fn)(void* context);
+typedef int (*search_candidate_fn)(const int* axes, const int* powers, int length, void* context);
+
 typedef struct {
     int ax[31];             // The axis of the move
     int po[31];             // The power of the move
@@ -15,9 +18,17 @@ typedef struct {
     int URtoDF[31];
     int minDistPhase1[31];  // IDA* distance do goal estimations
     int minDistPhase2[31];
+    search_cancel_fn cancel;
+    search_candidate_fn candidate;
+    void* context;
+    int stopped;
 } search_t;
 
 search_t* get_search(void);
+
+/* 调用前必须加载有效表；回调返回零停止，取消回调返回非零停止。 */
+void enumerate_search(char* facelets, search_cancel_fn cancel,
+                      search_candidate_fn candidate, void* context);
 
 // generate the solution string from the array data including a separator between phase1 and phase2 moves
 char* solutionToString(search_t* search, int length, int depthPhase1);
