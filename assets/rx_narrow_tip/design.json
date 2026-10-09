@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "description": "RX 原厂手指前端的刚性窄指尖，保留原碰撞网格",
+  "units": "m, kg, rad",
+  "source_zip_name": "RX_ASSY_V2_with_gripper.zip",
+  "source_zip_sha256": "a21d25f43194ec1e9d2f01219fe43a34f5127a00034540ceb5b3a39586d88db4",
+  "source_mjcf_relative_path": "mujoco_linkage_v5/free_sweep.xml",
+  "source_mjcf_sha256": "6734d47fb2dd9bfd02c65dd72062a9a2989bb75428ecc9412db7496543ee1246",
+  "coordinate_frame": "原 finger link 的局部坐标；x 为接近方向，y 为开合方向，z 为横向",
+  "positive_finger": {
+    "neck": {
+      "center": [
+        0.027,
+        0.01789246,
+        0
+      ],
+      "box_half_size": [
+        0.009,
+        0.003,
+        0.004
+      ],
+      "mass": 0.001
+    },
+    "pad": {
+      "center": [
+        0.04,
+        0.01689246,
+        0
+      ],
+      "box_half_size": [
+        0.008,
+        0.003,
+        0.008
+      ],
+      "mass": 0.001
+    }
+  },
+  "negative_finger": "将 positive_finger 中两个 center 的 y 取负",
+  "attachment": "每根原手指下增加无关节子体，neck 与 pad 刚性连接",
+  "added_mass_per_finger_kg": 0.002,
+  "fixed_mount_outward_offset_m": 0.04189107,
+  "contact": {
+    "friction": [
+      0,
+      0,
+      0
+    ],
+    "condim": 1,
+    "solref": [
+      0.004,
+      1
+    ],
+    "solimp": [
+      0.99,
+      0.999,
+      0.001,
+      0.5,
+      2
+    ],
+    "margin": 0.0005,
+    "note": "沿用源模型指面参数；与魔方的混合接触由魔方原有摩擦和维度提供摩擦力，并非整体无摩擦"
+  },
+  "validation_scope": "55 mm 名义魔方的单层探针，尚未接入完整还原",
+  "limitations": [
+    "新增质量为仿真设计值，非实物称量",
+    "刚性延长件未建模挠曲、胶层、螺钉或连接强度",
+    "源资产由用户提供，未随此设计重新发布",
+    "源模型电机力矩上限和材料参数不代表实机标定"
+  ],
+  "probe_grip_target_rad": -1.2,
+  "probe_motor_torque_cap_Nm": 0.6
+}

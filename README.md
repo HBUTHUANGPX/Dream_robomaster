@@ -78,6 +78,7 @@
 - [导航操作、定位和数据导出](docs/modules/navigation.md)
 - [对战操作、视觉和射击](docs/modules/duel.md)
 - [魔方操作、双夹爪和录像](docs/modules/cube.md)
+- [RX 窄指尖设计与单层验证](docs/rx-narrow-tip.md)
 - [双夹爪十二元动作搜索、预算和成本](docs/cube-primitive-search.md)
 - [开发、目录和测试](docs/development.md)
 - [迁移记录与已验证的功能](docs/migration.md)

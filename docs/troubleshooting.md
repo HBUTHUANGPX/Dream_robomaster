@@ -107,6 +107,11 @@ SSH 转发命令使用 `-N` 时，登录后通常没有输出。
 
 ## 双夹爪搜索失败或结果不符预期
 
+RX 窄指尖的独立诊断不属于当前默认还原入口，操作方法见[窄指尖验证](rx-narrow-tip.md)。
+缺少 `rm_cube_rx_tip_geometry` 或 `rm_cube_rx_tip_probe` 时，按该指南显式构建诊断目标。
+`final_passed:false` 表示单层机械验收未通过；保存 JSON 和视频，检查角度、位姿、接触与编码状态，不以视频能转动作为成功依据。
+源资产加载失败时检查压缩包版本和目录结构；输出路径是符号链接时改用结果目录中的普通文件，避免覆盖源资产。
+
 命令和参数格式见[十二元动作搜索指南](cube-primitive-search.md)。
 命令行模式先查看本次输出目录中的 `robot_plan.json`，再检查 `failure.json`。
 RPC 先检查 `ok` 和 `error`；`ok:true` 后还须检查规划结果的 `found`。

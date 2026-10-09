@@ -50,3 +50,9 @@ add_executable(rm_cube_candidate_parallel_tests tests/test_candidate_parallel.cp
 target_link_libraries(rm_cube_candidate_parallel_tests PRIVATE rm_cube_core)
 add_test(NAME cube_candidate_parallel COMMAND rm_cube_candidate_parallel_tests ${PROJECT_SOURCE_DIR})
 set_tests_properties(cube_candidate_parallel PROPERTIES TIMEOUT 30)
+
+# RX 原资产由用户提供；这些诊断程序显式构建，不成为默认运行时依赖。
+add_executable(rm_cube_rx_tip_geometry EXCLUDE_FROM_ALL tests/rx_tip/geometry.cpp)
+target_link_libraries(rm_cube_rx_tip_geometry PRIVATE rm_cube_core)
+add_executable(rm_cube_rx_tip_probe EXCLUDE_FROM_ALL tests/rx_tip/dynamic.cpp)
+target_link_libraries(rm_cube_rx_tip_probe PRIVATE rm_cube_core)
