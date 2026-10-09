@@ -17,6 +17,9 @@ constexpr char face_names[] = "RLUDFB";
 void need(bool ok, const std::string& message) {
   if (!ok) throw std::runtime_error(message);
 }
+bool close_cost(double a, double b) {
+  return std::abs(a - b) <= 1e-11 * std::max({1e-9, std::abs(a), std::abs(b)});
+}
 // 直接保存六个面的世界法向量；不使用生产状态编号、旋转函数或动作图。
 struct State {
   std::array<V, 6> face = normals;
@@ -124,7 +127,11 @@ RobotPlan compare(const std::string& name, const std::vector<std::string>& moves
   const double expected = reference(moves, start, o);
   auto p = optimize_robot_moves(moves, start, o, Clock::now() + std::chrono::seconds(10));
   need(p.has_value(), name + "：未返回解");
-  need(std::abs(p->cost - expected) < 1e-9, name + "：不是参考最短路径");
+  need(close_cost(p->cost, expected), name + "：不是参考最短路径");
+  // 用已知最优值再次剪枝，覆盖正反向求和顺序不同造成的浮点边界。
+  const auto bounded =
+      optimize_robot_moves(moves, start, o, Clock::now() + std::chrono::seconds(10), p->cost);
+  need(bounded && close_cost(bounded->cost, p->cost), name + "：上界剪枝误删最优路径");
   State s = import_state(start);
   double elapsed = 0;
   for (auto a : p->actions) {
@@ -138,8 +145,8 @@ RobotPlan compare(const std::string& name, const std::vector<std::string>& moves
   end.progress = s.progress;
   end.partial = s.partial;
   need(end == s, name + "：报告终态与独立重放不符");
-  need(std::abs(elapsed - p->execution_s) < 1e-9, name + "：执行时间错误");
-  need(std::abs(p->cost - (o.action_count ? double(p->actions.size()) : elapsed)) < 1e-9,
+  need(close_cost(elapsed, p->execution_s), name + "：执行时间错误");
+  need(close_cost(p->cost, o.action_count ? double(p->actions.size()) : elapsed),
        name + "：目标成本错误");
   return *p;
 }
@@ -188,6 +195,25 @@ int main(int argc, char** argv) {
         o.home = home;
         for (const auto& moves : targets) compare("非对称含零成本", moves, starts[1], o);
       }
+    // 多轮更换成本及起态，防止松弛图或下界复用错误；包含零成本和左右不对称。
+    for (int seed = 0; seed < 24; ++seed) {
+      o = SearchOptions{};
+      o.home = seed % 2;
+      o.action_count = seed % 5 == 0;
+      for (int a = 0; a < 12; ++a)
+        for (int m = 0; m < 3; ++m)
+          o.costs.duration[a][m] = double((seed * 17 + a * 11 + m * 7) % 19) / 16;
+      RobotState start{seed, {seed % 5 - 2, 0}, {seed % 3 != 0, true}};
+      compare("启发式随机成本与朝向", {seed % 2 ? "U2" : "B'", "F", "R2"}, start, o);
+    }
+    for (double scale : {1e-10, 1., 3000.}) {
+      o = SearchOptions{};
+      o.home = true;
+      for (int a = 0; a < 12; ++a)
+        for (int m = 0; m < 3; ++m)
+          o.costs.duration[a][m] = scale * double(1 + (a * 7 + m * 11) % 19) / 19;
+      compare("非二进制浮点成本尺度", {"B2", "U", "R'"}, starts[2], o);
+    }
     o = SearchOptions{};
     for (auto& row : o.costs.duration) row.fill(10);
     o.costs.duration[int(Primitive::A_N90)][1] = 0.125;
@@ -240,7 +266,7 @@ int main(int argc, char** argv) {
       result = search_robot_solution(solved, {}, o, root);
       need(result.found && result.improvements.size() == 1, "内存限制丢失已知解记录");
     }
-    std::cout << "独立最短路测试通过：默认成本48例、非对称成本16例及边界例。"
+    std::cout << "独立最短路测试通过：默认成本48例、非对称成本16例、启发式交叉24例及边界例。"
               << (argc > 1 ? "入口测试已执行。\n" : "未提供root，入口测试未执行。\n");
   } catch (const std::exception& e) {
     std::cerr << "失败：" << e.what() << '\n';

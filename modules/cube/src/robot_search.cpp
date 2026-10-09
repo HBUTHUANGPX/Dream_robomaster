@@ -1,8 +1,10 @@
 #include "rm/robot_search.hpp"
 
 #include <queue>
+#include <unordered_set>
 
 #include "rm/solution_candidates.hpp"
+#include "rm/solution_variants.hpp"
 namespace rm::cube {
 namespace {
 using Clock = std::chrono::steady_clock;
@@ -11,7 +13,7 @@ struct Edge {
   int state = -1;
   char face = 0;
   int count = 0;
-  std::string mode;
+  int mode = 0;
 };
 using Graph = std::array<std::array<Edge, 12>, states>;
 const Graph* graph(Clock::time_point deadline) {
@@ -26,7 +28,7 @@ const Graph* graph(Clock::time_point deadline) {
       if (auto t = primitive_transition(state, Primitive(a))) {
         Edge e;
         e.state = robot_state_id(t->state);
-        e.mode = t->mode;
+        e.mode = t->mode == "face" ? 1 : t->mode == "empty" ? 2 : 0;
         if (!t->move.empty()) {
           auto [f, c] = parse_move(t->move);
           e.face = f;
@@ -37,6 +39,86 @@ const Graph* graph(Clock::time_point deadline) {
   }
   cached = std::move(next);
   return &*cached;
+}
+// 合并同奇偶的有符号腕角，保留朝向、夹爪和横腕约束。
+// 忽略腕行程只会降低成本；实际搜索和执行仍使用完整机械状态。
+constexpr int relaxed_states = 216;
+int relaxed_state(int state) {
+  const int a = std::abs(state / 15 % 5 - 2) % 2;
+  const int b = std::abs(state / 3 % 5 - 2) % 2;
+  return (state / 75 * 3 + state % 3) * 3 + (a ? 1 : b ? 2 : 0);
+}
+struct Incoming {
+  int source, action;
+  Edge edge;
+};
+using IncomingGraph = std::array<std::vector<Incoming>, relaxed_states>;
+const IncomingGraph& relaxed_graph(const Graph& g) {
+  static const IncomingGraph incoming = [&] {
+    IncomingGraph out;
+    std::array<std::array<bool, 12>, relaxed_states> seen{};
+    for (int s = 0; s < states; ++s)
+      for (int a = 0; a < 12; ++a) {
+        const auto& e = g[s][a];
+        const int source = relaxed_state(s);
+        if (e.state >= 0 && !seen[source][a]) {
+          seen[source][a] = true;
+          out[relaxed_state(e.state)].push_back({source, a, e});
+        }
+      }
+    return out;
+  }();
+  return incoming;
+}
+std::optional<std::vector<double>> suffix_bounds(const Graph& graph,
+                                                 const std::vector<std::pair<char, int>>& moves,
+                                                 const SearchOptions& options,
+                                                 Clock::time_point deadline,
+                                                 size_t available_memory) {
+  const auto& incoming = relaxed_graph(graph);
+  const size_t count = (moves.size() * 4 + 1) * relaxed_states;
+  std::vector<double> distance(count, std::numeric_limits<double>::infinity());
+  using Item = std::pair<double, int>;
+  std::priority_queue<Item, std::vector<Item>, std::greater<Item>> work;
+  for (int s = 0; s < relaxed_states; ++s)
+    if (!options.home || s % 9 == 0) {
+      int node = int(moves.size()) * 4 * relaxed_states + s;
+      distance[node] = 0;
+      work.push({0, node});
+    }
+  size_t iterations = 0;
+  while (!work.empty()) {
+    if ((iterations++ & 63) == 0 && Clock::now() >= deadline) return {};
+    const auto [cost, node] = work.top();
+    work.pop();
+    if (cost != distance[node]) continue;
+    int stage = node / relaxed_states, progress = stage / 4, partial = stage % 4;
+    for (const auto& in : incoming[node % relaxed_states]) {
+      const auto& e = in.edge;
+      const double next_cost =
+          cost + (options.action_count ? 1 : options.costs.duration[in.action][e.mode]);
+      auto relax = [&](int source_stage) {
+        int source = source_stage * relaxed_states + in.source;
+        if (next_cost < distance[source]) {
+          distance[source] = next_cost;
+          work.push({next_cost, source});
+        }
+      };
+      if (!e.face) {
+        relax(stage);
+      } else {
+        // 尚未完成当前面时的反向边，以及恰好完成上一个面的反向边。
+        if (size_t(progress) < moves.size() && e.face == moves[progress].first &&
+            partial != moves[progress].second)
+          relax(progress * 4 + (partial - e.count + 4) % 4);
+        if (progress > 0 && partial == 0 && e.face == moves[progress - 1].first)
+          relax((progress - 1) * 4 + (moves[progress - 1].second - e.count + 4) % 4);
+      }
+    }
+    if (distance.size() * sizeof(double) + work.size() * sizeof(Item) * 2 > available_memory)
+      throw std::runtime_error("Robot search memory limit reached");
+  }
+  return distance;
 }
 void validate_options(const SearchOptions& o) {
   if (!std::isfinite(o.max_search_ms) || o.max_search_ms < 0 || o.max_search_ms > 3600000)
@@ -108,15 +190,24 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
   };
   if (n * sizeof(Label) + sizeof(Graph) > limit)
     throw std::runtime_error("Robot search memory limit reached");
-  double min_face = o.action_count ? 1 : std::numeric_limits<double>::infinity();
-  if (!o.action_count)
-    for (int a = 0; a < 12; ++a)
-      if (a % 6 < 4) min_face = std::min(min_face, o.costs.seconds(Primitive(a), "face"));
+  const auto& incoming = relaxed_graph(*g);
+  size_t incoming_bytes = sizeof(IncomingGraph);
+  for (const auto& row : incoming) incoming_bytes += row.capacity() * sizeof(Incoming);
+  const size_t graph_bytes = sizeof(Graph) + incoming_bytes;
+  const size_t bound_bytes = (moves.size() * 4 + 1) * relaxed_states * sizeof(double);
+  const size_t base_bytes = n * sizeof(Label) + graph_bytes + bound_bytes;
+  if (base_bytes > limit) throw std::runtime_error("Robot search memory limit reached");
+  auto bounds = suffix_bounds(*g, expected, o, deadline, limit - n * sizeof(Label) - graph_bytes);
+  if (!bounds) return {};
+  auto h = [&](int node) {
+    return (*bounds)[node / states * relaxed_states + relaxed_state(node % states)];
+  };
   std::vector<Label> labels(n);
   struct Item {
-    double cost;
+    double cost, estimate;
     int steps, node;
     bool operator>(const Item& b) const {
+      if (estimate != b.estimate) return estimate > b.estimate;
       if (cost != b.cost) return cost > b.cost;
       if (steps != b.steps) return steps > b.steps;
       return node > b.node;
@@ -124,7 +215,7 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
   };
   std::priority_queue<Item, std::vector<Item>, std::greater<Item>> queue;
   labels[initial] = {0, -1, -1, 0};
-  queue.push({0, 0, initial});
+  queue.push({0, h(initial), 0, initial});
   size_t expanded = 0, iterations = 0;
   std::optional<RobotPlan> incumbent;
   auto remember = [&](int node) {
@@ -178,16 +269,21 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
         next_stage = sum == expected[progress].second ? (progress + 1) * 4 : progress * 4 + sum;
       }
       int next = next_stage * states + e.state;
-      double cost = item.cost + (o.action_count ? 1 : o.costs.seconds(Primitive(a), e.mode));
+      double cost = item.cost + (o.action_count ? 1 : o.costs.duration[a][e.mode]);
       int steps = item.steps + 1;
       auto& to = labels[next];
-      if (cost + (moves.size() - size_t(next_stage / 4)) * min_face > upper_bound ||
-          cost > to.cost || (cost == to.cost && steps >= to.steps))
+      const double estimate = cost + h(next);
+      // 正反向浮点求和的误差随路径长度和成本尺度增长；只放宽剪枝，不修改真实成本。
+      const double slack = 8 * std::numeric_limits<double>::epsilon() * double(n) *
+                           std::max({1., std::abs(estimate), std::abs(upper_bound)});
+      if (!std::isfinite(estimate) ||
+          (std::isfinite(upper_bound) && estimate - upper_bound > slack) || cost > to.cost ||
+          (cost == to.cost && steps >= to.steps))
         continue;
       to = {cost, item.node, a, steps};
       if (size_t(next_stage / 4) == moves.size() && goal(e.state)) remember(next);
-      queue.push({cost, steps, next});
-      if (labels.size() * sizeof(Label) + queue.size() * sizeof(Item) * 2 + sizeof(Graph) > limit) {
+      queue.push({cost, cost + h(next), steps, next});
+      if (base_bytes + queue.size() * sizeof(Item) * 2 > limit) {
         if (incumbent) return stopped("memory_limit");
         throw std::runtime_error("Robot search memory limit reached");
       }
@@ -205,13 +301,29 @@ RobotSearchResult search_robot_solution(const std::string& state, const RobotSta
                               std::chrono::duration<double, std::milli>(o.max_search_ms));
   RobotSearchResult result;
   result.start = start;
-  auto consider = [&](const std::vector<std::string>& moves) {
+  std::unordered_set<std::string> seen;
+  auto running = [&] {
+    return result.stop_reason != "memory_limit" && Clock::now() < deadline &&
+           (!result.found || result.plan.cost > 0);
+  };
+  auto consider = [&](const std::vector<std::string>& moves, Clock::time_point candidate_deadline) {
+    std::string key;
+    for (const auto& move : moves) {
+      key += move;
+      key += ' ';
+    }
+    if (seen.contains(key)) return running() && Clock::now() < candidate_deadline;
     ++result.candidates;
     if (replay_facelet_moves(state, moves) != solved)
       throw std::runtime_error("Candidate failed independent facelet replay");
     auto p = optimize_robot_moves(
-        moves, start, o, deadline,
+        moves, start, o, candidate_deadline,
         result.found ? result.plan.cost : std::numeric_limits<double>::infinity());
+    // 被时间分片中断的候选允许在其他坐标系重试。完整评估过的候选才去重。
+    if (Clock::now() < candidate_deadline || (p && p->optimal_for_sequence)) {
+      if (seen.size() >= 4096) seen.clear();
+      seen.insert(std::move(key));
+    }
     if (p) {
       if (p->stop_reason == "memory_limit") result.stop_reason = "memory_limit";
       ++result.optimized_candidates;
@@ -227,27 +339,50 @@ RobotSearchResult search_robot_solution(const std::string& state, const RobotSta
              {"execution_s", result.plan.execution_s}});
       }
     }
-    return result.stop_reason != "memory_limit" && Clock::now() < deadline &&
-           (!result.found || result.plan.cost > 0);
+    return running() && Clock::now() < candidate_deadline;
   };
   try {
     if (state == solved)
-      consider({});
-    else if (Clock::now() < deadline)
-      enumerate_solutions(state, root, deadline, [&](const std::vector<std::string>& moves) {
-        if (!consider(moves)) return false;
-        // 对立面可交换，但机器人的执行代价可能不同。
-        for (size_t i = 1; i < moves.size(); ++i) {
-          auto [a, sa] = face_axis(moves[i - 1][0]);
-          auto [b, sb] = face_axis(moves[i][0]);
-          if (a == b && sa != sb) {
-            auto variant = moves;
-            std::swap(variant[i - 1], variant[i]);
-            if (!consider(variant)) return false;
-          }
+      consider({}, deadline);
+    else if (Clock::now() < deadline) {
+      // 三个两阶段主轴分别探索，恒等坐标系优先。
+      std::vector<size_t> frames;
+      std::array<bool, 3> axes{};
+      for (size_t frame = 0; frame < 24; ++frame) {
+        const auto& destination = cube_rotations()[frame].face_destination;
+        const size_t up =
+            std::find(destination.begin(), destination.end(), 'U') - destination.begin();
+        const size_t axis = up % 3;
+        if (!axes[axis]) {
+          axes[axis] = true;
+          frames.push_back(frame);
         }
-        return true;
-      });
+      }
+      // 短预算优先获得并改进首解，避免重复支付其他坐标系的首解成本。
+      if (o.max_search_ms < 250) frames.resize(1);
+      for (size_t i = 0; i < frames.size() && running(); ++i) {
+        const auto remaining = deadline - Clock::now();
+        const auto frame_deadline = frames.size() == 1 ? deadline
+                                    : i == 0           ? Clock::now() + remaining * 3 / 5
+                                    : i == 1           ? Clock::now() + remaining / 2
+                                                       : deadline;
+        enumerate_solutions(conjugate_facelets(state, frames[i]), root, frame_deadline,
+                            [&](const auto& variant_moves) {
+                              const auto moves = map_moves_to_original(variant_moves, frames[i]);
+                              if (!consider(moves, frame_deadline)) return false;
+                              for (size_t j = 1; j < moves.size(); ++j) {
+                                auto [a, sa] = face_axis(moves[j - 1][0]);
+                                auto [b, sb] = face_axis(moves[j][0]);
+                                if (a == b && sa != sb) {
+                                  auto reordered = moves;
+                                  std::swap(reordered[j - 1], reordered[j]);
+                                  if (!consider(reordered, frame_deadline)) return false;
+                                }
+                              }
+                              return running();
+                            });
+      }
+    }
     if (result.stop_reason.empty())
       result.stop_reason = Clock::now() >= deadline ? "deadline" : "candidate_search_finished";
   } catch (const std::runtime_error& e) {
