@@ -25,6 +25,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"cap_angle_deg", {43., 21.5, 31.}},
                  {"cap_merge_quads", 0},
                  {"cap_sectors", 16},
+                 {"cap_rings", {3, 3, 3}},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
                  {"turn_duration_s", 1.5},
@@ -69,6 +70,10 @@ void load_settings(const std::filesystem::path& path) {
     if (key == "cap_sectors" && (!v.is_number_integer() || v.get<double>() < 8 ||
                                  v.get<double>() > 32 || std::fmod(v.get<double>(), 4) != 0))
       throw std::invalid_argument("cap_sectors must be a multiple of four in [8,32]");
+    if (key == "cap_rings")
+      for (const auto& item : v)
+        if (!item.is_number_integer() || item.get<double>() < 1 || item.get<double>() > 4)
+          throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
     settings[key] = v;
   }
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
@@ -136,8 +141,9 @@ std::string scene() {
   const auto outer = settings["cap_outer_m"].get<std::array<double, 3>>();
   auto angle = settings["cap_angle_deg"].get<std::array<double, 3>>();
   for (auto& a : angle) a *= pi / 180;
-  const int rings = 3, sectors = settings["cap_sectors"].get<int>();
+  const int sectors = settings["cap_sectors"].get<int>();
   for (int type = 0; type < 3; ++type) {
+    const int rings = settings["cap_rings"][type].get<int>();
     auto point = [&](int r, int s) {
       double p = 2 * pi * s / sectors;
       // 中心卡脚保留对角承托翼，四个轴向缺口给角块颈部让路。

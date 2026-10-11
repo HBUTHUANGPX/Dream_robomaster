@@ -23,6 +23,8 @@
 这里的机械闭合通过接触形成。它不是把相邻色块永久连接成一个转轴环。
 MuJoCo的刚体树与接触系统共同表示该机构，见[官方建模说明](https://mujoco.readthedocs.io/en/stable/modeling.html)。
 卡脚分解为多个凸楔体，保留内侧空腔；凹形网格的碰撞处理边界见[官方碰撞说明](https://mujoco.readthedocs.io/en/stable/computation.html#collision-detection)。
+卡脚径向层数由 `cap_rings` 按中心、棱块、角块顺序指定，默认 `[3,3,3]`。
+降低层数会改变转动间隙，不能直接推广；已测候选和失败结果见[碰撞复杂度实验](mechanical-performance.md#减少卡脚径向分层)。
 中心翼、棱块凸缘和角块连接部的相互保持可参考[魔方机构专利中的结构说明](https://patents.google.com/patent/US10583351B2/en)。本模型尺寸为自定义参数，不是该专利或某款实物的尺寸复刻。
 
 ## 准备与运行
