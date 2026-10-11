@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "rm/cube.hpp"
+#include "rm/mechanical_sdf.hpp"
 
 using namespace rm;
 using namespace rm::cube;
@@ -9,6 +10,7 @@ using namespace rm::cube;
 // 仅用于离散构型的几何检查；不执行动力学，不作为物理还原结果。
 int main(int argc, char** argv) {
   try {
+    register_mechanical_sdf();
     if (argc < 3 || argc > 5)
       throw std::invalid_argument("用法: sweep 场景XML 输出JSON [前置打乱] [扫描面]");
     std::string prefix = argc > 3 ? argv[3] : "", scan = argc > 4 ? argv[4] : faces;

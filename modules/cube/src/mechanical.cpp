@@ -11,6 +11,7 @@
 #include "mechanical_rx.hpp"
 #include "rm/cube.hpp"
 #include "rm/mechanical_plan.hpp"
+#include "rm/mechanical_sdf.hpp"
 #include "rm/rx_gripper.hpp"
 #include "video.hpp"
 
@@ -26,6 +27,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"cap_merge_quads", 0},
                  {"cap_sectors", 16},
                  {"cap_rings", {3, 3, 3}},
+                 {"cap_collision_mode", 0},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
                  {"turn_duration_s", 1.5},
@@ -74,6 +76,9 @@ void load_settings(const std::filesystem::path& path) {
       for (const auto& item : v)
         if (!item.is_number_integer() || item.get<double>() < 1 || item.get<double>() > 4)
           throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
+    if (key == "cap_collision_mode" &&
+        (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
+      throw std::invalid_argument("cap_collision_mode must be an integer in [0,2]");
     settings[key] = v;
   }
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
@@ -134,8 +139,9 @@ void mesh(std::ostream& s, const std::string& name, const std::vector<Vec>& vs) 
 }
 std::string scene() {
   parts.clear();
-  std::ostringstream assets, bodies, motors;
+  std::ostringstream assets, bodies, motors, plugins;
   std::array<std::vector<std::string>, 3> cap_meshes;
+  std::array<std::vector<std::pair<Vec, Vec>>, 3> cap_rims, cap_spokes;
   // 三种卡脚处在不同球面半径。每个小楔体都是凸体，合起来保留内侧空腔。
   const auto inner = settings["cap_inner_m"].get<std::array<double, 3>>();
   const auto outer = settings["cap_outer_m"].get<std::array<double, 3>>();
@@ -144,6 +150,47 @@ std::string scene() {
   const int sectors = settings["cap_sectors"].get<int>();
   for (int type = 0; type < 3; ++type) {
     const int rings = settings["cap_rings"][type].get<int>();
+    if (value("cap_collision_mode") == 2) {
+      const std::string name = "cap_sdf_" + std::to_string(type);
+      plugins << "<instance name='" << name << "'><config key='inner' value='" << inner[type]
+              << "'/><config key='outer' value='" << outer[type]
+              << "'/><config key='angle_deg' value='" << angle[type] * 180 / pi
+              << "'/><config key='notch' value='" << (type == 0 ? 1 : 0) << "'/></instance>";
+      assets << "<mesh name='" << name << "'><plugin instance='" << name << "'/></mesh>";
+      continue;
+    }
+    if (value("cap_collision_mode") == 1) {
+      const double mid = (inner[type] + outer[type]) / 2;
+      const double tube = (outer[type] - inner[type]) / 2;
+      auto rim = [&](double phi, double fraction = 1.) -> Vec {
+        const double limit =
+            type == 0 ? std::min(angle[type], std::asin(.53 / std::max(std::abs(std::cos(phi)),
+                                                                       std::abs(std::sin(phi)))))
+                      : angle[type];
+        const double theta = std::max(.001, limit - std::asin(tube / mid)) * fraction;
+        return mid * Vec(std::sin(theta) * std::cos(phi), std::sin(theta) * std::sin(phi),
+                         std::cos(theta));
+      };
+      for (int s = 0; s < sectors; ++s)
+        cap_rims[type].emplace_back(rim(2 * pi * s / sectors), rim(2 * pi * (s + 1) / sectors));
+      // 细辐条连接颈部和承托环；分成两段，避免直弦侵入球芯。
+      for (int s = 0; s < 4; ++s) {
+        const double phi = pi / 4 + s * pi / 2;
+        cap_spokes[type].emplace_back(rim(phi, 0), rim(phi, .5));
+        cap_spokes[type].emplace_back(rim(phi, .5), rim(phi));
+      }
+      auto clear_core = [&](const auto& segments, double radius) {
+        for (const auto& [a, b] : segments) {
+          const Vec delta = b - a;
+          const double t = std::clamp(-a.dot(delta) / delta.squaredNorm(), 0., 1.);
+          if ((a + t * delta).norm() - radius < .0107)
+            throw std::invalid_argument("Capsule cap intersects spherical core");
+        }
+      };
+      clear_core(cap_rims[type], tube);
+      clear_core(cap_spokes[type], .00035);
+      continue;
+    }
     auto point = [&](int r, int s) {
       double p = 2 * pi * s / sectors;
       // 中心卡脚保留对角承托翼，四个轴向缺口给角块颈部让路。
@@ -217,6 +264,22 @@ std::string scene() {
                      : nonzero == 2 ? ".15 .75 .45 1"
                                     : "1 .5 .12 1")
                  << "' group='3'/>";
+        if (value("cap_collision_mode") == 1) {
+          const auto rotation = Eigen::Quaterniond::FromTwoVectors(Vec::UnitZ(), n);
+          auto emit = [&](const auto& segments, double radius) {
+            for (const auto& [a, b] : segments)
+              bodies << "<geom type='capsule' fromto='" << xyz(rotation * a) << " "
+                     << xyz(rotation * b) << "' size='" << radius
+                     << "' rgba='.2 .7 .5 1' group='3'/>";
+          };
+          emit(cap_rims[nonzero - 1], (outer[nonzero - 1] - inner[nonzero - 1]) / 2);
+          emit(cap_spokes[nonzero - 1], .00035);
+        }
+        if (value("cap_collision_mode") == 2) {
+          const std::string cap = "cap_sdf_" + std::to_string(nonzero - 1);
+          bodies << "<geom type='sdf' mesh='" << cap << "' quat='" << quaternion(n)
+                 << "' rgba='.3 .6 .8 1' group='3'><plugin instance='" << cap << "'/></geom>";
+        }
         if (nonzero == 2) {
           Vec tangent = Vec::Zero();
           std::vector<int> axes;
@@ -259,7 +322,10 @@ std::string scene() {
         bodies << "</body>\n";
       }
   std::ostringstream s;
-  s << "<mujoco model='Contact retained cube prototype'><compiler angle='radian'/><option "
+  s << "<mujoco model='Contact retained cube prototype'>";
+  if (value("cap_collision_mode") == 2)
+    s << "<extension><plugin plugin='rm.cube.cap'>" << plugins.str() << "</plugin></extension>";
+  s << "<compiler angle='radian'/><option "
        "timestep='"
     << value("timestep_s")
     << "' gravity='0 0 -9.81' integrator='implicitfast' solver='Newton' "
@@ -286,6 +352,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
   bool solve = false, record = false, prepared = false, plan_only = false;
   std::optional<double> search_ms_override;
   try {
+    register_mechanical_sdf();
     for (int i = 1; i < argc; ++i) {
       const std::string arg = argv[i];
       auto next = [&]() {

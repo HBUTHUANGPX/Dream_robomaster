@@ -265,4 +265,5 @@ B直接执行 `F2` 打乱、读取物理色块、求解并执行 `F2` 还原的�
 `U F2` 打乱及逆序动作执行完成，但最终姿态误差1.325°超过0.02弧度限值，对齐超时失败。
 启用最多一次重夹后，同一 `U F2` 流程通过：最终位置误差0.280毫米、姿态误差0.684°。
 当前实验使用 `modules/cube/configs/mechanical-rx-optimized.json`，命令及测量见[性能实验](mechanical-performance.md#复现)。
+该配置后续六步测试发生脱块；更简单的卡脚结构候选见[接触结构实验](mechanical-contact-redesign.md)。
 新规划路径尚未通过完整二十步物理验收。原失败条件见[动作优化记录](superpowers/plans/2026-10-11-mechanical-actions.md)。

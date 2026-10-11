@@ -5,6 +5,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include "rm/cube.hpp"
+#include "rm/mechanical_sdf.hpp"
 using namespace rm;
 using namespace rm::cube;
 
@@ -25,6 +26,7 @@ struct Timers {
 // 仅供故障复现：在独立进程初始化时恢复快照，不能把本程序输出拼成完整物理还原录像。
 int main(int argc, char** argv) {
   try {
+    register_mechanical_sdf();
     if (argc < 4 || argc > 5)
       throw std::invalid_argument("用法: replay 场景XML 状态JSON 输出目录 [参数JSON]");
     Json saved;
@@ -163,11 +165,26 @@ int main(int argc, char** argv) {
       return std::pair{ep, er};
     };
     const int ramp = static_cast<int>(ramp_steps);
-    Json report = {{"mode", "diagnostic_replay"},
-                   {"acceptance", "pose_only"},
-                   {"action", action},
-                   {"parameters", parameters},
-                   {"trace", Json::array()}};
+    Json report = {
+        {"mode", "diagnostic_replay"}, {"acceptance", "pose_only"}, {"action", action},
+        {"parameters", parameters},    {"stopped_early", false},    {"trace", Json::array()}};
+    report["source_scene"] = argv[1];
+    report["source_snapshot"] = argv[2];
+    report["sdf_initpoints"] = m->opt.sdf_initpoints;
+    std::vector<int> center_addresses;
+    for (char face : faces) {
+      const int joint = mj_name2id(m, mjOBJ_JOINT, ("preload_" + std::string(1, face)).c_str());
+      if (joint < 0) throw std::invalid_argument("Replay requires all six center preload joints");
+      center_addresses.push_back(m->jnt_qposadr[joint]);
+    }
+    auto centers = [&]() {
+      Json values = Json::object();
+      for (size_t i = 0; i < center_addresses.size(); ++i)
+        values[std::string(1, faces[i])] = d->qpos[center_addresses[i]];
+      return values;
+    };
+    report["initial_center_preload_m"] = centers();
+    double max_center_outward = 0;
     report["initial_tip_contacts"] = Json::array();
     for (int i = 0; i < d->ncon; ++i) {
       const auto& c = d->contact[i];
@@ -182,7 +199,8 @@ int main(int argc, char** argv) {
       }
     }
     double peak = 0;
-    bool escaped = false;
+    int simulated_steps = 0, max_contacts = 0;
+    double contact_sum = 0;
     auto contact_name = [&](int g) {
       const char* body = mj_id2name(m, mjOBJ_BODY, m->geom_bodyid[g]);
       const char* geom = mj_id2name(m, mjOBJ_GEOM, g);
@@ -205,6 +223,14 @@ int main(int argc, char** argv) {
                              .0005 * d->qvel[v];
       }
       mj_step(m, d);
+      ++simulated_steps;
+      for (int address : center_addresses)
+        max_center_outward = std::max(max_center_outward, d->qpos[address]);
+      contact_sum += d->ncon;
+      max_contacts = std::max(max_contacts, d->ncon);
+      // 数值警告优先于早停，不能因脱出或接触过多而跳过警告检查。
+      for (int i = 0; i < mjNWARNING; ++i)
+        if (d->warning[i].number) throw std::runtime_error("MuJoCo warning");
       double min_distance = 0, force = 0;
       int worst = -1;
       for (int i = 0; i < d->ncon; ++i) {
@@ -237,20 +263,51 @@ int main(int argc, char** argv) {
              {"position_error_m", pos},
              {"orientation_error_rad", angle},
              {"min_distance_m", min_distance},
+             {"center_preload_m", centers()},
              {"core_position", {position().x(), position().y(), position().z()}}});
       }
-      escaped = (position() - Vec(0, 0, .1)).norm() > .005;
-      if (escaped || d->ncon > 1000) {
+      // 与 mechanical.cpp 相同：每100步检查相对核心的径向偏差，阈值为5毫米。
+      // 完整转层不改变 slot 的模长，因此这里不受当前转层进度影响。
+      if (k % 100 == 0)
+        for (const auto& p : pieces) {
+          const double radius = (rotation_of(core).transpose() *
+                                 (Eigen::Map<const Vec>(d->site_xpos + 3 * p.site) - position()))
+                                    .norm();
+          if (std::abs(radius - (.055 / 3) * p.slot.norm()) > .005) {
+            report["escaped_piece"] = mj_id2name(m, mjOBJ_BODY, p.body);
+            report["stop_reason"] = "piece_escaped_radial_retention";
+            report["stopped_early"] = true;
+            break;
+          }
+        }
+      if ((position() - Vec(0, 0, .1)).norm() > .005 || d->ncon > 1000) {
+        if (!report["stopped_early"].get<bool>())
+          report["stop_reason"] = d->ncon > 1000 ? "contact_limit" : "core_escaped";
         report["stopped_early"] = true;
-        break;
       }
-      for (int i = 0; i < mjNWARNING; ++i)
-        if (d->warning[i].number) throw std::runtime_error("MuJoCo warning");
+      if (report["stopped_early"].get<bool>()) break;
     }
     mj_forward(m, d);
+    for (int i = 0; i < mjNWARNING; ++i)
+      if (d->warning[i].number) throw std::runtime_error("MuJoCo warning");
     report["dynamics_wall_time_s"] =
         std::chrono::duration<double>(std::chrono::steady_clock::now() - wall_started).count();
+    report["simulated_steps"] = simulated_steps;
+    report["planned_steps"] = static_cast<int>(total_steps);
+    // 每个已执行 mj_step 后采样一次，包含触发早停的步，不含初始化和末态 mj_forward。
+    report["mean_contacts"] = simulated_steps ? contact_sum / simulated_steps : 0.;
+    report["max_contacts"] = max_contacts;
+    report["max_center_outward_m"] = max_center_outward;
+    report["final_center_preload_m"] = centers();
     report["geoms"] = m->ngeom;
+    std::vector<bool> active_geoms(m->ngeom, false);
+    for (int g = 0; g < m->ngeom; ++g)
+      active_geoms[g] = m->geom_contype[g] != 0 || m->geom_conaffinity[g] != 0;
+    for (int p = 0; p < m->npair; ++p) {
+      active_geoms[m->pair_geom1[p]] = true;
+      active_geoms[m->pair_geom2[p]] = true;
+    }
+    report["active_geoms"] = std::count(active_geoms.begin(), active_geoms.end(), true);
     for (int i = 0; i < mjNTIMER; ++i)
       report["timers"][mjTIMERSTRING[i]] = {{"milliseconds", d->timer[i].duration},
                                             {"calls", d->timer[i].number}};
@@ -277,6 +334,10 @@ int main(int argc, char** argv) {
     report["pose_passed"] = !report.value("stopped_early", false) && pos_error < .0005 &&
                             angle_error < .02 && core_angle < .02 &&
                             (position() - Vec(0, 0, .1)).norm() < .001;
+    report["speed_comparable"] =
+        report["pose_passed"].get<bool>() && simulated_steps == static_cast<int>(total_steps);
+    report["timing_note"] =
+        "失败或早停不能用于速度比较；仅比较相同快照、步长和计划步数的通过运行。";
     std::ofstream file(output / "report.json");
     file << report.dump(2);
     file.close();
