@@ -6,6 +6,7 @@
 
 #include "rm/cube.hpp"
 #include "rm/mechanical_sdf.hpp"
+#include "replay_structure.hpp"
 using namespace rm;
 using namespace rm::cube;
 
@@ -171,13 +172,9 @@ int main(int argc, char** argv) {
     report["source_scene"] = argv[1];
     report["source_snapshot"] = argv[2];
     report["sdf_initpoints"] = m->opt.sdf_initpoints;
-    std::vector<int> center_addresses;
-    for (char face : faces) {
-      const int joint = mj_name2id(m, mjOBJ_JOINT, ("preload_" + std::string(1, face)).c_str());
-      if (joint < 0) throw std::invalid_argument("Replay requires all six center preload joints");
-      center_addresses.push_back(m->jnt_qposadr[joint]);
-    }
-    auto centers = [&]() {
+    const auto center_addresses = mechanical_test::center_preload_addresses(m, faces);
+    auto centers = [&]() -> Json {
+      if (center_addresses.empty()) return nullptr;
       Json values = Json::object();
       for (size_t i = 0; i < center_addresses.size(); ++i)
         values[std::string(1, faces[i])] = d->qpos[center_addresses[i]];
@@ -195,7 +192,14 @@ int main(int argc, char** argv) {
         mjtNum f[6];
         mj_contactForce(m, d, i, f);
         report["initial_tip_contacts"].push_back(
-            {{"tip", tip}, {"body", mj_id2name(m, mjOBJ_BODY, body)}, {"normal_n", f[0]}});
+            {{"tip", tip},
+             {"body", mj_id2name(m, mjOBJ_BODY, body)},
+             {"normal_n", f[0]},
+             {"tangent_n", {f[1], f[2]}},
+             {"torsion_nm", f[3]},
+             {"torsional_friction_m", c.friction[2]},
+             {"position_m", {c.pos[0], c.pos[1], c.pos[2]}},
+             {"normal_axis", {c.frame[0], c.frame[1], c.frame[2]}}});
       }
     }
     double peak = 0;
@@ -297,7 +301,8 @@ int main(int argc, char** argv) {
     // 每个已执行 mj_step 后采样一次，包含触发早停的步，不含初始化和末态 mj_forward。
     report["mean_contacts"] = simulated_steps ? contact_sum / simulated_steps : 0.;
     report["max_contacts"] = max_contacts;
-    report["max_center_outward_m"] = max_center_outward;
+    report["max_center_outward_m"] =
+        center_addresses.empty() ? Json(nullptr) : Json(max_center_outward);
     report["final_center_preload_m"] = centers();
     report["geoms"] = m->ngeom;
     std::vector<bool> active_geoms(m->ngeom, false);

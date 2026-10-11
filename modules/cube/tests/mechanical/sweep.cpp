@@ -33,13 +33,14 @@ int main(int argc, char** argv) {
         if (sign * position[axis] < .01) continue;
         ++selected;
         int j = m->body_jntadr[b], adr = m->jnt_qposadr[j];
-        if (m->jnt_type[j] == mjJNT_FREE) {
-          auto q = turn * Eigen::Quaterniond(d->qpos[adr + 3], d->qpos[adr + 4], d->qpos[adr + 5],
-                                             d->qpos[adr + 6]);
-          d->qpos[adr + 3] = q.w();
-          d->qpos[adr + 4] = q.x();
-          d->qpos[adr + 5] = q.y();
-          d->qpos[adr + 6] = q.z();
+        if (m->jnt_type[j] == mjJNT_FREE || m->jnt_type[j] == mjJNT_BALL) {
+          const int qa = adr + (m->jnt_type[j] == mjJNT_FREE ? 3 : 0);
+          auto q = turn * Eigen::Quaterniond(d->qpos[qa], d->qpos[qa + 1], d->qpos[qa + 2],
+                                             d->qpos[qa + 3]);
+          d->qpos[qa] = q.w();
+          d->qpos[qa + 1] = q.x();
+          d->qpos[qa + 2] = q.y();
+          d->qpos[qa + 3] = q.z();
         } else if (m->jnt_type[j] == mjJNT_HINGE)
           d->qpos[adr] += deg * pi / 180;
         else

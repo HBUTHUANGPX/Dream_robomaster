@@ -59,3 +59,15 @@ build/bin/rm_cube_mechanical_replay \
 历史版本没有逐块检查，可能在脱块后仍继续积分；其计时不能用于性能比较。
 同时查看 `pose_passed`、`simulated_steps` 和 `speed_comparable`，不能仅凭没有早停判断通过。
 测量结果和完整短流程验收见[碰撞实验](../../docs/mechanical-performance.md#减少卡脚径向分层)。
+
+## 关节导向实验
+
+关节模式的运行配置位于 `modules/cube/configs/mechanical-rx-guided-fast.json`。此模式状态维数与旧自由块快照不同，不能混用。
+
+`drift_before_whole_b.json` 是旧接触模式软指垫实验的整块B转动前状态，仅用于历史滑移诊断。来源为 `compliant-tip008-normal-six/diagnostic_states/before_49.json`；SHA-256为 `139e60df25f9892bdf93d1bd132595ecd7ae5ce70f152b36b35b350fcc50678e`。
+
+`joint_guided_results.json` 保存本次关节导向六步打乱及还原实测，包括完整参数、逐检查点误差、实际色块和结果；省去体积较大的规划与夹爪检查明细。原始输出目录仅用于本次追溯，重新运行不依赖这些目录。
+
+`joint_guided_six_demo.mp4` 为本项目生成的六步多面打乱及完整还原录像，正常速度，采用仓库RX资产及关节导向模型；不是外部下载素材。运行命令见[关节导向实验](../../docs/mechanical-rx.md#关节导向实验)。
+
+录像SHA-256：`8fa1a92ede059fe2ab0d1ae4d081c5a5aa9c1c69073dd91beaaa1804864333b3`。共1711帧、30帧/秒，播放时长约57.03秒；最后0.5秒为静置展示。

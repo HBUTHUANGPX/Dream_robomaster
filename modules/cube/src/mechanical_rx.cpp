@@ -57,7 +57,8 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
       } else if (xmlStrEqual(n->name, BAD_CAST "body")) {
         shells.push_back(get(n, "name") + "_shell");
         if (auto hinge = child(n, "joint")) {
-          set(hinge, "frictionloss", std::to_string(bearing_friction));
+          if (get(hinge, "type") == "hinge")
+            set(hinge, "frictionloss", std::to_string(bearing_friction));
           xmlUnlinkNode(n);
           xmlAddChild(core, n);
           set(n, "pos", "0 0 0");

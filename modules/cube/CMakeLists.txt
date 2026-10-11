@@ -79,3 +79,6 @@ target_link_libraries(rm_cube_mechanical_retention PRIVATE rm_cube_core)
 # 快照恢复仅用于独立故障复现，不是完整录像的执行入口。
 add_executable(rm_cube_mechanical_replay EXCLUDE_FROM_ALL tests/mechanical/replay.cpp)
 target_link_libraries(rm_cube_mechanical_replay PRIVATE rm_cube_core)
+# 读取实际生成的 RX guided 场景；不依赖未分发资产运行默认测试。
+add_executable(rm_cube_mechanical_guided_tests EXCLUDE_FROM_ALL tests/mechanical/guided.cpp)
+target_link_libraries(rm_cube_mechanical_guided_tests PRIVATE rm_cube_core)

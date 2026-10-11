@@ -79,7 +79,8 @@ RX已验证提速参数 `--speed 4 --wrist-speed 16 --jaw-speed 32`，同一62�
 
 连续接触机构原型使用 `./rm cube --mechanical --scramble "R U F" --solve --record`。卡脚和弹簧预紧维持内部装配，转动不切换weld、不重设位姿；默认使用固定核心试验台；追加 `--rx-bundle PATH` 可试验[RX摩擦夹持](docs/mechanical-rx.md)。基础参数见[机械魔方说明](docs/mechanical-cube.md)。
 连续接触RX也使用十二元动作路径搜索；可用 `--mechanical --plan-only --search-ms 1000` 先预览给定序列的动作成本，见[软件计划预览](docs/mechanical-rx.md#软件计划预览)。
-当前提速实验使用合并接触几何、动作搜索和有限重夹配置，短流程结果及复现命令见[性能实验](docs/mechanical-performance.md#复现)。
+新增[关节导向实验](docs/mechanical-rx.md#关节导向实验)：推荐显式加载 `modules/cube/configs/mechanical-rx-guided-fast.json`，以20个球关节和6个中心转轴保持径向位置，保留外壳碰撞与RX摩擦夹持。该配置已完成一次六步打乱与还原，省略内部摩擦，不模拟径向飞棱；默认仍为 `retention_mode:0` 的接触保持。
+历史接触提速实验使用合并接触几何、动作搜索和有限重夹配置，短流程结果及复现命令见[性能实验](docs/mechanical-performance.md#复现)。
 进一步的卡脚承托环与连续曲面比较见[接触结构实验](docs/mechanical-contact-redesign.md)，尚不代表长序列稳定。
 
 ## 按任务查阅

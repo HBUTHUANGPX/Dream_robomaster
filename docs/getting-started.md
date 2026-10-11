@@ -204,7 +204,8 @@ RX 当前采用腕部 3 秒、夹爪 2 秒的基准斜坡时长，每次另等�
 
 完成原生依赖准备后，可用 `./rm cube --mechanical --scramble "R U F" --solve --record` 验证连续卡脚接触机构。该模式需要EGL，录像需要FFmpeg；默认使用固定核心试验台，操作、输出和失败处理见[机械魔方说明](mechanical-cube.md)。需要RX驱动时，按[连续接触模型的夹爪接入](mechanical-rx.md)准备资产并追加 `--rx-bundle PATH`。
 长流程前可先用[软件计划预览](mechanical-rx.md#软件计划预览)查看优化后的动作数和预计动作时间，无需启动物理仿真。
-当前提速实验配置为 `modules/cube/configs/mechanical-rx-optimized.json`。先按[短流程复现](mechanical-performance.md#复现)验证；该配置尚未通过完整二十步验收。
+新[关节导向实验](mechanical-rx.md#关节导向实验)推荐 `modules/cube/configs/mechanical-rx-guided-fast.json`，提供无录像六步运行命令，已有一次六步打乱与还原通过记录。它以20个球关节和6个转轴限制径向位置，省略内部摩擦，不模拟径向飞棱，保留外壳碰撞与RX摩擦夹持；默认模式仍为接触保持，实验结果不能混用。
+历史接触提速配置为 `modules/cube/configs/mechanical-rx-optimized.json`。复现见[短流程实验](mechanical-performance.md#复现)；该配置尚未通过完整二十步验收。
 需要比较更少碰撞体的卡脚结构时，按[接触结构实验](mechanical-contact-redesign.md#复现与失败处理)运行承托环短流程。
 
 ## 接入逐行 JSON 协议

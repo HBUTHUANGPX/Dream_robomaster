@@ -28,6 +28,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"cap_sectors", 16},
                  {"cap_rings", {3, 3, 3}},
                  {"cap_collision_mode", 0},
+                 {"retention_mode", 0},
                  {"bearing_collision_mode", 0},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
@@ -35,6 +36,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"timestep_s", .0005},
                  {"internal_contact_impedance", .9999},
                  {"internal_contact_dimension", 3},
+                 {"friction_impedance_ratio", 10.},
                  {"alignment_timeout_s", 2.},
                  {"alignment_regrasp_attempts", 2},
                  {"robot_search_ms", 1000.},
@@ -79,6 +81,8 @@ void load_settings(const std::filesystem::path& path) {
       for (const auto& item : v)
         if (!item.is_number_integer() || item.get<double>() < 1 || item.get<double>() > 4)
           throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
+    if (key == "retention_mode" && (v.get<double>() != 0 && v.get<double>() != 1))
+      throw std::invalid_argument("retention_mode must be 0 or 1");
     if (key == "cap_collision_mode" &&
         (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
       throw std::invalid_argument("cap_collision_mode must be an integer in [0,2]");
@@ -97,6 +101,8 @@ void load_settings(const std::filesystem::path& path) {
     throw std::invalid_argument("Contact impedance must be between zero and one");
   if (value("rx_tip_contact_time_s") < .001 || value("rx_tip_contact_time_s") > .1)
     throw std::invalid_argument("RX tip contact time must be in [.001,.1] seconds");
+  if (value("friction_impedance_ratio") < 1 || value("friction_impedance_ratio") > 1000)
+    throw std::invalid_argument("Friction impedance ratio must be in [1,1000]");
   if (value("robot_search_ms") > 60000)
     throw std::invalid_argument("robot_search_ms must be in [0,60000]");
   if (value("rx_alignment_position_m") <= 0 || value("rx_alignment_position_m") >= .005 ||
@@ -150,6 +156,7 @@ void mesh(std::ostream& s, const std::string& name, const std::vector<Vec>& vs) 
 }
 std::string scene() {
   parts.clear();
+  const bool guided = value("retention_mode") == 1;
   const bool torpedo = value("bearing_collision_mode") == 2;
   const double core_radius = torpedo ? .009 : .0107;
   std::ostringstream assets, bodies, motors, plugins;
@@ -161,9 +168,9 @@ std::string scene() {
   auto angle = settings["cap_angle_deg"].get<std::array<double, 3>>();
   for (auto& a : angle) a *= pi / 180;
   const int sectors = settings["cap_sectors"].get<int>();
-  for (int type = 0; type < 3; ++type) {
+  for (int type = 0; !guided && type < 3; ++type) {
     const int rings = settings["cap_rings"][type].get<int>();
-    if (value("cap_collision_mode") == 2) {
+    if (!guided && value("cap_collision_mode") == 2) {
       const std::string name = "cap_sdf_" + std::to_string(type);
       plugins << "<instance name='" << name << "'><config key='inner' value='" << inner[type]
               << "'/><config key='outer' value='" << outer[type]
@@ -172,7 +179,7 @@ std::string scene() {
       assets << "<mesh name='" << name << "'><plugin instance='" << name << "'/></mesh>";
       continue;
     }
-    if (value("cap_collision_mode") == 1) {
+    if (!guided && value("cap_collision_mode") == 1) {
       const double mid = (inner[type] + outer[type]) / 2;
       const double tube = (outer[type] - inner[type]) / 2;
       auto rim = [&](double phi, double fraction = 1.) -> Vec {
@@ -257,15 +264,19 @@ std::string scene() {
           }
           bodies << "<joint name='hinge_" << face << "' type='hinge' axis='" << xyz(n)
                  << "' damping='.00002' armature='.00000001'/>";
-          bodies << "<joint name='preload_" << face << "' type='slide' axis='" << xyz(n)
-                 << "' stiffness='" << value("preload_stiffness_n_m") << "' springref='"
-                 << value("preload_reference_m")
-                 << "' damping='.2' limited='true' "
-                    "range='-.0015 .0015'/>";
+          if (!guided)
+            bodies << "<joint name='preload_" << face << "' type='slide' axis='" << xyz(n)
+                   << "' stiffness='" << value("preload_stiffness_n_m") << "' springref='"
+                   << value("preload_reference_m")
+                   << "' damping='.2' limited='true' "
+                      "range='-.0015 .0015'/>";
           motors << "<position name='drive_" << face << "' joint='hinge_" << face
                  << "' kp='.3' kv='.003' forcerange='" << -value("max_torque_nm") << " "
                  << value("max_torque_nm") << "'/>";
-        } else
+        } else if (guided)
+          bodies << "<joint name='guide_" << name
+                 << "' type='ball' damping='.00002' armature='.00000001'/>";
+        else
           bodies << "<freejoint/>";
         bodies << "<inertial pos='" << xyz(c)
                << "' mass='.003' diaginertia='.00000016 .00000016 .00000016'/>";
@@ -277,7 +288,7 @@ std::string scene() {
                      : nonzero == 2 ? ".15 .75 .45 1"
                                     : "1 .5 .12 1")
                  << "' group='3'/>";
-        if (value("cap_collision_mode") == 1) {
+        if (!guided && value("cap_collision_mode") == 1) {
           const auto rotation = Eigen::Quaterniond::FromTwoVectors(Vec::UnitZ(), n);
           auto emit = [&](const auto& segments, double radius) {
             for (const auto& [a, b] : segments)
@@ -288,12 +299,12 @@ std::string scene() {
           emit(cap_rims[nonzero - 1], (outer[nonzero - 1] - inner[nonzero - 1]) / 2);
           emit(cap_spokes[nonzero - 1], .00035);
         }
-        if (value("cap_collision_mode") == 2) {
+        if (!guided && value("cap_collision_mode") == 2) {
           const std::string cap = "cap_sdf_" + std::to_string(nonzero - 1);
           bodies << "<geom type='sdf' mesh='" << cap << "' quat='" << quaternion(n)
                  << "' rgba='.3 .6 .8 1' group='3'><plugin instance='" << cap << "'/></geom>";
         }
-        if (nonzero == 2) {
+        if (!guided && nonzero == 2) {
           Vec tangent = Vec::Zero();
           std::vector<int> axes;
           for (int a = 0; a < 3; ++a)
@@ -342,7 +353,7 @@ std::string scene() {
             bodies << "<geom type='mesh' mesh='" << bearing << "' rgba='.8 .5 .2 1' group='3'/>";
           }
         }
-        if (nonzero > 1)
+        if (!guided && nonzero > 1)
           bodies << "<geom type='capsule' fromto='"
                  << xyz(n * (torpedo && nonzero == 2 ? .00965 : .0112)) << " " << xyz(n * .018)
                  << "' size='.0004' rgba='.6 .6 .6 1' group='3'/>";
@@ -361,22 +372,26 @@ std::string scene() {
         bodies << "</body>\n";
       }
   std::ostringstream s;
-  s << "<mujoco model='Contact retained cube prototype'>";
-  if (value("cap_collision_mode") == 2)
+  s << "<mujoco model='"
+    << (guided ? "Joint guided cube prototype" : "Contact retained cube prototype") << "'>";
+  if (!guided && value("cap_collision_mode") == 2)
     s << "<extension><plugin plugin='rm.cube.cap'>" << plugins.str() << "</plugin></extension>";
   s << "<compiler angle='radian'/><option "
        "timestep='"
     << value("timestep_s")
     << "' gravity='0 0 -9.81' integrator='implicitfast' solver='Newton' "
-       "iterations='100' cone='elliptic' impratio='10'/><size memory='256M'/><default><geom "
+       "iterations='100' cone='elliptic' impratio='"
+    << value("friction_impedance_ratio")
+    << "'/><size memory='256M'/><default><geom "
        "friction='.03 .0001 .00001' solref='.001 1' solimp='"
     << value("internal_contact_impedance") << ' ' << value("internal_contact_impedance")
     << " .0001' condim='" << settings["internal_contact_dimension"].get<int>()
     << "'/></default><visual><global offwidth='800' offheight='600'/></visual><asset>"
     << assets.str()
     << "</asset><worldbody><light pos='.1 -.2 .5'/><geom type='sphere' pos='0 0 .1' size='"
-    << core_radius << "' rgba='.5 .3 .2 1' group='3'/>" << bodies.str() << "</worldbody><actuator>"
-    << motors.str() << "</actuator></mujoco>";
+    << core_radius << (guided ? "' contype='0' conaffinity='0" : "")
+    << "' rgba='.5 .3 .2 1' group='3'/>" << bodies.str() << "</worldbody><actuator>" << motors.str()
+    << "</actuator></mujoco>";
   return s.str();
 }
 }  // namespace
@@ -461,6 +476,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
          (value("record_fps") < 1 || std::floor(value("record_fps")) != value("record_fps"))))
       throw std::invalid_argument("Recording FPS must be an integer in [1,60], or zero");
     report["parameters"] = settings;
+    if (value("retention_mode") == 1) report["model"] = "experimental_joint_guided";
     report["video_playback"] = 1;
     std::filesystem::create_directories(out);
     prepared = true;
@@ -479,6 +495,17 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     report["equalities"] = m->neq;
     report["actuators"] = m->nu;
     report["geoms"] = m->ngeom;
+    report["velocity_dofs"] = m->nv;
+    int cube_shells = 0, ball_joints = 0;
+    for (int j = 0; j < m->njnt; ++j) ball_joints += m->jnt_type[j] == mjJNT_BALL;
+    for (int g = 0; g < m->ngeom; ++g) {
+      const char* name = mj_id2name(m, mjOBJ_GEOM, g);
+      if (name && std::string_view(name).starts_with("piece_") &&
+          std::string_view(name).ends_with("_shell"))
+        ++cube_shells;
+    }
+    report["ball_joints"] = ball_joints;
+    report["cube_shells"] = cube_shells;
     report["fixed_core_test_rig"] = !rx;
     report["gripper"] = rx ? "rx_friction" : "none";
     report["passive_detent"] = rx ? "torque=-amplitude*sin(4*angle)-0.0005*velocity" : "none";
@@ -561,8 +588,10 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       cv::Mat rgb = renderer->render(d, cam, &opt), bgr;
       cv::cvtColor(rgb, bgr, cv::COLOR_RGB2BGR);
       if (name.starts_with("frame_")) {
-        cv::putText(bgr, "Contact-retained mechanical prototype", {15, 28},
-                    cv::FONT_HERSHEY_SIMPLEX, .55, {230, 230, 230}, 1, cv::LINE_AA);
+        cv::putText(bgr,
+                    value("retention_mode") == 1 ? "Joint-guided cube / friction grippers"
+                                                 : "Contact-retained mechanical prototype",
+                    {15, 28}, cv::FONT_HERSHEY_SIMPLEX, .55, {230, 230, 230}, 1, cv::LINE_AA);
       }
       if (name.starts_with("frame_")) {
         writer.write(bgr);
