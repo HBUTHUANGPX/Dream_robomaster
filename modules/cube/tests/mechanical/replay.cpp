@@ -4,9 +4,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "replay_structure.hpp"
 #include "rm/cube.hpp"
 #include "rm/mechanical_sdf.hpp"
-#include "replay_structure.hpp"
+#include "rm/rx_wrist_tn.hpp"
 using namespace rm;
 using namespace rm::cube;
 
@@ -103,6 +104,8 @@ int main(int argc, char** argv) {
       m->actuator_forcerange[2 * a] = -parameters.at("rx_jaw_torque_nm").get<double>();
       m->actuator_forcerange[2 * a + 1] = -m->actuator_forcerange[2 * a];
     }
+    std::optional<RxWristTn> wrist_tn;
+    if (parameters.value("rx_wrist_tn", 0.) == 1) wrist_tn.emplace(m);
     mj_forward(m, d);
     int core = mj_name2id(m, mjOBJ_BODY, "mechanical_core");
     auto position = [&]() -> Vec { return Eigen::Map<const Vec>(d->xpos + 3 * core); };
@@ -226,7 +229,9 @@ int main(int argc, char** argv) {
                                  std::sin(4 * d->qpos[m->jnt_qposadr[j]]) -
                              .0005 * d->qvel[v];
       }
+      if (wrist_tn) wrist_tn->before_step(m, d);
       mj_step(m, d);
+      if (wrist_tn) wrist_tn->after_step(d);
       ++simulated_steps;
       for (int address : center_addresses)
         max_center_outward = std::max(max_center_outward, d->qpos[address]);

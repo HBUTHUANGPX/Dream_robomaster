@@ -320,3 +320,48 @@ B直接执行 `F2` 打乱、读取物理色块、求解并执行 `F2` 还原的�
 当前实验使用 `modules/cube/configs/mechanical-rx-optimized.json`，命令及测量见[性能实验](mechanical-performance.md#复现)。
 该配置后续六步测试发生脱块；更简单的卡脚结构候选见[接触结构实验](mechanical-contact-redesign.md)。
 新规划路径尚未通过完整二十步物理验收。原失败条件见[动作优化记录](superpowers/plans/2026-10-11-mechanical-actions.md)。
+
+## 腕轴TN与关节导向完整录像
+
+配置为 `modules/cube/configs/mechanical-rx-guided-tn.json`，其中 `rx_wrist_tn:1` 启用限制。
+两个虚拟腕轴采用用户提供的 mimic_baseline 中 RX-P2 S 型电机TN曲线。这是仿真电机选型，不是对夹爪实物电机型号的确认。
+参考算法与数据来源见[腕轴TN数据](../assets/rx_gripper/tn/README.md)。
+
+每个物理步读取实际腕轴速度，以绝对速度查询0.05 rpm网格的保守包络，再与原15牛米上限取较小值。
+该边界限制正、负执行器力矩，不直接裁剪关节速度。超过公共测量范围时输出归零。
+原位置执行器的控制增益保留；没有移植训练环境的策略延迟或奖励。
+参考数据没有夹爪开合电机曲线，开合轴继续使用0.3牛米限制。
+
+完成本页准备后，在仓库根目录执行。输出目录已存在时换一个新目录：
+
+```bash
+./rm cube --mechanical \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --mechanical-config modules/cube/configs/mechanical-rx-guided-tn.json \
+  --scramble "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2" \
+  --solve --record --output output/cube-mechanical/guided-tn-20
+```
+
+结束后检查 `passed:true`、`solved:true` 和 `wrist_tn_enabled:true`。
+`wrist_tn` 分别记录两腕实际力矩峰值、步首速度峰值、越界量与动态上限低于静态上限的步数。
+TN未触发收紧时，不应声称该次录像验证了高速力矩削弱；高速边界另由动力学测试覆盖。
+如果失败，保留首次失败报告，不把分段回放拼成完整还原录像。
+
+2026年10月11日本次验收结果：
+
+| 项目 | 结果 |
+| --- | --- |
+| 打乱与还原 | 20步打乱、21步求解，41个检查点通过 |
+| 最终色块 | 实际读回全部复原，`passed:true`、`solved:true` |
+| 仿真与录像 | 195.6秒仿真；195.634秒视频，1倍速 |
+| 计算耗时 | 81.66秒，包含原始录像，不包含后加字幕 |
+| 最终最大位置误差 | 0.411毫米 |
+| 最终最大姿态误差 | 0.01306弧度 |
+| 两腕速度峰值 | A：3.89274 rad/s；B：3.89278 rad/s |
+| 两腕力矩峰值 | A：0.82110 Nm；B：0.81573 Nm |
+| TN越界量 | 两腕均为0；动态边界未低于已有15 Nm限制 |
+| 动作规划 | 打乱和还原均采用 `robot_search` 优化结果 |
+
+完整[录像与报告](../assets/mechanical_cube/README.md#关节导向与腕轴tn20步完整录像)已保存到资产目录。
+本次 `./rm test` 通过24项C++、19项Rust、34项网页与入口测试，文档检查通过71份。
+额外TN快照回放验证通过。短流程、完整流程和高速边界测试分别记录，不用本次低速录像代替高速限幅验证。

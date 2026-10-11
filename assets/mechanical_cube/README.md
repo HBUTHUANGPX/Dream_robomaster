@@ -71,3 +71,21 @@ build/bin/rm_cube_mechanical_replay \
 `joint_guided_six_demo.mp4` 为本项目生成的六步多面打乱及完整还原录像，正常速度，采用仓库RX资产及关节导向模型；不是外部下载素材。运行命令见[关节导向实验](../../docs/mechanical-rx.md#关节导向实验)。
 
 录像SHA-256：`8fa1a92ede059fe2ab0d1ae4d081c5a5aa9c1c69073dd91beaaa1804864333b3`。共1711帧、30帧/秒，播放时长约57.03秒；最后0.5秒为静置展示。
+
+## 关节导向与腕轴TN：20步完整录像
+
+以下文件由本仓库生成，采用RX资产及新关节导向模型；没有拼接诊断回放。
+
+| 文件 | 内容 |
+| --- | --- |
+| `joint_guided_tn_20_demo.mp4` | 正常速度的20步打乱、21步求解还原；含中文步骤字幕 |
+| `joint_guided_tn_20_report.json` | 完整参数、优化动作计划、41个检查点、实际色块和TN统计 |
+| `joint_guided_tn_20_video.json` | 视频时长、打乱结束时刻、动作序列和验收摘要 |
+
+视频为800×600、30帧/秒，共5869帧，约195.634秒。
+视频SHA-256为 `5e6321b0ba714cb9d99a1087bfd5b90a42d55ff385101a3b2511345edfd52621`。
+报告SHA-256为 `27486fac5d8ce947f7d1ebe4c5a0cf9398cf18d6dc97c9317619f85b1f1a92dc`。
+
+复现入口见[腕轴TN完整录像](../../docs/mechanical-rx.md#腕轴tn与关节导向完整录像)。
+步骤字幕由 `node modules/cube/tools/annotate-mechanical-video.mjs 输出目录` 生成，需先有验收通过的原录像。
+报告中的原始输出路径仅用于来源追溯，复现不依赖该目录。

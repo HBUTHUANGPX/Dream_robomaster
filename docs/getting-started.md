@@ -233,3 +233,5 @@ printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-r
 入口会执行增量构建。
 如果入口提示依赖缺失，执行 `./rm setup`，再重新启动。
 如果只想检查依赖，执行 `./rm doctor`。
+
+腕轴TN限制与新关节模式20步录像入口见[完整录像说明](mechanical-rx.md#腕轴tn与关节导向完整录像)。

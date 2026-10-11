@@ -13,6 +13,7 @@
 #include "rm/mechanical_plan.hpp"
 #include "rm/mechanical_sdf.hpp"
 #include "rm/rx_gripper.hpp"
+#include "rm/rx_wrist_tn.hpp"
 #include "video.hpp"
 
 namespace {
@@ -45,6 +46,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"rx_core_position_m", .001},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
+                 {"rx_wrist_tn", 0},
                  {"rx_tip_friction", 1.2},
                  {"rx_tip_contact_time_s", .004},
                  {"rx_bearing_friction_nm", .002},
@@ -81,6 +83,8 @@ void load_settings(const std::filesystem::path& path) {
       for (const auto& item : v)
         if (!item.is_number_integer() || item.get<double>() < 1 || item.get<double>() > 4)
           throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
+    if (key == "rx_wrist_tn" && v.get<double>() != 0 && v.get<double>() != 1)
+      throw std::invalid_argument("rx_wrist_tn must be 0 or 1");
     if (key == "retention_mode" && (v.get<double>() != 0 && v.get<double>() != 1))
       throw std::invalid_argument("retention_mode must be 0 or 1");
     if (key == "cap_collision_mode" &&
@@ -519,6 +523,14 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         m->actuator_forcerange[2 * a + 1] = value("rx_jaw_torque_nm");
       }
     }
+    std::optional<RxWristTn> wrist_tn;
+    if (value("rx_wrist_tn") == 1) {
+      if (!rx) throw std::invalid_argument("Wrist TN requires RX grippers");
+      wrist_tn.emplace(m);
+    }
+    report["wrist_tn_enabled"] = wrist_tn.has_value();
+    if (wrist_tn)
+      report["wrist_tn_profile"] = "RX-P2 S conservative 0.05 rpm; virtual wrist selection";
     const int core = rx ? mj_name2id(m, mjOBJ_BODY, "mechanical_core") : -1;
     auto core_position = [&]() -> Vec {
       return rx ? Vec(Eigen::Map<const Vec>(d->xpos + 3 * core)) : Vec(0, 0, .1);
@@ -639,7 +651,21 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                 .0005 * d->qvel[v];
           }
         }
+        if (wrist_tn) wrist_tn->before_step(m, d);
         mj_step(m, d);
+        if (wrist_tn) {
+          wrist_tn->after_step(d);
+          {
+            report["wrist_tn"] = Json::array();
+            for (const auto& a : wrist_tn->axes)
+              report["wrist_tn"].push_back({{"actuator", mj_id2name(m, mjOBJ_ACTUATOR, a.actuator)},
+                                            {"peak_speed_rad_s", a.peak_speed_rad_s},
+                                            {"peak_torque_nm", a.peak_torque_nm},
+                                            {"max_excess_nm", a.max_excess_nm},
+                                            {"reduced_steps", a.reduced_steps},
+                                            {"static_limit_nm", a.static_limit}});
+          }
+        }
         if (check_contacts) check_rotation_contacts();
         ++ticks;
         if (rx && ticks % 10 == 0) {

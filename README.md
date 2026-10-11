@@ -103,3 +103,5 @@ RX已验证提速参数 `--speed 4 --wrist-speed 16 --jaw-speed 32`，同一62�
 导航默认使用 ICP 定位。FAST-LIO 不属于日常启动流程。
 FAST-LIO 的 ROS 构建和容器回放尚未通过本机运行验收。
 历史 Python 代码只用于对照，见[历史版本说明](legacy/README.md)。
+
+腕轴TN限制与新关节模式20步录像入口见[完整录像说明](docs/mechanical-rx.md#腕轴tn与关节导向完整录像)。
