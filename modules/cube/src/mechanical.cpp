@@ -53,6 +53,8 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_wrist_accel_rad_s2", 80.},
                  {"rx_wrist_empty_multiplier", 1.5},
                  {"rx_wrist_settle_s", .15},
+                 {"rx_jaw_duration_s", .5},
+                 {"rx_jaw_settle_s", .15},
                  {"rx_wrist_kp", 20.},
                  {"rx_wrist_kv", 1.},
                  {"rx_tip_friction", 1.2},
@@ -109,7 +111,9 @@ void load_settings(const std::filesystem::path& path) {
   if (value("cube_mass_kg") < .01 || value("cube_mass_kg") > 1 ||
       value("rx_wrist_accel_rad_s2") <= 0 || value("rx_wrist_empty_multiplier") < 1 ||
       value("rx_wrist_empty_multiplier") > 4 || value("rx_wrist_kp") <= 0 ||
-      value("rx_wrist_settle_s") > 2 || value("rx_wrist_speed_rad_s") > 30)
+      value("rx_wrist_settle_s") > 2 || value("rx_wrist_speed_rad_s") > 30 ||
+      value("rx_jaw_duration_s") <= 0 || value("rx_jaw_duration_s") > 2 ||
+      value("rx_jaw_settle_s") > 2)
     throw std::invalid_argument("Invalid cube mass or wrist motion settings");
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
       value("max_torque_nm") <= 0)
@@ -472,7 +476,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       throw std::invalid_argument("robot_search_ms must be in [0,60000]");
     if (record) settings["record_fps"] = 30.;
     std::optional<PrimitiveCosts> motion_costs;
-    if (value("rx_wrist_speed_rad_s") > 0 || value("rx_wrist_settle_s") != .15) {
+    if (value("rx_wrist_speed_rad_s") > 0 || value("rx_wrist_settle_s") != .15 ||
+        value("rx_jaw_duration_s") != .5 || value("rx_jaw_settle_s") != .15) {
       motion_costs.emplace();
       for (int a = 0; a < 12; ++a)
         for (int mode = 0; mode < 3; ++mode) {
@@ -484,7 +489,10 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                                                    factor * value("rx_wrist_accel_rad_s2"), dt)
                                   : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
           motion_costs->duration[a][mode] =
-              a % 6 >= 4 ? .65 : turn + std::lround(value("rx_wrist_settle_s") / dt) * dt;
+              a % 6 >= 4 ? (std::max(1L, std::lround(value("rx_jaw_duration_s") / dt)) +
+                            std::lround(value("rx_jaw_settle_s") / dt)) *
+                               dt
+                         : turn + std::lround(value("rx_wrist_settle_s") / dt) * dt;
         }
     }
 
@@ -876,21 +884,24 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         }
       }
       d->ctrl[a] = target;
-      advance(turning ? value("rx_wrist_settle_s") : .15, turning);
+      advance(turning ? value("rx_wrist_settle_s") : value("rx_jaw_settle_s"), turning);
       if (turning)
-        report["wrist_motions"].push_back({{"actuator", name},
-                                           {"mode", report["current_action"].value("mode", "")},
-                                           {"start_time_s", began},
-                                           {"duration_s", duration},
-                                           {"settle_s", value("rx_wrist_settle_s")},
-                                           {"peak_tracking_error_rad", peak_error},
-                                           {"peak_speed_rad_s", peak_speed},
-                                           {"peak_torque_nm", peak_torque},
-                                           {"feedforward_inertia_kg_m2", inertia},
-                                           {"target", target}});
+        report["wrist_motions"].push_back(
+            {{"actuator", name},
+             {"mode", report["current_action"].value("mode", "")},
+             {"start_time_s", began},
+             {"duration_s", duration},
+             {"settle_s", value("rx_wrist_settle_s")},
+             {"peak_tracking_error_rad", peak_error},
+             {"peak_speed_rad_s", peak_speed},
+             {"peak_torque_nm", peak_torque},
+             {"end_tracking_error_rad", d->qpos[m->jnt_qposadr[m->actuator_trnid[2 * a]]] - target},
+             {"end_speed_rad_s", d->qvel[v]},
+             {"feedforward_inertia_kg_m2", inertia},
+             {"target", target}});
     };
     auto jaw = [&](const std::string& h, bool close) {
-      command(h + "_fingers_actuator", close ? -1.20 : -2.25, .5);
+      command(h + "_fingers_actuator", close ? -1.20 : -2.25, value("rx_jaw_duration_s"));
       report["jaw_checks"].push_back({{"hand", h},
                                       {"closed", close},
                                       {"gap_m", gap(h)},
@@ -1158,6 +1169,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       report["solution"] = solution;
       execute_moves(solution);
     }
+    // 录像收尾不能替代动作结束时的验收。
+    if (rx && value("record_fps") > 0) check_pose("before recording tail", true, true);
+    report["execution_time_s"] = d->time;
     if (value("record_fps") > 0) advance(.5, rx);
     if (rx) check_pose("final", true, true);
     report["final_facelets"] = physical_facelets();

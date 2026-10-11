@@ -49,7 +49,9 @@ int main(int argc, char** argv) {
                                         "rx_wrist_speed_rad_s",
                                         "rx_wrist_accel_rad_s2",
                                         "rx_wrist_empty_multiplier",
-                                        "rx_wrist_settle_s"};
+                                        "rx_wrist_settle_s",
+                                        "rx_jaw_duration_s",
+                                        "rx_jaw_settle_s"};
     if (argc == 5) {
       Json custom;
       std::ifstream(argv[4]) >> custom;
@@ -75,7 +77,10 @@ int main(int argc, char** argv) {
         parameters.value("rx_wrist_speed_rad_s", 0.) > 30 ||
         parameters.value("rx_wrist_empty_multiplier", 1.5) < 1 ||
         parameters.value("rx_wrist_empty_multiplier", 1.5) > 4 ||
-        parameters.value("rx_wrist_settle_s", .15) > 2)
+        parameters.value("rx_wrist_settle_s", .15) > 2 ||
+        parameters.value("rx_jaw_duration_s", .5) <= 0 ||
+        parameters.value("rx_jaw_duration_s", .5) > 2 ||
+        parameters.value("rx_jaw_settle_s", .15) > 2)
       throw std::invalid_argument("Invalid replay wrist settings");
     for (const auto* key :
          {"turn_duration_s", "timestep_s", "rx_jaw_torque_nm", "rx_detent_torque_nm"})
@@ -168,7 +173,13 @@ int main(int argc, char** argv) {
       mj_fullM(m, d, mass.data());
       inertia = mass[wrist_dof * m->nv + wrist_dof];
     }
-    if (!jaw) {
+    if (jaw) {
+      ramp_steps = std::max(1., std::round(parameters.value("rx_jaw_duration_s", .5) / timestep));
+      settle_steps = std::round(
+          parameters.value("settle_duration_s", parameters.value("rx_jaw_settle_s", .15)) /
+          timestep);
+      total_steps = ramp_steps + settle_steps;
+    } else {
       settle_steps = std::round(
           parameters.value("settle_duration_s", parameters.value("rx_wrist_settle_s", .15)) /
           timestep);

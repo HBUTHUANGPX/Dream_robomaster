@@ -1,0 +1,130 @@
+[
+  {
+    "name": "jaw400",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.4
+    }
+  },
+  {
+    "name": "jaw300",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.3
+    }
+  },
+  {
+    "name": "jaw200",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.2
+    }
+  },
+  {
+    "name": "jaw100",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.1
+    }
+  },
+  {
+    "name": "wrist12",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 12,
+      "rx_wrist_accel_rad_s2": 120
+    }
+  },
+  {
+    "name": "wrist16",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 16,
+      "rx_wrist_accel_rad_s2": 160
+    }
+  },
+  {
+    "name": "jaw450",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.45
+    }
+  },
+  {
+    "name": "jaw350",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.35
+    }
+  },
+  {
+    "name": "jaw250",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_jaw_duration_s": 0.25
+    }
+  },
+  {
+    "name": "repeat10",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {}
+  },
+  {
+    "name": "reverse20",
+    "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+    "parameters": {}
+  },
+  {
+    "name": "different20",
+    "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+    "parameters": {}
+  },
+  {
+    "name": "wrist14",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 14,
+      "rx_wrist_accel_rad_s2": 140
+    }
+  },
+  {
+    "name": "repeat10v12",
+    "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 12,
+      "rx_wrist_accel_rad_s2": 120
+    }
+  },
+  {
+    "name": "reverse20v12",
+    "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 12,
+      "rx_wrist_accel_rad_s2": 120
+    }
+  },
+  {
+    "name": "different20v12",
+    "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 12,
+      "rx_wrist_accel_rad_s2": 120
+    }
+  },
+  {
+    "name": "reverse20v8",
+    "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 8,
+      "rx_wrist_accel_rad_s2": 80
+    }
+  },
+  {
+    "name": "different20v8",
+    "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+    "parameters": {
+      "rx_wrist_speed_rad_s": 8,
+      "rx_wrist_accel_rad_s2": 80
+    }
+  }
+]

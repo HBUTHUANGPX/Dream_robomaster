@@ -28,6 +28,30 @@ function replies(output, count) {
   return lines.map(line => JSON.parse(line));
 }
 
+test('机械计划采用夹爪实际时间，零等待不计入成本', () => {
+  const parent = path.join(repository, 'output/cube-mechanical');
+  fs.mkdirSync(parent, {recursive: true});
+  const directory = fs.mkdtempSync(path.join(parent, 'timing-test-'));
+  try {
+    for (const [speed, settle] of [[0, 0], [0, 0.15], [10, 0]]) {
+      const config = path.join(directory, 'parameters.json');
+      fs.writeFileSync(config, JSON.stringify({rx_jaw_duration_s: 0.1203,
+        rx_jaw_settle_s: 0, rx_wrist_settle_s: settle, rx_wrist_speed_rad_s: speed}));
+      run(native, ['--root', repository, '--mechanical', '--plan-only',
+        '--scramble', 'R U', '--mechanical-config', config, '--output', directory]);
+      const plan = JSON.parse(fs.readFileSync(path.join(directory, 'plan.json')));
+      const actions = plan.optimization.candidate;
+      const jaws = actions.filter(action => action.mode === 'jaw');
+      assert.ok(jaws.length > 0);
+      assert.ok(jaws.every(action => Math.abs(action.duration_s - 0.1205) < 1e-10));
+      if (speed === 0) assert.ok(actions.filter(action => action.mode !== 'jaw')
+        .every(action => Math.abs(action.duration_s - 1.5 - settle) < 1e-10));
+      assert.ok(Math.abs(actions.reduce((sum, action) => sum + action.duration_s, 0) -
+        plan.optimization.chosen.estimated_execution_s) < 1e-10);
+    }
+  } finally { fs.rmSync(directory, {recursive: true, force: true}); }
+});
+
 test('连续魔方请求在非单位朝向下执行 move、gripper 和 scramble', () => {
   const commands = [
     ['gripper', {action: 'initialize'}],
