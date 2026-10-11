@@ -1,0 +1,142 @@
+{
+  "description": "失败录像。前段连续正常速度直到保护停止，后段为最后3秒的放大慢放及2秒定格；后期处理不改变物理试验。",
+  "source_commit": "18de627",
+  "runs": [
+    {
+      "reference_speed_rad_s": 14,
+      "reference_accel_rad_s2": 140,
+      "error": "RX core slipped: D2",
+      "passed": false,
+      "stop": {
+        "contacts": 73,
+        "core_orientation_error_rad": 0.011006813783401192,
+        "core_position": "0.000325059749685   0.0032957453319    0.100063739386",
+        "facelet_position_component_error_m": 0.001065420854636609,
+        "move": "D2",
+        "orientation_error_rad": 0.04249530642372125,
+        "position_error_m": 0.0013374209177865028,
+        "time_s": 28.2979999999794
+      },
+      "video": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 800,
+            "height": 600,
+            "r_frame_rate": "30/1",
+            "nb_frames": "1269"
+          }
+        ],
+        "format": {
+          "duration": "42.300000",
+          "size": "2638744"
+        }
+      },
+      "render": {
+        "raw_duration_s": 28.3,
+        "slow_replay_start_s": 25.3,
+        "slow_playback": 0.25,
+        "freeze_end_s": 2,
+        "ffmpeg_args": [
+          "-y",
+          "-v",
+          "error",
+          "-i",
+          "output/cube-mechanical/failure-video-14/demo.mp4",
+          "-filter_complex",
+          "[0:v]split=2[a][b];[a]drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-14/normal.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15[normal];[b]trim=start=25.3,setpts=4*(PTS-STARTPTS),crop=480:360:160:180,scale=800:600,drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-14/slow.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15,drawbox=x=0:y=550:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-14/reason.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=565,fps=30,tpad=stop_mode=clone:stop_duration=2[slow];[normal][slow]concat=n=2:v=1:a=0[joined];[joined]drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-14/normal.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15:enable='lt(t,28.3)',drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-14/slow.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15:enable='gte(t,28.3)'[out]",
+          "-map",
+          "[out]",
+          "-c:v",
+          "libx264",
+          "-preset",
+          "fast",
+          "-crf",
+          "19",
+          "-pix_fmt",
+          "yuv420p",
+          "-movflags",
+          "+faststart",
+          "assets/mechanical_cube/wrist_failure_14_demo.mp4"
+        ]
+      },
+      "files": [
+        {
+          "file": "assets/mechanical_cube/wrist_failure_14_demo.mp4",
+          "sha256": "6c01862db6fa5707740c5fb1295072cea730e2f7dc78045532f1da9bd39049de"
+        },
+        {
+          "file": "assets/mechanical_cube/wrist_failure_14_report.json",
+          "sha256": "2b35a573689f3ccc64926647f94c1b4b4cebeaf44230f8d662ea54b2e77b684e"
+        }
+      ]
+    },
+    {
+      "reference_speed_rad_s": 16,
+      "reference_accel_rad_s2": 160,
+      "error": "RX lost cube support",
+      "passed": false,
+      "stop": {
+        "contacts": 66,
+        "core_position": " 0.00509981955052 0.000602763197858   0.0994459741722",
+        "facelet_position_component_error_m": 0.0010160977661266852,
+        "orientation_error_rad": 0.06806923069353353,
+        "position_error_m": 0.0013897276154016377,
+        "time_s": 23.906499999989634
+      },
+      "video": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 800,
+            "height": 600,
+            "r_frame_rate": "30/1",
+            "nb_frames": "1134"
+          }
+        ],
+        "format": {
+          "duration": "37.800000",
+          "size": "2244027"
+        }
+      },
+      "render": {
+        "raw_duration_s": 23.934,
+        "slow_replay_start_s": 20.934,
+        "slow_playback": 0.25,
+        "freeze_end_s": 2,
+        "ffmpeg_args": [
+          "-y",
+          "-v",
+          "error",
+          "-i",
+          "output/cube-mechanical/failure-video-16/demo.mp4",
+          "-filter_complex",
+          "[0:v]split=2[a][b];[a]drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-16/normal.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15[normal];[b]trim=start=20.934,setpts=4*(PTS-STARTPTS),crop=480:360:160:180,scale=800:600,drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-16/slow.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15,drawbox=x=0:y=550:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-16/reason.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=565,fps=30,tpad=stop_mode=clone:stop_duration=2[slow];[normal][slow]concat=n=2:v=1:a=0[joined];[joined]drawbox=x=0:y=0:w=iw:h=50:color=black:t=fill,drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-16/normal.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15:enable='lt(t,23.934)',drawtext=font='Noto Sans CJK SC':textfile=output/cube-mechanical/failure-video-16/slow.txt:fontsize=19:fontcolor=white:x=(w-tw)/2:y=15:enable='gte(t,23.934)'[out]",
+          "-map",
+          "[out]",
+          "-c:v",
+          "libx264",
+          "-preset",
+          "fast",
+          "-crf",
+          "19",
+          "-pix_fmt",
+          "yuv420p",
+          "-movflags",
+          "+faststart",
+          "assets/mechanical_cube/wrist_failure_16_demo.mp4"
+        ]
+      },
+      "files": [
+        {
+          "file": "assets/mechanical_cube/wrist_failure_16_demo.mp4",
+          "sha256": "7cde6b36b3dff27b6e948b1139f1fc536c613845e90b263443b8c7678b214152"
+        },
+        {
+          "file": "assets/mechanical_cube/wrist_failure_16_report.json",
+          "sha256": "20a953b0b498562a9729122c65bef55b41926a45cf9c9aad72facb28922c326e"
+        }
+      ]
+    }
+  ]
+}

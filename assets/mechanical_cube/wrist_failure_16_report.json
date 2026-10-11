@@ -1,0 +1,7529 @@
+{
+  "actions": [
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "R",
+      "target": -1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "R",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "R",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "U",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "U",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "U",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "F2",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "F2",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "F2",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "L'",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "L'",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "L'",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "D",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "D",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "D",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "B",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "B",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "B",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "R2",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "R2",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "R2",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "U'",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "U'",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "U'",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 3.141592653589793
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "F",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "F",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "F",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "L2",
+      "target": -1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "L2",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "L2",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "D'",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "D'",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "D'",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": -1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "B2",
+      "target": -3.141592653589793
+    },
+    {
+      "hand": "B",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "B2",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "B2",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "face",
+      "move": "R'",
+      "target": 1.5707963267948966
+    },
+    {
+      "hand": "A",
+      "kind": "layer_lock",
+      "mode": "",
+      "move": "R'",
+      "target": 0.0
+    },
+    {
+      "hand": "",
+      "kind": "checkpoint",
+      "mode": "",
+      "move": "R'",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "empty",
+      "move": "",
+      "target": -1.5707963267948966
+    },
+    {
+      "hand": "B",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "B",
+      "kind": "yaw",
+      "mode": "whole",
+      "move": "",
+      "target": 0.0
+    },
+    {
+      "hand": "A",
+      "kind": "jaw",
+      "mode": "",
+      "move": "",
+      "target": 115.0
+    }
+  ],
+  "actuators": 4,
+  "ball_joints": 24,
+  "cube_mass_properties": {
+    "center_of_mass_world_m": "7.32569035463e-19                 0               0.1",
+    "distribution": "estimated, uniformly scaled original piece/core allocation",
+    "dynamic_mass_kg": 0.07400000000000002,
+    "inertia_about_com_kg_m2": [
+      [
+        3.444363636351355e-05,
+        2.117582368135751e-22,
+        0.0
+      ],
+      [
+        2.117582368135751e-22,
+        3.444363636351355e-05,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        3.444363636351354e-05
+      ]
+    ]
+  },
+  "cube_shells": 26,
+  "current_action": {
+    "hand": "B",
+    "kind": "yaw",
+    "mode": "face",
+    "move": "U2",
+    "target": -3.141592653589793
+  },
+  "equalities": 9,
+  "error": "RX lost cube support",
+  "fixed_core_test_rig": false,
+  "geoms": 513,
+  "gripper": "rx_friction",
+  "initial": {
+    "contacts": 0,
+    "facelet_position_component_error_m": 3.3334446314370325e-14,
+    "orientation_error_rad": 0.0,
+    "position_error_m": 5.773294876439725e-14,
+    "time_s": 0.0
+  },
+  "internal_constraint_switches": 0,
+  "jaw_checks": [
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 5.719958650176162,
+        "right": 7.129379967043301
+      },
+      "gap_m": 0.054339370495628536,
+      "hand": "A",
+      "time_s": 0.7999999999999673
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 5.6040502086090385,
+        "right": 7.176725770965119
+      },
+      "gap_m": 0.05434945961745308,
+      "hand": "B",
+      "time_s": 1.2999999999999123
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237906793350477,
+      "hand": "B",
+      "time_s": 2.3384999999999483
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 5.10861403493902,
+        "right": 7.8232096443740575
+      },
+      "gap_m": 0.05429505731203129,
+      "hand": "B",
+      "time_s": 3.077000000000195
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237864530179423,
+      "hand": "A",
+      "time_s": 3.577000000000362
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 4.31124060770375,
+        "right": 8.413100344432952
+      },
+      "gap_m": 0.05434692184348835,
+      "hand": "A",
+      "time_s": 4.315500000000328
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237903762114081,
+      "hand": "B",
+      "time_s": 5.422499999999714
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 7.155187837253446,
+        "right": 5.645734649672722
+      },
+      "gap_m": 0.05434489675604874,
+      "hand": "B",
+      "time_s": 6.160999999999305
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237895730974427,
+      "hand": "A",
+      "time_s": 6.660999999999028
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 6.5210087965228665,
+        "right": 6.383060722998811
+      },
+      "gap_m": 0.05433503541012714,
+      "hand": "A",
+      "time_s": 7.593999999998511
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237879543796392,
+      "hand": "B",
+      "time_s": 8.570999999998984
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 7.217247326976923,
+        "right": 5.586762274530723
+      },
+      "gap_m": 0.05430152363682188,
+      "hand": "B",
+      "time_s": 9.309499999999886
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.0823787529891399,
+      "hand": "A",
+      "time_s": 10.048000000000789
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 9.104689209739721,
+        "right": 3.7233556913054686
+      },
+      "gap_m": 0.0543171191499163,
+      "hand": "A",
+      "time_s": 10.981000000001929
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237865703215332,
+      "hand": "B",
+      "time_s": 11.48100000000254
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 5.003208694612097,
+        "right": 7.75493204913383
+      },
+      "gap_m": 0.05431130720143553,
+      "hand": "B",
+      "time_s": 12.494500000003779
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237918168177485,
+      "hand": "A",
+      "time_s": 13.601500000005132
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 7.736298744095752,
+        "right": 5.017049686118071
+      },
+      "gap_m": 0.0543083974298213,
+      "hand": "A",
+      "time_s": 14.340000000006034
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237863554191545,
+      "hand": "B",
+      "time_s": 15.078500000006937
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 5.35247304745385,
+        "right": 7.520659176792831
+      },
+      "gap_m": 0.05430933879800673,
+      "hand": "B",
+      "time_s": 16.011500000008034
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.0823786394109942,
+      "hand": "A",
+      "time_s": 16.88000000000601
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 8.8955213355644,
+        "right": 3.7532809985167095
+      },
+      "gap_m": 0.054356367617824135,
+      "hand": "A",
+      "time_s": 17.61850000000429
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237916186683839,
+      "hand": "B",
+      "time_s": 18.357000000002568
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 3.2972647754815503,
+        "right": 9.596469636291669
+      },
+      "gap_m": 0.05443621615779173,
+      "hand": "B",
+      "time_s": 19.290000000000393
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237879865209795,
+      "hand": "A",
+      "time_s": 19.789999999999228
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 3.177938561385435,
+        "right": 9.344925475520425
+      },
+      "gap_m": 0.05455884545546263,
+      "hand": "A",
+      "time_s": 20.528499999997507
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237876118457034,
+      "hand": "B",
+      "time_s": 21.635499999994927
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 7.944943849480649,
+        "right": 4.60253734559225
+      },
+      "gap_m": 0.05455093519502073,
+      "hand": "B",
+      "time_s": 22.568499999992753
+    },
+    {
+      "closed": false,
+      "forces_n": {
+        "left": 0.0,
+        "right": 0.0
+      },
+      "gap_m": 0.08237867535725445,
+      "hand": "A",
+      "time_s": 23.068499999991587
+    },
+    {
+      "closed": true,
+      "forces_n": {
+        "left": 2.783469877592233,
+        "right": 9.75064547810737
+      },
+      "gap_m": 0.054553294258852636,
+      "hand": "A",
+      "time_s": 23.806999999989866
+    }
+  ],
+  "loading_fixture_releases": 1,
+  "model": "experimental_joint_guided",
+  "parameters": {
+    "alignment_regrasp_attempts": 0,
+    "alignment_timeout_s": 0,
+    "bearing_collision_mode": 1,
+    "cap_angle_deg": [
+      43.0,
+      21.5,
+      31.0
+    ],
+    "cap_collision_mode": 1,
+    "cap_inner_m": [
+      0.0146,
+      0.01265,
+      0.01085
+    ],
+    "cap_merge_quads": 1,
+    "cap_outer_m": [
+      0.0162,
+      0.0143,
+      0.0125
+    ],
+    "cap_rings": [
+      3,
+      2,
+      2
+    ],
+    "cap_sectors": 16,
+    "cube_mass_kg": 0.074,
+    "friction_impedance_ratio": 100,
+    "internal_contact_dimension": 1,
+    "internal_contact_impedance": 0.99,
+    "max_torque_nm": 0.03,
+    "preload_reference_m": -0.0015,
+    "preload_stiffness_n_m": 500.0,
+    "record_fps": 30.0,
+    "retention_mode": 1,
+    "robot_search_ms": 1000,
+    "rx_alignment_angle_rad": 0.08726646259971647,
+    "rx_alignment_position_m": 0.002,
+    "rx_bearing_friction_nm": 0.002,
+    "rx_core_position_m": 0.002,
+    "rx_detent_torque_nm": 0.08,
+    "rx_jaw_duration_s": 0.5,
+    "rx_jaw_settle_s": 0,
+    "rx_jaw_torque_nm": 0.3,
+    "rx_tip_contact_time_s": 0.008,
+    "rx_tip_friction": 1.2,
+    "rx_wrist_accel_rad_s2": 160,
+    "rx_wrist_empty_multiplier": 1.5,
+    "rx_wrist_kp": 80,
+    "rx_wrist_kv": 2,
+    "rx_wrist_settle_s": 0,
+    "rx_wrist_speed_rad_s": 16,
+    "rx_wrist_tn": 1,
+    "shell_bevel_m": 0.00065,
+    "shell_gap_m": 5e-05,
+    "timestep_s": 0.0005,
+    "turn_duration_s": 1.5
+  },
+  "passed": false,
+  "passive_detent": "torque=-amplitude*sin(4*angle)-0.0005*velocity",
+  "peak_tip_contact_normal_n": 12.290686555526644,
+  "peak_tip_contact_tangent_n": 14.532936218706896,
+  "peak_turn_tip_contact_tangent_n": 14.532936218706896,
+  "pieces": [
+    {
+      "actual": " 0.0180734945426  0.0186847857184 -0.0182362526581",
+      "expected": " 0.0183333333333  0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.014136706532138148,
+      "piece": "piece_0"
+    },
+    {
+      "actual": "  -0.0183188122869    0.0183471775892 -0.000156247012319",
+      "expected": "-0.0183333333333  0.0183333333333                0",
+      "orientation_error_rad": 0.006263290675776067,
+      "piece": "piece_1"
+    },
+    {
+      "actual": "-0.017332328556 0.0192881872089 0.0183272898802",
+      "expected": "-0.0183333333333  0.0183333333333  0.0183333333333",
+      "orientation_error_rad": 0.049382352662905665,
+      "piece": "piece_2"
+    },
+    {
+      "actual": "1.24885774201e-05  -0.0183127212891   0.0183539179807",
+      "expected": "              -0 -0.0183333333333  0.0183333333333",
+      "orientation_error_rad": 0.05915878114583816,
+      "piece": "piece_3"
+    },
+    {
+      "actual": "  -0.0183333333333  3.03576608296e-18 -6.43745039913e-19",
+      "expected": "-0.0183333333333               -0                0",
+      "orientation_error_rad": 0.0043836674270957545,
+      "piece": "piece_4"
+    },
+    {
+      "actual": " -0.0182744648451  -0.0183690919259 0.000917942623643",
+      "expected": "-0.0183333333333 -0.0183333333333                0",
+      "orientation_error_rad": 0.03790369241241748,
+      "piece": "piece_5"
+    },
+    {
+      "actual": " 0.0183275273203 -0.0192922976474  0.0173275020455",
+      "expected": " 0.0183333333333 -0.0183333333333  0.0183333333333",
+      "orientation_error_rad": 0.06806923069353353,
+      "piece": "piece_6"
+    },
+    {
+      "actual": "   0.0183229264783 -0.000984043287382    0.0183173209368",
+      "expected": "0.0183333333333               0 0.0183333333333",
+      "orientation_error_rad": 0.05033510714562228,
+      "piece": "piece_7"
+    },
+    {
+      "actual": " 0.0177650614987 -0.0179136167089 -0.0192831081437",
+      "expected": " 0.0183333333333 -0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.04742909798433615,
+      "piece": "piece_8"
+    },
+    {
+      "actual": "   0.0183491166744   -0.0182904556511 -0.000995676436013",
+      "expected": " 0.0183333333333 -0.0183333333333                0",
+      "orientation_error_rad": 0.04703935600309249,
+      "piece": "piece_9"
+    },
+    {
+      "actual": "6.50521303491e-18  -0.0183333333333 -2.0362672052e-18",
+      "expected": "               0 -0.0183333333333               -0",
+      "orientation_error_rad": 0.0348409144980677,
+      "piece": "piece_10"
+    },
+    {
+      "actual": "  0.0183649545016   0.0183015630089 5.88201037971e-05",
+      "expected": "0.0183333333333 0.0183333333333               0",
+      "orientation_error_rad": 0.008784744208099238,
+      "piece": "piece_11"
+    },
+    {
+      "actual": "4.39101879857e-18 2.16671027908e-18  -0.0183333333333",
+      "expected": "               0                0 -0.0183333333333",
+      "orientation_error_rad": 0.0038612024076751556,
+      "piece": "piece_12"
+    },
+    {
+      "actual": "-4.40457132572e-18 -2.16671027908e-18    0.0183333333333",
+      "expected": "              0               0 0.0183333333333",
+      "orientation_error_rad": 0.041728031998884245,
+      "piece": "piece_13"
+    },
+    {
+      "actual": "-0.0183333498959 0.00101609776613  0.0183051372337",
+      "expected": "-0.0183333333333                0  0.0183333333333",
+      "orientation_error_rad": 0.0491688902747718,
+      "piece": "piece_14"
+    },
+    {
+      "actual": "-6.93889390391e-18    0.0183333333333  3.55753837847e-19",
+      "expected": "              0 0.0183333333333               0",
+      "orientation_error_rad": 0.003112972704093816,
+      "piece": "piece_15"
+    },
+    {
+      "actual": "-0.000565125530158   -0.0183350358072   -0.0183229178163",
+      "expected": "               0 -0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.0416472877962594,
+      "piece": "piece_16"
+    },
+    {
+      "actual": " 0.019215151272 0.0173803365387 0.0183585183695",
+      "expected": "0.0183333333333 0.0183333333333 0.0183333333333",
+      "orientation_error_rad": 0.046292870182474966,
+      "piece": "piece_17"
+    },
+    {
+      "actual": "-0.000222295662068    0.0183410653073   -0.0183242497868",
+      "expected": "               0  0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.010904175422719778,
+      "piece": "piece_18"
+    },
+    {
+      "actual": "-0.0188459044111 -0.0185852819393 -0.0175428764885",
+      "expected": "-0.0183333333333 -0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.040970990364033406,
+      "piece": "piece_19"
+    },
+    {
+      "actual": "  0.0183581642752 0.000388464980464   -0.018304347069",
+      "expected": " 0.0183333333333                0 -0.0183333333333",
+      "orientation_error_rad": 0.015412294979316071,
+      "piece": "piece_20"
+    },
+    {
+      "actual": "  0.0183333333333                 0 1.55176435937e-18",
+      "expected": "0.0183333333333               0               0",
+      "orientation_error_rad": 0.007915458461796018,
+      "piece": "piece_21"
+    },
+    {
+      "actual": "0.00093958479236  0.0183078045111  0.0183347674275",
+      "expected": "              0 0.0183333333333 0.0183333333333",
+      "orientation_error_rad": 0.04773663805163274,
+      "piece": "piece_22"
+    },
+    {
+      "actual": "-0.0182646756794 -0.0174049412147  0.0192821932614",
+      "expected": "-0.0183333333333 -0.0183333333333  0.0183333333333",
+      "orientation_error_rad": 0.056995862949357726,
+      "piece": "piece_23"
+    },
+    {
+      "actual": "  -0.0183653321285 -0.000283880270341   -0.0182990767533",
+      "expected": "-0.0183333333333               -0 -0.0183333333333",
+      "orientation_error_rad": 0.011940623887315932,
+      "piece": "piece_24"
+    },
+    {
+      "actual": "-0.0185274484807  0.0180140553817 -0.0184542893341",
+      "expected": "-0.0183333333333  0.0183333333333 -0.0183333333333",
+      "orientation_error_rad": 0.013641269207315215,
+      "piece": "piece_25"
+    }
+  ],
+  "planning": [
+    {
+      "candidate": [
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 0.23850000000000002,
+          "mode": "face",
+          "move": "R",
+          "start_s": 0.0
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 0.7385,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 0.23850000000000002
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 0.9770000000000001,
+          "mode": "whole",
+          "move": "",
+          "start_s": 0.7385
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 1.477,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 0.9770000000000001
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 1.977,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 1.477
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 2.2155,
+          "mode": "whole",
+          "move": "",
+          "start_s": 1.977
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 2.7155,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 2.2155
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 2.954,
+          "mode": "face",
+          "move": "U",
+          "start_s": 2.7155
+        },
+        {
+          "action": "A_P180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 3.3225000000000002,
+          "mode": "face",
+          "move": "F2",
+          "start_s": 2.954
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 3.8225000000000002,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 3.3225000000000002
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 4.061,
+          "mode": "whole",
+          "move": "",
+          "start_s": 3.8225000000000002
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 4.561,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 4.061
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 5.061,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 4.561
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 5.2555,
+          "mode": "empty",
+          "move": "",
+          "start_s": 5.061
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 5.494,
+          "mode": "whole",
+          "move": "",
+          "start_s": 5.2555
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 5.994,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 5.494
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 6.2325,
+          "mode": "face",
+          "move": "L'",
+          "start_s": 5.994
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 6.471,
+          "mode": "face",
+          "move": "D",
+          "start_s": 6.2325
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 6.971,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 6.471
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 7.2095,
+          "mode": "whole",
+          "move": "",
+          "start_s": 6.971
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 7.7095,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 7.2095
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 7.948,
+          "mode": "face",
+          "move": "B",
+          "start_s": 7.7095
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 8.448,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 7.948
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 8.6865,
+          "mode": "whole",
+          "move": "",
+          "start_s": 8.448
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 8.881,
+          "mode": "empty",
+          "move": "",
+          "start_s": 8.6865
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 9.381,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 8.881
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 9.881,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 9.381
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 10.1195,
+          "mode": "whole",
+          "move": "",
+          "start_s": 9.881
+        },
+        {
+          "action": "B_N180",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "duration_s": 0.275,
+          "end_s": 10.3945,
+          "mode": "empty",
+          "move": "",
+          "start_s": 10.1195
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 10.8945,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 10.3945
+        },
+        {
+          "action": "A_P180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 11.263,
+          "mode": "face",
+          "move": "R2",
+          "start_s": 10.8945
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 11.5015,
+          "mode": "face",
+          "move": "U'",
+          "start_s": 11.263
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 12.0015,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 11.5015
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 12.24,
+          "mode": "whole",
+          "move": "",
+          "start_s": 12.0015
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 12.74,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 12.24
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              2,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 12.9785,
+          "mode": "face",
+          "move": "F",
+          "start_s": 12.74
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 13.4785,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 12.9785
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 13.717,
+          "mode": "whole",
+          "move": "",
+          "start_s": 13.4785
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              2
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 13.9115,
+          "mode": "empty",
+          "move": "",
+          "start_s": 13.717
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 14.4115,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 13.9115
+        },
+        {
+          "action": "B_N180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              1
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 14.78,
+          "mode": "face",
+          "move": "L2",
+          "start_s": 14.4115
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 15.28,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 14.78
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 15.5185,
+          "mode": "whole",
+          "move": "",
+          "start_s": 15.28
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 16.0185,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 15.5185
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 16.256999999999998,
+          "mode": "face",
+          "move": "D'",
+          "start_s": 16.0185
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 16.756999999999998,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 16.256999999999998
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 16.995499999999996,
+          "mode": "whole",
+          "move": "",
+          "start_s": 16.756999999999998
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 17.189999999999998,
+          "mode": "empty",
+          "move": "",
+          "start_s": 16.995499999999996
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 17.689999999999998,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 17.189999999999998
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 18.189999999999998,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 17.689999999999998
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 18.428499999999996,
+          "mode": "whole",
+          "move": "",
+          "start_s": 18.189999999999998
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 18.928499999999996,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 18.428499999999996
+        },
+        {
+          "action": "B_N180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 19.296999999999997,
+          "mode": "face",
+          "move": "B2",
+          "start_s": 18.928499999999996
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 19.535499999999995,
+          "mode": "face",
+          "move": "R'",
+          "start_s": 19.296999999999997
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 20.035499999999995,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 19.535499999999995
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 20.273999999999994,
+          "mode": "whole",
+          "move": "",
+          "start_s": 20.035499999999995
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 20.468499999999995,
+          "mode": "empty",
+          "move": "",
+          "start_s": 20.273999999999994
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 20.968499999999995,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 20.468499999999995
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 21.468499999999995,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 20.968499999999995
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 21.706999999999994,
+          "mode": "whole",
+          "move": "",
+          "start_s": 21.468499999999995
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 22.206999999999994,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 21.706999999999994
+        },
+        {
+          "action": "B_N180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 22.575499999999995,
+          "mode": "face",
+          "move": "U2",
+          "start_s": 22.206999999999994
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 22.813999999999993,
+          "mode": "face",
+          "move": "F'",
+          "start_s": 22.575499999999995
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 23.313999999999993,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 22.813999999999993
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              1,
+              -2
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 23.55249999999999,
+          "mode": "whole",
+          "move": "",
+          "start_s": 23.313999999999993
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -2
+            ]
+          },
+          "duration_s": 0.1945,
+          "end_s": 23.746999999999993,
+          "mode": "empty",
+          "move": "",
+          "start_s": 23.55249999999999
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 24.246999999999993,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 23.746999999999993
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 24.746999999999993,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 24.246999999999993
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                -1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 24.98549999999999,
+          "mode": "whole",
+          "move": "",
+          "start_s": 24.746999999999993
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 25.48549999999999,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 24.98549999999999
+        },
+        {
+          "action": "A_N180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 25.853999999999992,
+          "mode": "face",
+          "move": "D2",
+          "start_s": 25.48549999999999
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 26.09249999999999,
+          "mode": "face",
+          "move": "L",
+          "start_s": 25.853999999999992
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 26.59249999999999,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 26.09249999999999
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                -1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 26.83099999999999,
+          "mode": "whole",
+          "move": "",
+          "start_s": 26.59249999999999
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 27.33099999999999,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 26.83099999999999
+        },
+        {
+          "action": "A_P90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 27.569499999999987,
+          "mode": "face",
+          "move": "B'",
+          "start_s": 27.33099999999999
+        },
+        {
+          "action": "B_OPEN",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 28.069499999999987,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 27.569499999999987
+        },
+        {
+          "action": "A_N90",
+          "after": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ]
+            ],
+            "wrist_quarters": [
+              -1,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 28.307999999999986,
+          "mode": "whole",
+          "move": "",
+          "start_s": 28.069499999999987
+        },
+        {
+          "action": "B_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              false
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 28.807999999999986,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 28.307999999999986
+        },
+        {
+          "action": "B_N90",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 29.046499999999984,
+          "mode": "face",
+          "move": "U",
+          "start_s": 28.807999999999986
+        },
+        {
+          "action": "A_OPEN",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 29.546499999999984,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 29.046499999999984
+        },
+        {
+          "action": "B_P90",
+          "after": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                0.0,
+                1.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                -1.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              -1
+            ]
+          },
+          "duration_s": 0.23850000000000002,
+          "end_s": 29.784999999999982,
+          "mode": "whole",
+          "move": "",
+          "start_s": 29.546499999999984
+        },
+        {
+          "action": "A_CLOSE",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              false,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.5,
+          "end_s": 30.284999999999982,
+          "mode": "jaw",
+          "move": "",
+          "start_s": 29.784999999999982
+        },
+        {
+          "action": "A_P180",
+          "after": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              0,
+              0
+            ]
+          },
+          "before": {
+            "closed": [
+              true,
+              true
+            ],
+            "orientation": [
+              [
+                1.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                -1.0
+              ],
+              [
+                0.0,
+                1.0,
+                0.0
+              ]
+            ],
+            "wrist_quarters": [
+              -2,
+              0
+            ]
+          },
+          "duration_s": 0.3685,
+          "end_s": 30.653499999999983,
+          "mode": "face",
+          "move": "R2",
+          "start_s": 30.284999999999982
+        }
+      ],
+      "chosen": {
+        "action_count": 84,
+        "estimated_execution_s": 30.653499999999983
+      },
+      "chosenplanner": "robot_search",
+      "estimated_execution_s": 30.653499999999983,
+      "moves": [
+        "R",
+        "U",
+        "F2",
+        "L'",
+        "D",
+        "B",
+        "R2",
+        "U'",
+        "F",
+        "L2",
+        "D'",
+        "B2",
+        "R'",
+        "U2",
+        "F'",
+        "D2",
+        "L",
+        "B'",
+        "U",
+        "R2"
+      ],
+      "peephole": {
+        "action_count": 174,
+        "estimated_execution_s": 68.19049999999999
+      },
+      "raw": {
+        "action_count": 188,
+        "estimated_execution_s": 75.1905
+      },
+      "search_ms": 4.014854,
+      "search_stop_reason": "optimal",
+      "start_orientation": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "scramble": [
+    "R",
+    "U",
+    "F2",
+    "L'",
+    "D",
+    "B",
+    "R2",
+    "U'",
+    "F",
+    "L2",
+    "D'",
+    "B2",
+    "R'",
+    "U2",
+    "F'",
+    "D2",
+    "L",
+    "B'",
+    "U",
+    "R2"
+  ],
+  "settled": {
+    "contacts": 40,
+    "facelet_position_component_error_m": 0.0001372915062637578,
+    "orientation_error_rad": 0.005285407296952577,
+    "position_error_m": 0.00016783402754448596,
+    "time_s": 0.3000000000000002
+  },
+  "slip_state": {
+    "contacts": 66,
+    "core_position": " 0.00509981955052 0.000602763197858   0.0994459741722",
+    "facelet_position_component_error_m": 0.0010160977661266852,
+    "orientation_error_rad": 0.06806923069353353,
+    "position_error_m": 0.0013897276154016377,
+    "time_s": 23.906499999989634
+  },
+  "steps": [
+    {
+      "contacts": 70,
+      "core_orientation_error_rad": 0.0018222871525305155,
+      "core_position": "-5.49144621898e-05  5.86804625463e-05     0.100005629242",
+      "facelet_position_component_error_m": 0.0002594941264071719,
+      "move": "grasp",
+      "orientation_error_rad": 0.011155534417161682,
+      "position_error_m": 0.00034859984239085477,
+      "time_s": 1.5999999999998793
+    },
+    {
+      "contacts": 70,
+      "core_orientation_error_rad": 0.0018222871525305155,
+      "core_position": "-5.49144621898e-05  5.86804625463e-05     0.100005629242",
+      "facelet_position_component_error_m": 0.0002594941264071719,
+      "move": "before R",
+      "orientation_error_rad": 0.011155534417161682,
+      "position_error_m": 0.00034859984239085477,
+      "time_s": 1.5999999999998793
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.004725581481258842,
+      "core_position": "-0.000265925534261  3.99503621595e-05     0.100064991215",
+      "facelet_position_component_error_m": 0.0002557517117336115,
+      "move": "R",
+      "orientation_error_rad": 0.014111889759148148,
+      "position_error_m": 0.00033008638036778176,
+      "time_s": 1.838499999999853
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.004725581481258842,
+      "core_position": "-0.000265925534261  3.99503621595e-05     0.100064991215",
+      "facelet_position_component_error_m": 0.0002557517117336115,
+      "move": "R checkpoint",
+      "orientation_error_rad": 0.014111889759148148,
+      "position_error_m": 0.00033008638036778176,
+      "time_s": 1.838499999999853
+    },
+    {
+      "contacts": 58,
+      "core_orientation_error_rad": 0.010003422284655344,
+      "core_position": "-0.000265317481824 -5.48517678071e-05     0.099977307213",
+      "facelet_position_component_error_m": 0.0003331010846628693,
+      "move": "whole A",
+      "orientation_error_rad": 0.013727269213566566,
+      "position_error_m": 0.00042585439338177754,
+      "time_s": 2.577000000000028
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.008023388275548037,
+      "core_position": "-5.76716958384e-05  6.64128361012e-05    0.0997549368949",
+      "facelet_position_component_error_m": 0.00023861091645028393,
+      "move": "whole B",
+      "orientation_error_rad": 0.013207437497516525,
+      "position_error_m": 0.00033565262862936474,
+      "time_s": 3.8155000000004415
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.004398862128575478,
+      "core_position": "-0.000136038953541  2.76764465465e-05    0.0999191317263",
+      "facelet_position_component_error_m": 0.00037385632526255527,
+      "move": "before U",
+      "orientation_error_rad": 0.01577369449093223,
+      "position_error_m": 0.0004852935262686867,
+      "time_s": 4.315500000000328
+    },
+    {
+      "contacts": 74,
+      "core_orientation_error_rad": 0.004486317304931711,
+      "core_position": " -0.00016113463218 -3.33087542212e-05    0.0999835803929",
+      "facelet_position_component_error_m": 0.0003179431073170626,
+      "move": "U",
+      "orientation_error_rad": 0.013568036154761192,
+      "position_error_m": 0.00041951096028536604,
+      "time_s": 4.554000000000196
+    },
+    {
+      "contacts": 74,
+      "core_orientation_error_rad": 0.004486317304931711,
+      "core_position": " -0.00016113463218 -3.33087542212e-05    0.0999835803929",
+      "facelet_position_component_error_m": 0.0003179431073170626,
+      "move": "U checkpoint",
+      "orientation_error_rad": 0.013568036154761192,
+      "position_error_m": 0.00041951096028536604,
+      "time_s": 4.554000000000196
+    },
+    {
+      "contacts": 74,
+      "core_orientation_error_rad": 0.004486317304931711,
+      "core_position": " -0.00016113463218 -3.33087542212e-05    0.0999835803929",
+      "facelet_position_component_error_m": 0.0003179431073170626,
+      "move": "before F2",
+      "orientation_error_rad": 0.013568036154761192,
+      "position_error_m": 0.00041951096028536604,
+      "time_s": 4.554000000000196
+    },
+    {
+      "contacts": 65,
+      "core_orientation_error_rad": 0.007989684514420009,
+      "core_position": "-0.000128488071656  -2.0325225495e-05    0.0999899919275",
+      "facelet_position_component_error_m": 0.00041944979929664505,
+      "move": "F2",
+      "orientation_error_rad": 0.01627350440510402,
+      "position_error_m": 0.0005167412530378121,
+      "time_s": 4.922499999999991
+    },
+    {
+      "contacts": 65,
+      "core_orientation_error_rad": 0.007989684514420009,
+      "core_position": "-0.000128488071656  -2.0325225495e-05    0.0999899919275",
+      "facelet_position_component_error_m": 0.00041944979929664505,
+      "move": "F2 checkpoint",
+      "orientation_error_rad": 0.01627350440510402,
+      "position_error_m": 0.0005167412530378121,
+      "time_s": 4.922499999999991
+    },
+    {
+      "contacts": 63,
+      "core_orientation_error_rad": 0.014277580461809766,
+      "core_position": "-0.000130485408494 -1.12704455048e-05     0.100020153838",
+      "facelet_position_component_error_m": 0.0002559739880949423,
+      "move": "whole A",
+      "orientation_error_rad": 0.013555525449235214,
+      "position_error_m": 0.0003517684164130002,
+      "time_s": 5.660999999999582
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.013101753306428454,
+      "core_position": "6.47262965329e-05 6.92351965594e-05   0.0998958818425",
+      "facelet_position_component_error_m": 0.000286602108702249,
+      "move": "whole B",
+      "orientation_error_rad": 0.012590944985435773,
+      "position_error_m": 0.000353690865454485,
+      "time_s": 7.093999999998788
+    },
+    {
+      "contacts": 68,
+      "core_orientation_error_rad": 0.008233063646122848,
+      "core_position": "1.27717840771e-05 6.55511015901e-05   0.0998764011972",
+      "facelet_position_component_error_m": 0.00045162496956405174,
+      "move": "before L'",
+      "orientation_error_rad": 0.01764304848379429,
+      "position_error_m": 0.000560193380450877,
+      "time_s": 7.593999999998511
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.02123073407369171,
+      "core_position": " 0.00021700760076 0.000206637682143   0.0997691204078",
+      "facelet_position_component_error_m": 0.0007858147276321829,
+      "move": "L'",
+      "orientation_error_rad": 0.03538195970465655,
+      "position_error_m": 0.001049425306625293,
+      "time_s": 7.832499999998379
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.02123073407369171,
+      "core_position": " 0.00021700760076 0.000206637682143   0.0997691204078",
+      "facelet_position_component_error_m": 0.0007858147276321829,
+      "move": "L' checkpoint",
+      "orientation_error_rad": 0.03538195970465655,
+      "position_error_m": 0.001049425306625293,
+      "time_s": 7.832499999998379
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.02123073407369171,
+      "core_position": " 0.00021700760076 0.000206637682143   0.0997691204078",
+      "facelet_position_component_error_m": 0.0007858147276321829,
+      "move": "before D",
+      "orientation_error_rad": 0.03538195970465655,
+      "position_error_m": 0.001049425306625293,
+      "time_s": 7.832499999998379
+    },
+    {
+      "contacts": 73,
+      "core_orientation_error_rad": 0.007221495567284633,
+      "core_position": "-0.000188077527547  0.000102676065482    0.0998184972702",
+      "facelet_position_component_error_m": 0.0004694366320572088,
+      "move": "D",
+      "orientation_error_rad": 0.021637525277597387,
+      "position_error_m": 0.0006024198382788188,
+      "time_s": 8.070999999998373
+    },
+    {
+      "contacts": 73,
+      "core_orientation_error_rad": 0.007221495567284633,
+      "core_position": "-0.000188077527547  0.000102676065482    0.0998184972702",
+      "facelet_position_component_error_m": 0.0004694366320572088,
+      "move": "D checkpoint",
+      "orientation_error_rad": 0.021637525277597387,
+      "position_error_m": 0.0006024198382788188,
+      "time_s": 8.070999999998373
+    },
+    {
+      "contacts": 58,
+      "core_orientation_error_rad": 0.0044880009629506895,
+      "core_position": "-0.000201089759986 -0.000210607546051     0.100043542231",
+      "facelet_position_component_error_m": 0.00037569287660233625,
+      "move": "whole A",
+      "orientation_error_rad": 0.015052326993202936,
+      "position_error_m": 0.00047082371606981975,
+      "time_s": 8.809499999999275
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.005987785743116235,
+      "core_position": "-0.000187289027631 -0.000122262339319     0.100065538229",
+      "facelet_position_component_error_m": 0.0002969219426540888,
+      "move": "before B",
+      "orientation_error_rad": 0.01214656971251145,
+      "position_error_m": 0.00037723184361141755,
+      "time_s": 9.309499999999886
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.004263369134044251,
+      "core_position": "-0.000111269726321 -6.48754778971e-05     0.100096591926",
+      "facelet_position_component_error_m": 0.0002927283758282842,
+      "move": "B",
+      "orientation_error_rad": 0.012416995765234407,
+      "position_error_m": 0.00038354358959678933,
+      "time_s": 9.548000000000178
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.004263369134044251,
+      "core_position": "-0.000111269726321 -6.48754778971e-05     0.100096591926",
+      "facelet_position_component_error_m": 0.0002927283758282842,
+      "move": "B checkpoint",
+      "orientation_error_rad": 0.012416995765234407,
+      "position_error_m": 0.00038354358959678933,
+      "time_s": 9.548000000000178
+    },
+    {
+      "contacts": 58,
+      "core_orientation_error_rad": 0.0037398892062349355,
+      "core_position": " -0.00010912880289 -4.49612732424e-05     0.100017794065",
+      "facelet_position_component_error_m": 0.00044145788901877453,
+      "move": "whole B",
+      "orientation_error_rad": 0.01721435757593056,
+      "position_error_m": 0.0005458243995990895,
+      "time_s": 10.28650000000108
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.014230302212538827,
+      "core_position": "-0.000176988020276 -3.47676668076e-06     0.099932168032",
+      "facelet_position_component_error_m": 0.000294571933892096,
+      "move": "whole A",
+      "orientation_error_rad": 0.013215684948459955,
+      "position_error_m": 0.00038263439581191224,
+      "time_s": 11.719500000002832
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.01070032442782868,
+      "core_position": "-0.000168301362281  8.02224233981e-05    0.0999801403676",
+      "facelet_position_component_error_m": 0.00037565754900930476,
+      "move": "before R2",
+      "orientation_error_rad": 0.014840090283938977,
+      "position_error_m": 0.0004626789105102169,
+      "time_s": 12.494500000003779
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.0036628071586352544,
+      "core_position": "-0.000179927647187  6.37329102597e-05      0.10004080219",
+      "facelet_position_component_error_m": 0.0002542579312475972,
+      "move": "R2",
+      "orientation_error_rad": 0.012670761472923049,
+      "position_error_m": 0.00031529550089214357,
+      "time_s": 12.863000000004229
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.0036628071586352544,
+      "core_position": "-0.000179927647187  6.37329102597e-05      0.10004080219",
+      "facelet_position_component_error_m": 0.0002542579312475972,
+      "move": "R2 checkpoint",
+      "orientation_error_rad": 0.012670761472923049,
+      "position_error_m": 0.00031529550089214357,
+      "time_s": 12.863000000004229
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.0036628071586352544,
+      "core_position": "-0.000179927647187  6.37329102597e-05      0.10004080219",
+      "facelet_position_component_error_m": 0.0002542579312475972,
+      "move": "before U'",
+      "orientation_error_rad": 0.012670761472923049,
+      "position_error_m": 0.00031529550089214357,
+      "time_s": 12.863000000004229
+    },
+    {
+      "contacts": 65,
+      "core_orientation_error_rad": 0.006611239664952163,
+      "core_position": "-0.000167142230878   3.6761419887e-05    0.0999623566054",
+      "facelet_position_component_error_m": 0.00042954689460283565,
+      "move": "U'",
+      "orientation_error_rad": 0.016674092757508217,
+      "position_error_m": 0.0005231387364388337,
+      "time_s": 13.10150000000452
+    },
+    {
+      "contacts": 65,
+      "core_orientation_error_rad": 0.006611239664952163,
+      "core_position": "-0.000167142230878   3.6761419887e-05    0.0999623566054",
+      "facelet_position_component_error_m": 0.00042954689460283565,
+      "move": "U' checkpoint",
+      "orientation_error_rad": 0.016674092757508217,
+      "position_error_m": 0.0005231387364388337,
+      "time_s": 13.10150000000452
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.011393631039190262,
+      "core_position": "0.000143649698125 7.18571128686e-05   0.0999354323978",
+      "facelet_position_component_error_m": 0.000335435552597501,
+      "move": "whole B",
+      "orientation_error_rad": 0.013805929307228341,
+      "position_error_m": 0.00042741654004072987,
+      "time_s": 13.840000000005423
+    },
+    {
+      "contacts": 61,
+      "core_orientation_error_rad": 0.0037363740028647325,
+      "core_position": "5.23429863074e-05 5.83391690293e-05   0.0999823417028",
+      "facelet_position_component_error_m": 0.00023755202867941153,
+      "move": "before F",
+      "orientation_error_rad": 0.01124207607181466,
+      "position_error_m": 0.00029625828244490073,
+      "time_s": 14.340000000006034
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.003337192786349896,
+      "core_position": "0.000126122922664 5.48870886523e-05    0.099909918298",
+      "facelet_position_component_error_m": 0.0003925904291773065,
+      "move": "F",
+      "orientation_error_rad": 0.01565225776968599,
+      "position_error_m": 0.0004844173281996141,
+      "time_s": 14.578500000006326
+    },
+    {
+      "contacts": 64,
+      "core_orientation_error_rad": 0.003337192786349896,
+      "core_position": "0.000126122922664 5.48870886523e-05    0.099909918298",
+      "facelet_position_component_error_m": 0.0003925904291773065,
+      "move": "F checkpoint",
+      "orientation_error_rad": 0.01565225776968599,
+      "position_error_m": 0.0004844173281996141,
+      "time_s": 14.578500000006326
+    },
+    {
+      "contacts": 61,
+      "core_orientation_error_rad": 0.00986841795907816,
+      "core_position": " 0.000122976277783 -0.000109618499776     0.100004141256",
+      "facelet_position_component_error_m": 0.0003273678184172908,
+      "move": "whole A",
+      "orientation_error_rad": 0.013673133190924539,
+      "position_error_m": 0.00041996704440991074,
+      "time_s": 15.317000000007228
+    },
+    {
+      "contacts": 70,
+      "core_orientation_error_rad": 0.00500284177566071,
+      "core_position": " 0.000121732098988 -5.22533134904e-05    0.0999701217522",
+      "facelet_position_component_error_m": 0.00018331973339521732,
+      "move": "before L2",
+      "orientation_error_rad": 0.007715242594577393,
+      "position_error_m": 0.0002298261953533406,
+      "time_s": 16.011500000008034
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.008571611430020663,
+      "core_position": "3.66093943223e-05 0.000152273653145    0.100039612081",
+      "facelet_position_component_error_m": 0.0005773811496029672,
+      "move": "L2",
+      "orientation_error_rad": 0.02458392475325911,
+      "position_error_m": 0.0007070340165297652,
+      "time_s": 16.380000000007175
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.008571611430020663,
+      "core_position": "3.66093943223e-05 0.000152273653145    0.100039612081",
+      "facelet_position_component_error_m": 0.0005773811496029672,
+      "move": "L2 checkpoint",
+      "orientation_error_rad": 0.02458392475325911,
+      "position_error_m": 0.0007070340165297652,
+      "time_s": 16.380000000007175
+    },
+    {
+      "contacts": 63,
+      "core_orientation_error_rad": 0.01803555118143084,
+      "core_position": "-1.91901253902e-05  0.000165002027048     0.100028071271",
+      "facelet_position_component_error_m": 0.00040098068526344885,
+      "move": "whole B",
+      "orientation_error_rad": 0.016138451045065,
+      "position_error_m": 0.0004938593473327016,
+      "time_s": 17.118500000005454
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.00950746936773258,
+      "core_position": "-0.000197980941784  0.000150645477503    0.0999473851367",
+      "facelet_position_component_error_m": 0.0004592489647541574,
+      "move": "before D'",
+      "orientation_error_rad": 0.01823225439755836,
+      "position_error_m": 0.000568788143667129,
+      "time_s": 17.61850000000429
+    },
+    {
+      "contacts": 58,
+      "core_orientation_error_rad": 0.013637692217225904,
+      "core_position": "-0.000565768684173  8.07685345292e-05    0.0999401828933",
+      "facelet_position_component_error_m": 0.0005361626223025044,
+      "move": "D'",
+      "orientation_error_rad": 0.02219211176939701,
+      "position_error_m": 0.0007028063755191763,
+      "time_s": 17.857000000003733
+    },
+    {
+      "contacts": 58,
+      "core_orientation_error_rad": 0.013637692217225904,
+      "core_position": "-0.000565768684173  8.07685345292e-05    0.0999401828933",
+      "facelet_position_component_error_m": 0.0005361626223025044,
+      "move": "D' checkpoint",
+      "orientation_error_rad": 0.02219211176939701,
+      "position_error_m": 0.0007028063755191763,
+      "time_s": 17.857000000003733
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.022055768202433355,
+      "core_position": "-0.000599218141846  -0.00012173623941     0.100006312326",
+      "facelet_position_component_error_m": 0.0004833907252229548,
+      "move": "whole A",
+      "orientation_error_rad": 0.01949674636622566,
+      "position_error_m": 0.0005964756127355326,
+      "time_s": 18.595500000002012
+    },
+    {
+      "contacts": 59,
+      "core_orientation_error_rad": 0.021638726574854026,
+      "core_position": "3.41833027366e-05 0.000197188561277   0.0996119342917",
+      "facelet_position_component_error_m": 0.00030008214626349797,
+      "move": "whole B",
+      "orientation_error_rad": 0.01372035764413016,
+      "position_error_m": 0.0003960302059730865,
+      "time_s": 20.028499999998672
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.019976985538312828,
+      "core_position": "-0.000247732128719  0.000199087109065    0.0997454277653",
+      "facelet_position_component_error_m": 0.0004580315262969377,
+      "move": "before B2",
+      "orientation_error_rad": 0.02084719806878747,
+      "position_error_m": 0.000567074930909586,
+      "time_s": 20.528499999997507
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.0260476920675584,
+      "core_position": "-0.000373988356091 -2.62150570997e-05     0.100024892847",
+      "facelet_position_component_error_m": 0.0005660222763705612,
+      "move": "B2",
+      "orientation_error_rad": 0.02531673549428049,
+      "position_error_m": 0.0007550414532917015,
+      "time_s": 20.89699999999665
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.0260476920675584,
+      "core_position": "-0.000373988356091 -2.62150570997e-05     0.100024892847",
+      "facelet_position_component_error_m": 0.0005660222763705612,
+      "move": "B2 checkpoint",
+      "orientation_error_rad": 0.02531673549428049,
+      "position_error_m": 0.0007550414532917015,
+      "time_s": 20.89699999999665
+    },
+    {
+      "contacts": 60,
+      "core_orientation_error_rad": 0.0260476920675584,
+      "core_position": "-0.000373988356091 -2.62150570997e-05     0.100024892847",
+      "facelet_position_component_error_m": 0.0005660222763705612,
+      "move": "before R'",
+      "orientation_error_rad": 0.02531673549428049,
+      "position_error_m": 0.0007550414532917015,
+      "time_s": 20.89699999999665
+    },
+    {
+      "contacts": 76,
+      "core_orientation_error_rad": 0.02276386081546923,
+      "core_position": "-0.000205442638514 -5.67634184054e-05    0.0999583842656",
+      "facelet_position_component_error_m": 0.0007456739419061838,
+      "move": "R'",
+      "orientation_error_rad": 0.030080638183437366,
+      "position_error_m": 0.0009455547807789171,
+      "time_s": 21.135499999996092
+    },
+    {
+      "contacts": 76,
+      "core_orientation_error_rad": 0.02276386081546923,
+      "core_position": "-0.000205442638514 -5.67634184054e-05    0.0999583842656",
+      "facelet_position_component_error_m": 0.0007456739419061838,
+      "move": "R' checkpoint",
+      "orientation_error_rad": 0.030080638183437366,
+      "position_error_m": 0.0009455547807789171,
+      "time_s": 21.135499999996092
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.03493474599408538,
+      "core_position": "-0.000231550623312 -5.11385665766e-05      0.10015512936",
+      "facelet_position_component_error_m": 0.00039638906383723804,
+      "move": "whole A",
+      "orientation_error_rad": 0.015840697555099842,
+      "position_error_m": 0.0004936075636863719,
+      "time_s": 21.87399999999437
+    },
+    {
+      "contacts": 62,
+      "core_orientation_error_rad": 0.026161065605032462,
+      "core_position": "-0.000177540779114  0.000341537537196    0.0996768626914",
+      "facelet_position_component_error_m": 0.0003812196330624483,
+      "move": "whole B",
+      "orientation_error_rad": 0.015784969054643144,
+      "position_error_m": 0.00047381745165320303,
+      "time_s": 23.30699999999103
+    },
+    {
+      "contacts": 67,
+      "core_orientation_error_rad": 0.021093092159852046,
+      "core_position": "-0.000467935976776  0.000357549380122    0.0997706532843",
+      "facelet_position_component_error_m": 0.0006109349577268393,
+      "move": "before U2",
+      "orientation_error_rad": 0.026942157447044052,
+      "position_error_m": 0.0008483903375099205,
+      "time_s": 23.806999999989866
+    }
+  ],
+  "velocity_dofs": 100,
+  "video_playback": 1,
+  "wall_time_s": 19.313302963,
+  "wrist_motions": [
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.026749719378878573,
+      "end_tracking_error_rad": -0.000895666932886563,
+      "feedforward_inertia_kg_m2": 0.01019534539825967,
+      "mode": "face",
+      "peak_speed_rad_s": 12.377982314347946,
+      "peak_torque_nm": 3.420103616660789,
+      "peak_tracking_error_rad": 0.005617579258979433,
+      "settle_s": 0.0,
+      "start_time_s": 1.5999999999998793,
+      "target": -1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.02223070837503261,
+      "end_tracking_error_rad": 0.0007307211249472546,
+      "feedforward_inertia_kg_m2": 0.010195360126629296,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368408890244327,
+      "peak_torque_nm": 3.3492565736057003,
+      "peak_tracking_error_rad": 0.005679899387583176,
+      "settle_s": 0.0,
+      "start_time_s": 2.3384999999999483,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.022309286244652428,
+      "end_tracking_error_rad": 0.0006605867436060286,
+      "feedforward_inertia_kg_m2": 0.010195367047546405,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367376899735405,
+      "peak_torque_nm": 3.344621151944729,
+      "peak_tracking_error_rad": 0.0056993848250531665,
+      "settle_s": 0.0,
+      "start_time_s": 3.577000000000362,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.026927080749060885,
+      "end_tracking_error_rad": -0.0008243446613353765,
+      "feedforward_inertia_kg_m2": 0.010195534415922412,
+      "mode": "face",
+      "peak_speed_rad_s": 12.384709211423678,
+      "peak_torque_nm": 3.416578488002429,
+      "peak_tracking_error_rad": 0.005658956627956513,
+      "settle_s": 0.0,
+      "start_time_s": 4.315500000000328,
+      "target": 0.0
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.3685,
+      "end_speed_rad_s": -0.01996738587164247,
+      "end_tracking_error_rad": 0.0005943267464751933,
+      "feedforward_inertia_kg_m2": 0.010195369005319003,
+      "mode": "face",
+      "peak_speed_rad_s": 15.98922132754969,
+      "peak_torque_nm": 3.761067296983171,
+      "peak_tracking_error_rad": 0.008116448941685173,
+      "settle_s": 0.0,
+      "start_time_s": 4.554000000000196,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.0223109935160626,
+      "end_tracking_error_rad": -0.0006604770618598987,
+      "feedforward_inertia_kg_m2": 0.010195382414304555,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367323621719857,
+      "peak_torque_nm": 3.3450305850448387,
+      "peak_tracking_error_rad": 0.005695868404839821,
+      "settle_s": 0.0,
+      "start_time_s": 5.422499999999714,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.1945,
+      "end_speed_rad_s": -0.031336252780410356,
+      "end_tracking_error_rad": 0.0010958142350983024,
+      "feedforward_inertia_kg_m2": 0.010259834907101152,
+      "mode": "empty",
+      "peak_speed_rad_s": 15.171253543927888,
+      "peak_torque_nm": 4.513548789366638,
+      "peak_tracking_error_rad": 0.006921136919487925,
+      "settle_s": 0.0,
+      "start_time_s": 6.660999999999028,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.0224444152888773,
+      "end_tracking_error_rad": 0.0006596329983752369,
+      "feedforward_inertia_kg_m2": 0.010195423675149118,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367467968197108,
+      "peak_torque_nm": 3.344560848670831,
+      "peak_tracking_error_rad": 0.005697800625005578,
+      "settle_s": 0.0,
+      "start_time_s": 6.85549999999892,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.02616245106246282,
+      "end_tracking_error_rad": 0.0008797036099585931,
+      "feedforward_inertia_kg_m2": 0.010195436535096206,
+      "mode": "face",
+      "peak_speed_rad_s": 12.380030555826874,
+      "peak_torque_nm": 3.428430502774603,
+      "peak_tracking_error_rad": 0.005433287660664643,
+      "settle_s": 0.0,
+      "start_time_s": 7.593999999998511,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.026725483654670246,
+      "end_tracking_error_rad": -0.000752469974731218,
+      "feedforward_inertia_kg_m2": 0.01019564966345362,
+      "mode": "face",
+      "peak_speed_rad_s": 12.384477946398794,
+      "peak_torque_nm": 3.4297316500470743,
+      "peak_tracking_error_rad": 0.005501093715643224,
+      "settle_s": 0.0,
+      "start_time_s": 7.832499999998379,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.022166091177643343,
+      "end_tracking_error_rad": -0.0007308850466321525,
+      "feedforward_inertia_kg_m2": 0.010195372150893799,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368536842901284,
+      "peak_torque_nm": 3.3494211846081043,
+      "peak_tracking_error_rad": 0.005680478702325242,
+      "settle_s": 0.0,
+      "start_time_s": 8.570999999998984,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.026640986447473775,
+      "end_tracking_error_rad": -0.000865333803052426,
+      "feedforward_inertia_kg_m2": 0.010195425356979117,
+      "mode": "face",
+      "peak_speed_rad_s": 12.384937069211535,
+      "peak_torque_nm": 3.4218198005136173,
+      "peak_tracking_error_rad": 0.005648710102397647,
+      "settle_s": 0.0,
+      "start_time_s": 9.309499999999886,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.022189082992315368,
+      "end_tracking_error_rad": 0.0007317087438218906,
+      "feedforward_inertia_kg_m2": 0.010195367214400688,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368464263626592,
+      "peak_torque_nm": 3.3492666254358596,
+      "peak_tracking_error_rad": 0.005680611857981077,
+      "settle_s": 0.0,
+      "start_time_s": 10.048000000000789,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.1945,
+      "end_speed_rad_s": -0.030911602630509873,
+      "end_tracking_error_rad": 0.001160439087784848,
+      "feedforward_inertia_kg_m2": 0.010261496346889243,
+      "mode": "empty",
+      "peak_speed_rad_s": 15.172418137594402,
+      "peak_torque_nm": 4.518114412759516,
+      "peak_tracking_error_rad": 0.006900980920655497,
+      "settle_s": 0.0,
+      "start_time_s": 10.28650000000108,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.022142349813118432,
+      "end_tracking_error_rad": -0.0007320408774084917,
+      "feedforward_inertia_kg_m2": 0.01019535649848538,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.36841422760151,
+      "peak_torque_nm": 3.3494110523959932,
+      "peak_tracking_error_rad": 0.005681317060181268,
+      "settle_s": 0.0,
+      "start_time_s": 11.48100000000254,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.275,
+      "end_speed_rad_s": 0.031381407085148035,
+      "end_tracking_error_rad": -0.0009841800099197892,
+      "feedforward_inertia_kg_m2": 0.010261495329790078,
+      "mode": "empty",
+      "peak_speed_rad_s": 21.445693546588483,
+      "peak_torque_nm": 5.480586543232732,
+      "peak_tracking_error_rad": 0.01021653005552925,
+      "settle_s": 0.0,
+      "start_time_s": 11.719500000002832,
+      "target": 0.0
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.3685,
+      "end_speed_rad_s": -0.01959251054173269,
+      "end_tracking_error_rad": 0.0005504422602884418,
+      "feedforward_inertia_kg_m2": 0.01019538921759436,
+      "mode": "face",
+      "peak_speed_rad_s": 15.98855994611195,
+      "peak_torque_nm": 3.759645090577692,
+      "peak_tracking_error_rad": 0.00811402432864905,
+      "settle_s": 0.0,
+      "start_time_s": 12.494500000003779,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.02679476482731963,
+      "end_tracking_error_rad": 0.0007248163026141174,
+      "feedforward_inertia_kg_m2": 0.010195378520159436,
+      "mode": "face",
+      "peak_speed_rad_s": 12.384784617048858,
+      "peak_torque_nm": 3.4239851121637415,
+      "peak_tracking_error_rad": 0.00556712376403623,
+      "settle_s": 0.0,
+      "start_time_s": 12.863000000004229,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.02223794429133246,
+      "end_tracking_error_rad": 0.000729007216092814,
+      "feedforward_inertia_kg_m2": 0.010195355454277305,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368414320936662,
+      "peak_torque_nm": 3.349319576013613,
+      "peak_tracking_error_rad": 0.005679333494021943,
+      "settle_s": 0.0,
+      "start_time_s": 13.601500000005132,
+      "target": 3.141592653589793
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.02682932704535144,
+      "end_tracking_error_rad": -0.0007448291494254189,
+      "feedforward_inertia_kg_m2": 0.010195439454784957,
+      "mode": "face",
+      "peak_speed_rad_s": 12.383116231976537,
+      "peak_torque_nm": 3.4247660142543452,
+      "peak_tracking_error_rad": 0.005537196209603801,
+      "settle_s": 0.0,
+      "start_time_s": 14.340000000006034,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.02225017049899219,
+      "end_tracking_error_rad": -0.000731098983445481,
+      "feedforward_inertia_kg_m2": 0.010195353987039153,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368435151796923,
+      "peak_torque_nm": 3.3492324227793233,
+      "peak_tracking_error_rad": 0.0056800098352068895,
+      "settle_s": 0.0,
+      "start_time_s": 15.078500000006937,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.1945,
+      "end_speed_rad_s": 0.030918325991801242,
+      "end_tracking_error_rad": -0.0011605849732636564,
+      "feedforward_inertia_kg_m2": 0.010261495208807694,
+      "mode": "empty",
+      "peak_speed_rad_s": 15.172407764682399,
+      "peak_torque_nm": 4.517970060427274,
+      "peak_tracking_error_rad": 0.006902483922960556,
+      "settle_s": 0.0,
+      "start_time_s": 15.317000000007228,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.3685,
+      "end_speed_rad_s": 0.019790445663588518,
+      "end_tracking_error_rad": -0.0005676407402539496,
+      "feedforward_inertia_kg_m2": 0.010195439764011825,
+      "mode": "face",
+      "peak_speed_rad_s": 15.986426881071543,
+      "peak_torque_nm": 3.757808185698856,
+      "peak_tracking_error_rad": 0.008064464818079875,
+      "settle_s": 0.0,
+      "start_time_s": 16.011500000008034,
+      "target": -1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.022549933633525556,
+      "end_tracking_error_rad": 0.0007403838270594215,
+      "feedforward_inertia_kg_m2": 0.010195482788267709,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367696819624506,
+      "peak_torque_nm": 3.337906933098239,
+      "peak_tracking_error_rad": 0.005800785832198341,
+      "settle_s": 0.0,
+      "start_time_s": 16.88000000000601,
+      "target": 0.0
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.026383160908507525,
+      "end_tracking_error_rad": 0.0009572639050223763,
+      "feedforward_inertia_kg_m2": 0.010195534473855388,
+      "mode": "face",
+      "peak_speed_rad_s": 12.391026682341371,
+      "peak_torque_nm": 3.4171121545061425,
+      "peak_tracking_error_rad": 0.005589339624699541,
+      "settle_s": 0.0,
+      "start_time_s": 17.61850000000429,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.02220335744769072,
+      "end_tracking_error_rad": -0.0007318345041725031,
+      "feedforward_inertia_kg_m2": 0.010195488173451232,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368499718919633,
+      "peak_torque_nm": 3.349721382812888,
+      "peak_tracking_error_rad": 0.005681371396583534,
+      "settle_s": 0.0,
+      "start_time_s": 18.357000000002568,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.1945,
+      "end_speed_rad_s": 0.03103258123832114,
+      "end_tracking_error_rad": -0.0010112591983708619,
+      "feedforward_inertia_kg_m2": 0.01026149631790963,
+      "mode": "empty",
+      "peak_speed_rad_s": 15.170814056584897,
+      "peak_torque_nm": 4.520899249785835,
+      "peak_tracking_error_rad": 0.006820420166800845,
+      "settle_s": 0.0,
+      "start_time_s": 18.595500000002012,
+      "target": -1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.0225684893717305,
+      "end_tracking_error_rad": 0.0007396762780073765,
+      "feedforward_inertia_kg_m2": 0.010195558246113047,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367574167071647,
+      "peak_torque_nm": 3.33742965028064,
+      "peak_tracking_error_rad": 0.005802481136560678,
+      "settle_s": 0.0,
+      "start_time_s": 19.789999999999228,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.3685,
+      "end_speed_rad_s": 0.018936289744384875,
+      "end_tracking_error_rad": -0.0006160079160855148,
+      "feedforward_inertia_kg_m2": 0.010195714336667645,
+      "mode": "face",
+      "peak_speed_rad_s": 15.988040113491303,
+      "peak_torque_nm": 3.824863130565049,
+      "peak_tracking_error_rad": 0.007890996305039977,
+      "settle_s": 0.0,
+      "start_time_s": 20.528499999997507,
+      "target": -3.141592653589793
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.026494577932988032,
+      "end_tracking_error_rad": 0.0009237178823238157,
+      "feedforward_inertia_kg_m2": 0.010195584165600617,
+      "mode": "face",
+      "peak_speed_rad_s": 12.38066313813935,
+      "peak_torque_nm": 3.4177337517276527,
+      "peak_tracking_error_rad": 0.005561417954817349,
+      "settle_s": 0.0,
+      "start_time_s": 20.89699999999665,
+      "target": 1.5707963267948966
+    },
+    {
+      "actuator": "A_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": 0.022113014038312628,
+      "end_tracking_error_rad": -0.0007317099822385147,
+      "feedforward_inertia_kg_m2": 0.01019547545572182,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.368422346163483,
+      "peak_torque_nm": 3.349430281606587,
+      "peak_tracking_error_rad": 0.005679759168511378,
+      "settle_s": 0.0,
+      "start_time_s": 21.635499999994927,
+      "target": 0.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.1945,
+      "end_speed_rad_s": -0.03091159378053537,
+      "end_tracking_error_rad": 0.0011604480702016584,
+      "feedforward_inertia_kg_m2": 0.010261496479239957,
+      "mode": "empty",
+      "peak_speed_rad_s": 15.172418231597106,
+      "peak_torque_nm": 4.518114305937331,
+      "peak_tracking_error_rad": 0.006900985295984707,
+      "settle_s": 0.0,
+      "start_time_s": 21.87399999999437,
+      "target": -1.5707963267948966
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "duration_s": 0.23850000000000002,
+      "end_speed_rad_s": -0.022561453731816904,
+      "end_tracking_error_rad": 0.0007416997390736903,
+      "feedforward_inertia_kg_m2": 0.010195740405478328,
+      "mode": "whole",
+      "peak_speed_rad_s": 12.367844238916348,
+      "peak_torque_nm": 3.3375135599727486,
+      "peak_tracking_error_rad": 0.005804897754767557,
+      "settle_s": 0.0,
+      "start_time_s": 23.068499999991587,
+      "target": 0.0
+    }
+  ],
+  "wrist_tn": [
+    {
+      "actuator": "A_yaw_drive",
+      "max_excess_nm": 0.0,
+      "peak_speed_rad_s": 15.98922132754969,
+      "peak_torque_nm": 4.518114412759516,
+      "reduced_steps": 0,
+      "static_limit_nm": 15.0
+    },
+    {
+      "actuator": "B_yaw_drive",
+      "max_excess_nm": 0.0,
+      "peak_speed_rad_s": 21.445693546588483,
+      "peak_torque_nm": 5.480586543232732,
+      "reduced_steps": 0,
+      "static_limit_nm": 15.0
+    }
+  ],
+  "wrist_tn_enabled": true,
+  "wrist_tn_profile": "RX-P2 S conservative 0.05 rpm; virtual wrist selection"
+}
