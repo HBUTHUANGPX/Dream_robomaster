@@ -11,7 +11,8 @@ const timestamp=t=>{const n=Math.round(t*100);return `${Math.floor(n/360000)}:${
 const duration=report.frames/(report.parameters.record_fps||30);
 const rows=[];
 const line=(a,b,text,style='Caption')=>rows.push(`Dialogue: 0,${timestamp(a)},${timestamp(b)},${style},,0,0,0,,${text}`);
-line(0,duration,`RX摩擦夹爪 · ${report.scramble.length}步打乱与求解还原 · 1倍速`,'Title');
+const massLabel=Number.isFinite(report.parameters.cube_mass_kg)?` · ${Math.round(report.parameters.cube_mass_kg*1000)}克魔方`:'';
+line(0,duration,`RX摩擦夹爪${massLabel} · ${report.scramble.length}步打乱与求解还原 · 1倍速`,'Title');
 let start=report.steps[0].time_s;
 line(0,start,'夹持与上料：建立接触后解除外部固定');
 for(let i=0;i<moves.length;i++){

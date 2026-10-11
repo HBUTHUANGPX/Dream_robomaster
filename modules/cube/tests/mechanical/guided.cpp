@@ -21,7 +21,8 @@ void near(double actual, double expected, const char* message) {
 // 检查实际生成的 RX guided 场景；只做正运动学，不代替动态还原验收。
 int main(int argc, char** argv) {
   try {
-    if (argc != 2) throw std::invalid_argument("用法: guided 场景XML");
+    if (argc != 2 && argc != 3)
+      throw std::invalid_argument("用法: guided 场景XML [预期魔方质量kg]");
     char error[2048]{};
     std::unique_ptr<mjModel, decltype(&mj_deleteModel)> m(
         mj_loadXML(argv[1], nullptr, error, sizeof(error)), mj_deleteModel);
@@ -88,6 +89,23 @@ int main(int argc, char** argv) {
     need(shells == 26 && ball_count == 20, "必须有26个 shell 和20个 ball");
     for (int g = m->body_geomadr[core]; g < m->body_geomadr[core] + m->body_geomnum[core]; ++g)
       need(!m->geom_contype[g] && !m->geom_conaffinity[g], "核心只能作为视觉几何");
+    if (argc == 3) {
+      const double expected = std::stod(argv[2]);
+      need(std::isfinite(expected) && expected > 0, "预期质量无效");
+      double total = m->body_mass[core];
+      for (int b = 1; b < m->nbody; ++b) {
+        const char* name = mj_id2name(m.get(), mjOBJ_BODY, b);
+        if (!name || !std::string_view(name).starts_with("piece_")) continue;
+        total += m->body_mass[b];
+        near(m->body_mass[b], expected * 3. / 88., "块质量未同步缩放");
+        for (int k = 0; k < 3; ++k)
+          near(m->body_inertia[3 * b + k], expected / .088 * 1.6e-7, "块惯性未同步缩放");
+      }
+      near(total, expected, "魔方总质量错误");
+      near(m->body_mass[core], expected * 10. / 88., "核心质量未同步缩放");
+      for (int k = 0; k < 3; ++k)
+        near(m->body_inertia[3 * core + k], expected / .088 * 5e-7, "核心惯性未同步缩放");
+    }
     // 显式 pair 也不能把核心或内部保持几何重新激活。
     for (int p = 0; p < m->npair; ++p)
       for (int g : {m->pair_geom1[p], m->pair_geom2[p]}) {

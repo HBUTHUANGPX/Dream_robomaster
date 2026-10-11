@@ -6,13 +6,36 @@ namespace rm::cube {
 namespace {
 using Clock = std::chrono::steady_clock;
 
-Json measure(const Plan& plan, double turn_duration_s) {
+Json measure(const Plan& plan, double turn_duration_s, const PrimitiveCosts* costs) {
   size_t count = 0;
   double seconds = 0;
+  std::array<double, 2> wrist{};
   for (const auto& a : plan) {
     if (a.kind == "jaw" || a.kind == "yaw") {
       ++count;
-      seconds += a.kind == "jaw" ? .65 : turn_duration_s + .15;
+      if (!costs) {
+        seconds += a.kind == "jaw" ? .65 : turn_duration_s + .15;
+        continue;
+      }
+      if (a.hand != "A" && a.hand != "B")
+        throw std::invalid_argument("Unknown mechanical action hand");
+      const int hand = a.hand == "A" ? 0 : 1;
+      int kind;
+      if (a.kind == "jaw") {
+        if (a.target != 0 && a.target != 115)
+          throw std::invalid_argument("Invalid mechanical jaw target");
+        kind = a.target == 0 ? 4 : 5;
+      } else {
+        const double quarters = (a.target - wrist[hand]) / (pi / 2);
+        if (!std::isfinite(quarters) || std::abs(quarters) > 2. + 1e-9)
+          throw std::invalid_argument("Invalid mechanical wrist delta");
+        const int turn = std::lround(quarters);
+        if (turn == 0 || std::abs(quarters - turn) > 1e-9)
+          throw std::invalid_argument("Mechanical wrist delta must be 90 or 180 degrees");
+        kind = (std::abs(turn) == 2 ? 2 : 0) + (turn < 0 ? 1 : 0);
+        wrist[hand] = a.target;
+      }
+      seconds += costs->seconds(Primitive(hand * 6 + kind), a.kind == "jaw" ? "jaw" : a.mode);
     }
   }
   return {{"action_count", count}, {"estimated_execution_s", seconds}};
@@ -67,18 +90,24 @@ Plan convert(const std::vector<Primitive>& primitives, RobotState state,
 }  // namespace
 
 MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat orientation,
-                                     double turn_duration_s, double search_ms) {
+                                     double turn_duration_s, double search_ms,
+                                     const PrimitiveCosts* costs) {
   if (!std::isfinite(turn_duration_s) || turn_duration_s <= 0 || turn_duration_s > 3599.85)
     throw std::invalid_argument("Invalid mechanical turn duration");
   if (!std::isfinite(search_ms) || search_ms < 0 || search_ms > 60000)
     throw std::invalid_argument("Invalid mechanical search budget");
+  if (costs)
+    for (const auto& row : costs->duration)
+      for (double seconds : row)
+        if (!std::isfinite(seconds) || seconds <= 0 || seconds > 3600)
+          throw std::invalid_argument("Mechanical action costs must be finite and in (0,3600]");
   const auto raw = compile_moves(moves, orientation, true);
   MechanicalPlan result{optimize_plan(raw, orientation), Json::object()};
   auto& report = result.report;
   report["moves"] = moves;
   report["start_orientation"] = matrix_json(orientation);
-  report["raw"] = measure(raw, turn_duration_s);
-  report["peephole"] = measure(result.actions, turn_duration_s);
+  report["raw"] = measure(raw, turn_duration_s, costs);
+  report["peephole"] = measure(result.actions, turn_duration_s, costs);
   report["chosenplanner"] = "peephole";
   report["candidate"] = Json::array();
   report["search_ms"] = 0.;
@@ -88,8 +117,11 @@ MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat 
     SearchOptions options;
     options.home = true;
     options.max_search_ms = search_ms;
-    for (int a = 0; a < 12; ++a)
-      options.costs.duration[a].fill(a % 6 >= 4 ? .65 : turn_duration_s + .15);
+    if (costs)
+      options.costs = *costs;
+    else
+      for (int a = 0; a < 12; ++a)
+        options.costs.duration[a].fill(a % 6 >= 4 ? .65 : turn_duration_s + .15);
     const RobotState start{orientation_index(orientation), {0, 0}, {true, true}};
     const auto began = Clock::now();
     const auto deadline = began + std::chrono::duration_cast<Clock::duration>(
@@ -106,7 +138,7 @@ MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat 
       auto plan = convert(candidate->actions, start, moves);
       report["candidate"] = primitive_plan_json(candidate->actions, start, options.costs);
       report["search_stop_reason"] = candidate->stop_reason;
-      const auto metrics = measure(plan, turn_duration_s);
+      const auto metrics = measure(plan, turn_duration_s, costs);
       if (metrics["estimated_execution_s"].get<double>() <=
           report["peephole"]["estimated_execution_s"].get<double>()) {
         result.actions = std::move(plan);
@@ -115,7 +147,7 @@ MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat 
     } else if (report["search_stop_reason"] == "disabled")
       report["search_stop_reason"] = "deadline";
   }
-  report["chosen"] = measure(result.actions, turn_duration_s);
+  report["chosen"] = measure(result.actions, turn_duration_s, costs);
   report["estimated_execution_s"] = report["chosen"]["estimated_execution_s"];
   return result;
 }

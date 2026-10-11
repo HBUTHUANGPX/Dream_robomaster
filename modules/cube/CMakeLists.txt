@@ -93,3 +93,6 @@ target_link_libraries(rm_cube_mechanical_replay PRIVATE rm_cube_core)
 # 读取实际生成的 RX guided 场景；不依赖未分发资产运行默认测试。
 add_executable(rm_cube_mechanical_guided_tests EXCLUDE_FROM_ALL tests/mechanical/guided.cpp)
 target_link_libraries(rm_cube_mechanical_guided_tests PRIVATE rm_cube_core)
+add_executable(rm_cube_wrist_motion_tests tests/test_wrist_motion.cpp)
+target_link_libraries(rm_cube_wrist_motion_tests PRIVATE rm_cube_core)
+add_test(NAME cube_wrist_motion COMMAND rm_cube_wrist_motion_tests)

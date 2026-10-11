@@ -89,3 +89,21 @@ build/bin/rm_cube_mechanical_replay \
 复现入口见[腕轴TN完整录像](../../docs/mechanical-rx.md#腕轴tn与关节导向完整录像)。
 步骤字幕由 `node modules/cube/tools/annotate-mechanical-video.mjs 输出目录` 生成，需先有验收通过的原录像。
 报告中的原始输出路径仅用于来源追溯，复现不依赖该目录。
+
+## 魔方质量基准
+
+`mass_reference.json` 保存GAN356 M官方总质量、尺寸、来源和本模型的质量分配假设。
+只参考总质量74克；仍使用55毫米仿真几何，各块质心惯性与核心质量按原比例缩放。
+真实零部件质量分配未知，不将估计张量描述为厂家实测。
+
+## 快速腕轴完整录像
+
+`wrist_control_20_demo.mp4` 为74克模型20步打乱、21步还原的正常速度录像，2955帧、30帧/秒，约98.5秒。
+`wrist_control_20_report.json` 保存完整动作计划、41个检查点、质量惯性和腕轴跟踪统计。
+`wrist_control_results.json` 保存候选的成功与失败结果；最快通过本次完整验收的配置为10 rad/s、100 rad/s²。
+
+`wrist_control_20_demo.mp4` SHA-256：`b7e7e933c192f5aea021aa542b167b9ca1a8eca46241139368f76f0ed5f881e2`。
+
+`wrist_control_20_report.json` SHA-256：`7d3e700e51efd20ec4473d06044d3c160cd207368d3071872f960204eb6d0f94`。
+
+复现命令见[快速腕轴控制与质量基准](../../docs/mechanical-rx.md#快速腕轴控制与质量基准)。本项目生成视频，使用仓库已有RX资产，没有拼接独立诊断回放。

@@ -116,6 +116,54 @@ MechanicalPlan check(const std::vector<std::string>& moves, Mat orientation = Ma
   replay(result.actions, moves, orientation);
   return result;
 }
+
+Json custom_measured(const Plan& plan, const PrimitiveCosts& costs) {
+  std::array<int, 2> wrist{};
+  double seconds = 0;
+  size_t count = 0;
+  for (const auto& a : plan) {
+    if (a.kind != "jaw" && a.kind != "yaw") continue;
+    const int h = a.hand == "A" ? 0 : 1;
+    int kind = a.target == 0 ? 4 : 5;
+    int column = 0;
+    if (a.kind == "yaw") {
+      const int next = std::lround(a.target / (pi / 2)), delta = next - wrist[h];
+      need(std::abs(delta) == 1 || std::abs(delta) == 2, "自定义计费动作角度错误");
+      kind = (std::abs(delta) == 2 ? 2 : 0) + (delta < 0 ? 1 : 0);
+      column = a.mode == "whole" ? 0 : a.mode == "face" ? 1 : 2;
+      wrist[h] = next;
+    }
+    seconds += costs.duration[6 * h + kind][column];
+    ++count;
+  }
+  return {{"action_count", count}, {"estimated_execution_s", seconds}};
+}
+
+MechanicalPlan custom_check(const std::vector<std::string>& moves, const PrimitiveCosts& costs,
+                            double budget, Mat orientation = Mat::Identity()) {
+  const auto result = plan_mechanical_moves(moves, orientation, .4, budget, &costs);
+  const auto raw = compile_moves(moves, orientation, true),
+             peephole = optimize_plan(raw, orientation);
+  need(result.report.at("raw") == custom_measured(raw, costs), "自定义原始成本错误");
+  need(result.report.at("peephole") == custom_measured(peephole, costs), "自定义回退成本错误");
+  need(result.report.at("chosen") == custom_measured(result.actions, costs), "自定义选用成本错误");
+  const double chosen = custom_measured(result.actions, costs)["estimated_execution_s"];
+  need(result.report.at("estimated_execution_s") == chosen, "自定义总成本错误");
+  need(chosen <= custom_measured(peephole, costs)["estimated_execution_s"].get<double>(),
+       "自定义搜索成本劣于回退");
+  double total = 0;
+  for (const auto& row : result.report.at("candidate")) {
+    const double duration = costs.seconds(parse_primitive(row.at("action")), row.at("mode"));
+    need(std::abs(row.at("duration_s").get<double>() - duration) < 1e-12, "搜索未使用传入成本");
+    need(std::abs(row.at("start_s").get<double>() - total) < 1e-9, "候选起始时刻成本错误");
+    total += duration;
+    need(std::abs(row.at("end_s").get<double>() - total) < 1e-9, "候选结束时刻成本错误");
+  }
+  if (result.report.at("chosenplanner") == "robot_search")
+    need(std::abs(total - chosen) < 1e-9, "候选成本和执行计划不一致");
+  replay(result.actions, moves, orientation);
+  return result;
+}
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -148,6 +196,32 @@ int main(int argc, char** argv) {
              fallback.report.at("chosenplanner") == "peephole",
          "零预算仍然搜索");
     check(many, Mat::Identity(), .4, .000001);
+    PrimitiveCosts costs;
+    for (int a = 0; a < 12; ++a)
+      for (int mode = 0; mode < 3; ++mode) costs.duration[a][mode] = .11 + .07 * a + .13 * mode;
+    custom_check({"R2", "U", "F2", "L'"}, costs, 0);
+    custom_check({"R", "R", "F2"}, costs, 1000);
+    custom_check({"F", "R2"}, costs, 0, robot_orientations()[13]);
+    // 180度价格远高于两次90度；确保成本真正进入搜索，而不只是重算报告。
+    for (int a = 0; a < 12; ++a) costs.duration[a].fill(a % 6 >= 4 ? .1 : a % 6 >= 2 ? 10. : .2);
+    const auto split = custom_check({"R2"}, costs, 1000);
+    need(split.report.at("chosenplanner") == "robot_search", "自定义成本没有改变候选选择");
+    need(split.report.at("estimated_execution_s").get<double>() < 2.,
+         "搜索仍使用昂贵180度而未拆成90度");
+    for (double bad : {0., -1., 3600.01, std::numeric_limits<double>::quiet_NaN(),
+                       std::numeric_limits<double>::infinity()}) {
+      auto invalid = costs;
+      invalid.duration[0][2] = bad;
+      bool rejected = false;
+      try {
+        plan_mechanical_moves({}, Mat::Identity(), .4, 0, &invalid);
+      } catch (const std::invalid_argument&) {
+        rejected = true;
+      }
+      need(rejected, "自定义非法成本在零预算下未拒绝");
+    }
+    costs.duration[0][2] = 3600.;
+    custom_check({}, costs, 0);
     for (const auto& values :
          std::array<std::array<double, 2>, 5>{{{0., 0.},
                                                {-1., 0.},

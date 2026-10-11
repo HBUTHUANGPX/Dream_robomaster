@@ -14,13 +14,15 @@
 #include "rm/mechanical_sdf.hpp"
 #include "rm/rx_gripper.hpp"
 #include "rm/rx_wrist_tn.hpp"
+#include "rm/wrist_motion.hpp"
 #include "video.hpp"
 
 namespace {
 using namespace rm;
 using namespace rm::cube;
 constexpr double pitch_m = .055 / 3;
-Json settings = {{"shell_gap_m", .00005},
+Json settings = {{"cube_mass_kg", .088},
+                 {"shell_gap_m", .00005},
                  {"shell_bevel_m", .00065},
                  {"cap_inner_m", {.01460, .01265, .01085}},
                  {"cap_outer_m", {.0162, .0143, .0125}},
@@ -47,6 +49,12 @@ Json settings = {{"shell_gap_m", .00005},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_wrist_tn", 0},
+                 {"rx_wrist_speed_rad_s", 0.},
+                 {"rx_wrist_accel_rad_s2", 80.},
+                 {"rx_wrist_empty_multiplier", 1.5},
+                 {"rx_wrist_settle_s", .15},
+                 {"rx_wrist_kp", 20.},
+                 {"rx_wrist_kv", 1.},
                  {"rx_tip_friction", 1.2},
                  {"rx_tip_contact_time_s", .004},
                  {"rx_bearing_friction_nm", .002},
@@ -98,6 +106,11 @@ void load_settings(const std::filesystem::path& path) {
       throw std::invalid_argument("internal_contact_dimension must be one or three");
     settings[key] = v;
   }
+  if (value("cube_mass_kg") < .01 || value("cube_mass_kg") > 1 ||
+      value("rx_wrist_accel_rad_s2") <= 0 || value("rx_wrist_empty_multiplier") < 1 ||
+      value("rx_wrist_empty_multiplier") > 4 || value("rx_wrist_kp") <= 0 ||
+      value("rx_wrist_settle_s") > 2 || value("rx_wrist_speed_rad_s") > 30)
+    throw std::invalid_argument("Invalid cube mass or wrist motion settings");
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
       value("max_torque_nm") <= 0)
     throw std::invalid_argument("Invalid timing or torque");
@@ -164,6 +177,7 @@ std::string scene() {
   const bool torpedo = value("bearing_collision_mode") == 2;
   const double core_radius = torpedo ? .009 : .0107;
   std::ostringstream assets, bodies, motors, plugins;
+  bodies << std::setprecision(17);
   std::array<std::vector<std::string>, 3> cap_meshes;
   std::array<std::vector<std::pair<Vec, Vec>>, 3> cap_rims, cap_spokes;
   // 三种卡脚处在不同球面半径。每个小楔体都是凸体，合起来保留内侧空腔。
@@ -282,8 +296,9 @@ std::string scene() {
                  << "' type='ball' damping='.00002' armature='.00000001'/>";
         else
           bodies << "<freejoint/>";
-        bodies << "<inertial pos='" << xyz(c)
-               << "' mass='.003' diaginertia='.00000016 .00000016 .00000016'/>";
+        bodies << "<inertial pos='" << xyz(c) << "' mass='" << .003 * value("cube_mass_kg") / .088
+               << "' diaginertia='" << xyz(Vec::Constant(.00000016 * value("cube_mass_kg") / .088))
+               << "'/>";
         bodies << "<geom name='" << name << "_shell' type='mesh' mesh='" << name
                << "_shell' rgba='.08 .08 .08 1'/>";
         for (const auto& cap : cap_meshes[nonzero - 1])
@@ -456,12 +471,30 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         value("robot_search_ms") > 60000)
       throw std::invalid_argument("robot_search_ms must be in [0,60000]");
     if (record) settings["record_fps"] = 30.;
+    std::optional<PrimitiveCosts> motion_costs;
+    if (value("rx_wrist_speed_rad_s") > 0 || value("rx_wrist_settle_s") != .15) {
+      motion_costs.emplace();
+      for (int a = 0; a < 12; ++a)
+        for (int mode = 0; mode < 3; ++mode) {
+          const double factor = mode == 2 ? value("rx_wrist_empty_multiplier") : 1.;
+          const double dt = value("timestep_s");
+          const double turn = value("rx_wrist_speed_rad_s") > 0
+                                  ? wrist_duration((a % 6 < 2 ? 1 : 2) * pi / 2,
+                                                   factor * value("rx_wrist_speed_rad_s"),
+                                                   factor * value("rx_wrist_accel_rad_s2"), dt)
+                                  : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
+          motion_costs->duration[a][mode] =
+              a % 6 >= 4 ? .65 : turn + std::lround(value("rx_wrist_settle_s") / dt) * dt;
+        }
+    }
+
     const auto requested = split_moves(sequence);
     for (const auto& move : requested) parse_move(move);
     if (plan_only) {
       if (solve || record) throw std::invalid_argument("Plan-only cannot solve or record physics");
-      auto plan = plan_mechanical_moves(requested, Mat::Identity(), value("turn_duration_s"),
-                                        value("robot_search_ms"));
+      auto plan =
+          plan_mechanical_moves(requested, Mat::Identity(), value("turn_duration_s"),
+                                value("robot_search_ms"), motion_costs ? &*motion_costs : nullptr);
       std::filesystem::create_directories(out);
       std::ofstream file(out / "plan.json");
       file << Json{{"planning_only", true},
@@ -489,7 +522,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     auto xml = scene();
     scene_file << (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
                                             value("rx_tip_friction"),
-                                            value("rx_tip_contact_time_s"))
+                                            value("rx_tip_contact_time_s"), value("cube_mass_kg"))
                       : xml);
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");
@@ -522,6 +555,13 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         m->actuator_forcerange[2 * a] = -value("rx_jaw_torque_nm");
         m->actuator_forcerange[2 * a + 1] = value("rx_jaw_torque_nm");
       }
+    }
+    for (const char* hand : {"A", "B"}) {
+      if (!rx) break;
+      int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(hand) + "_yaw_drive").c_str());
+      m->actuator_gainprm[10 * a] = value("rx_wrist_kp");
+      m->actuator_biasprm[10 * a + 1] = -value("rx_wrist_kp");
+      m->actuator_biasprm[10 * a + 2] = -value("rx_wrist_kv");
     }
     std::optional<RxWristTn> wrist_tn;
     if (value("rx_wrist_tn") == 1) {
@@ -723,6 +763,33 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       }
     };
     mj_forward(m, d);
+
+    double cube_mass = 0;
+    Vec com = Vec::Zero();
+    std::vector<int> cube_bodies;
+    for (int b = 1; b < m->nbody; ++b) {
+      const char* name = mj_id2name(m, mjOBJ_BODY, b);
+      if (name && (std::string_view(name).starts_with("piece_") ||
+                   std::string_view(name) == "mechanical_core")) {
+        cube_bodies.push_back(b);
+        cube_mass += m->body_mass[b];
+        com += m->body_mass[b] * Eigen::Map<const Vec>(d->xipos + 3 * b);
+      }
+    }
+    com /= cube_mass;
+    Mat inertia = Mat::Zero();
+    for (int b : cube_bodies) {
+      Vec r = Eigen::Map<const Vec>(d->xipos + 3 * b) - com;
+      Mat rot = Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(d->ximat + 9 * b);
+      inertia +=
+          rot * Eigen::Map<const Vec>(m->body_inertia + 3 * b).asDiagonal() * rot.transpose() +
+          m->body_mass[b] * (r.squaredNorm() * Mat::Identity() - r * r.transpose());
+    }
+    report["cube_mass_properties"] = {
+        {"dynamic_mass_kg", cube_mass},
+        {"center_of_mass_world_m", xyz(com)},
+        {"inertia_about_com_kg_m2", matrix_json(inertia)},
+        {"distribution", "estimated, uniformly scaled original piece/core allocation"}};
     report["initial"] = measure();
     snapshot("initial");
     snapshot("internal");
@@ -774,13 +841,53 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       if (a < 0) throw std::runtime_error("Missing RX actuator: " + name);
       double start = d->ctrl[a];
       bool turning = name.ends_with("_yaw_drive");
+      bool controlled = turning && value("rx_wrist_speed_rad_s") > 0;
+      const bool empty = report.contains("current_action") &&
+                         report["current_action"].value("mode", "") == "empty";
+      const double factor = empty ? value("rx_wrist_empty_multiplier") : 1.;
+      if (controlled)
+        duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
+                                  factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep);
       int count = std::max(1L, std::lround(duration / m->opt.timestep));
-      for (int k = 1; k <= count; ++k) {
-        double u = double(k) / count;
-        d->ctrl[a] = start + (target - start) * u * u * u * (10 + u * (-15 + 6 * u));
-        advance(m->opt.timestep, turning);
+      duration = count * m->opt.timestep;
+      int v = turning ? m->jnt_dofadr[m->actuator_trnid[2 * a]] : -1;
+      double inertia = 0;
+      if (controlled) {
+        mj_forward(m, d);
+        std::vector<mjtNum> mass(m->nv * m->nv);
+        mj_fullM(m, d, mass.data());
+        inertia = mass[v * m->nv + v];
       }
-      advance(.15, turning);
+      double peak_error = 0, peak_speed = 0, peak_torque = 0, began = d->time;
+      for (int k = 1; k <= count; ++k) {
+        auto ref = wrist_sample(start, target, duration, k * m->opt.timestep);
+        d->ctrl[a] = ref.position;
+        if (controlled)
+          d->ctrl[a] += ((value("rx_wrist_kv") + m->dof_damping[v]) * ref.velocity +
+                         inertia * ref.acceleration) /
+                        value("rx_wrist_kp");
+        advance(m->opt.timestep, turning);
+        if (turning) {
+          peak_error =
+              std::max(peak_error,
+                       std::abs(d->qpos[m->jnt_qposadr[m->actuator_trnid[2 * a]]] - ref.position));
+          peak_speed = std::max(peak_speed, std::abs(d->qvel[v]));
+          peak_torque = std::max(peak_torque, std::abs(d->actuator_force[a]));
+        }
+      }
+      d->ctrl[a] = target;
+      advance(turning ? value("rx_wrist_settle_s") : .15, turning);
+      if (turning)
+        report["wrist_motions"].push_back({{"actuator", name},
+                                           {"mode", report["current_action"].value("mode", "")},
+                                           {"start_time_s", began},
+                                           {"duration_s", duration},
+                                           {"settle_s", value("rx_wrist_settle_s")},
+                                           {"peak_tracking_error_rad", peak_error},
+                                           {"peak_speed_rad_s", peak_speed},
+                                           {"peak_torque_nm", peak_torque},
+                                           {"feedforward_inertia_kg_m2", inertia},
+                                           {"target", target}});
     };
     auto jaw = [&](const std::string& h, bool close) {
       command(h + "_fingers_actuator", close ? -1.20 : -2.25, .5);
@@ -935,7 +1042,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     auto execute_moves = [&](const std::vector<std::string>& moves) {
       if (rx) {
         auto selected = plan_mechanical_moves(moves, robot_orientation, value("turn_duration_s"),
-                                              value("robot_search_ms"));
+                                              value("robot_search_ms"),
+                                              motion_costs ? &*motion_costs : nullptr);
         report["planning"].push_back(selected.report);
         auto& plan = selected.actions;
         for (const auto& a : plan) {

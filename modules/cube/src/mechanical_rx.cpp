@@ -2,6 +2,9 @@
 
 #include <libxml/parser.h>
 
+#include <iomanip>
+#include <sstream>
+
 #include "rm/rx_gripper.hpp"
 
 namespace rm::cube {
@@ -30,7 +33,7 @@ Node add(Node n, const char* tag,
 }  // namespace
 std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::path& bundle,
                                 double bearing_friction, double tip_friction,
-                                double tip_contact_time) {
+                                double tip_contact_time, double cube_mass) {
   std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> doc(
       xmlReadMemory(xml.data(), xml.size(), "mechanical.xml", nullptr, XML_PARSE_NONET),
       xmlFreeDoc);
@@ -44,8 +47,12 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
   set(defaults, "conaffinity", "31");
   auto core = add(world, "body", {{"name", "mechanical_core"}, {"pos", "0 0 .1"}});
   add(core, "freejoint", {{"name", "mechanical_core_free"}});
-  add(core, "inertial",
-      {{"pos", "0 0 0"}, {"mass", ".01"}, {"diaginertia", ".0000005 .0000005 .0000005"}});
+  const double scale = cube_mass / .088;
+  std::ostringstream mass, inertia;
+  mass << std::setprecision(17) << .01 * scale;
+  inertia << std::setprecision(17) << .0000005 * scale << " " << .0000005 * scale << " "
+          << .0000005 * scale;
+  add(core, "inertial", {{"pos", "0 0 0"}, {"mass", mass.str()}, {"diaginertia", inertia.str()}});
   std::vector<std::string> shells;
   for (auto n = world->children; n;) {
     auto next = n->next;

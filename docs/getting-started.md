@@ -235,3 +235,5 @@ printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-r
 如果只想检查依赖，执行 `./rm doctor`。
 
 腕轴TN限制与新关节模式20步录像入口见[完整录像说明](mechanical-rx.md#腕轴tn与关节导向完整录像)。
+
+使用新前馈控制和74克质量基准，见[快速腕轴入口](mechanical-rx.md#快速腕轴控制与质量基准)。

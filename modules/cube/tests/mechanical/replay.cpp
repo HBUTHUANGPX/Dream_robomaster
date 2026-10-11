@@ -8,6 +8,7 @@
 #include "rm/cube.hpp"
 #include "rm/mechanical_sdf.hpp"
 #include "rm/rx_wrist_tn.hpp"
+#include "rm/wrist_motion.hpp"
 using namespace rm;
 using namespace rm::cube;
 
@@ -36,10 +37,19 @@ int main(int argc, char** argv) {
     Json parameters = saved.at("parameters");
     if (!parameters.is_object())
       throw std::invalid_argument("Snapshot parameters must be an object");
-    const std::set<std::string> allowed{"turn_duration_s",           "timestep_s",
-                                        "rx_jaw_torque_nm",          "rx_detent_torque_nm",
-                                        "settle_duration_s",         "tip_torsional_friction_m",
-                                        "internal_contact_impedance"};
+    const std::set<std::string> allowed{"turn_duration_s",
+                                        "timestep_s",
+                                        "rx_jaw_torque_nm",
+                                        "rx_detent_torque_nm",
+                                        "settle_duration_s",
+                                        "tip_torsional_friction_m",
+                                        "internal_contact_impedance",
+                                        "rx_wrist_kp",
+                                        "rx_wrist_kv",
+                                        "rx_wrist_speed_rad_s",
+                                        "rx_wrist_accel_rad_s2",
+                                        "rx_wrist_empty_multiplier",
+                                        "rx_wrist_settle_s"};
     if (argc == 5) {
       Json custom;
       std::ifstream(argv[4]) >> custom;
@@ -60,15 +70,22 @@ int main(int argc, char** argv) {
           (key == "internal_contact_impedance" && (value <= 0 || value >= 1)))
         throw std::invalid_argument("Invalid replay parameter: " + key);
     }
+    if (parameters.value("rx_wrist_kp", 20.) <= 0 ||
+        parameters.value("rx_wrist_accel_rad_s2", 80.) <= 0 ||
+        parameters.value("rx_wrist_speed_rad_s", 0.) > 30 ||
+        parameters.value("rx_wrist_empty_multiplier", 1.5) < 1 ||
+        parameters.value("rx_wrist_empty_multiplier", 1.5) > 4 ||
+        parameters.value("rx_wrist_settle_s", .15) > 2)
+      throw std::invalid_argument("Invalid replay wrist settings");
     for (const auto* key :
          {"turn_duration_s", "timestep_s", "rx_jaw_torque_nm", "rx_detent_torque_nm"})
       if (!parameters.contains(key))
         throw std::invalid_argument("Missing replay parameter: " + std::string(key));
     const double timestep = parameters.at("timestep_s");
-    const double ramp_steps =
+    double ramp_steps =
         std::max(1., std::round(parameters.at("turn_duration_s").get<double>() / timestep));
-    const double settle_steps = std::round(parameters.value("settle_duration_s", .15) / timestep);
-    const double total_steps = ramp_steps + settle_steps;
+    double settle_steps = std::round(parameters.value("settle_duration_s", .15) / timestep);
+    double total_steps = ramp_steps + settle_steps;
     if (!std::isfinite(total_steps) || total_steps > std::numeric_limits<int>::max() - 1.)
       throw std::invalid_argument("Replay duration/timestep exceeds step limit");
     std::filesystem::path output = argv[3];
@@ -104,6 +121,14 @@ int main(int argc, char** argv) {
       m->actuator_forcerange[2 * a] = -parameters.at("rx_jaw_torque_nm").get<double>();
       m->actuator_forcerange[2 * a + 1] = -m->actuator_forcerange[2 * a];
     }
+    for (const char* hand : {"A", "B"}) {
+      int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(hand) + "_yaw_drive").c_str());
+      const double kp = parameters.value("rx_wrist_kp", 20.),
+                   kv = parameters.value("rx_wrist_kv", 1.);
+      m->actuator_gainprm[10 * a] = kp;
+      m->actuator_biasprm[10 * a + 1] = -kp;
+      m->actuator_biasprm[10 * a + 2] = -kv;
+    }
     std::optional<RxWristTn> wrist_tn;
     if (parameters.value("rx_wrist_tn", 0.) == 1) wrist_tn.emplace(m);
     mj_forward(m, d);
@@ -126,6 +151,31 @@ int main(int argc, char** argv) {
         mj_name2id(m, mjOBJ_ACTUATOR, (hand + (jaw ? "_fingers_actuator" : "_yaw_drive")).c_str());
     if (actuator < 0 || core < 0) throw std::invalid_argument("Replay requires an RX cube scene");
     double start = d->ctrl[actuator], began = d->time;
+    const bool controlled = !jaw && parameters.value("rx_wrist_speed_rad_s", 0.) > 0;
+    const int wrist_dof = m->jnt_dofadr[m->actuator_trnid[2 * actuator]];
+    double inertia = 0;
+    if (controlled) {
+      const double factor =
+          mode == "empty" ? parameters.value("rx_wrist_empty_multiplier", 1.5) : 1.;
+      ramp_steps = std::round(
+          wrist_duration(target - start,
+                         factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
+                         factor * parameters.value("rx_wrist_accel_rad_s2", 80.), timestep) /
+          timestep);
+
+      total_steps = ramp_steps + settle_steps;
+      std::vector<mjtNum> mass(m->nv * m->nv);
+      mj_fullM(m, d, mass.data());
+      inertia = mass[wrist_dof * m->nv + wrist_dof];
+    }
+    if (!jaw) {
+      settle_steps = std::round(
+          parameters.value("settle_duration_s", parameters.value("rx_wrist_settle_s", .15)) /
+          timestep);
+      total_steps = ramp_steps + settle_steps;
+    }
+    if (!std::isfinite(total_steps) || total_steps > std::numeric_limits<int>::max() - 1.)
+      throw std::invalid_argument("Replay motion duration exceeds step limit");
     Mat expected_core;
     for (int i = 0; i < 3; ++i)
       for (int j = 0; j < 3; ++j) expected_core(i, j) = saved["robot_orientation"][i][j];
@@ -220,8 +270,13 @@ int main(int argc, char** argv) {
     for (auto& timer : d->timer) timer = {};
     const auto wall_started = std::chrono::steady_clock::now();
     for (int k = 1; k <= static_cast<int>(total_steps); ++k) {
-      double u = std::min(1., double(k) / ramp);
-      d->ctrl[actuator] = start + (target - start) * u * u * u * (10 + u * (-15 + 6 * u));
+      auto ref = wrist_sample(start, target, ramp * timestep, k * timestep);
+      d->ctrl[actuator] = ref.position;
+      if (controlled)
+        d->ctrl[actuator] +=
+            ((parameters.value("rx_wrist_kv", 1.) + m->dof_damping[wrist_dof]) * ref.velocity +
+             inertia * ref.acceleration) /
+            parameters.value("rx_wrist_kp", 20.);
       for (char f : faces) {
         int j = mj_name2id(m, mjOBJ_JOINT, ("hinge_" + std::string(1, f)).c_str()),
             v = m->jnt_dofadr[j];

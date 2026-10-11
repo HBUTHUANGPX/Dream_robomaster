@@ -105,3 +105,5 @@ FAST-LIO 的 ROS 构建和容器回放尚未通过本机运行验收。
 历史 Python 代码只用于对照，见[历史版本说明](legacy/README.md)。
 
 腕轴TN限制与新关节模式20步录像入口见[完整录像说明](docs/mechanical-rx.md#腕轴tn与关节导向完整录像)。
+
+使用新前馈控制和74克质量基准，见[快速腕轴入口](docs/mechanical-rx.md#快速腕轴控制与质量基准)。

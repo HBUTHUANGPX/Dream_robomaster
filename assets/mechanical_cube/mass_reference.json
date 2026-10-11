@@ -1,0 +1,14 @@
+{
+  "reference_product": "GAN356 M",
+  "source_url": "https://www.gancube.cn/gan356m/",
+  "accessed": "2026-10-11",
+  "published_mass_kg": 0.074,
+  "published_side_m": 0.056,
+  "simulated_side_m": 0.055,
+  "mass_distribution": "Estimated: preserve original 26 equal piece masses and core mass ratio; scale by 74/88",
+  "piece_mass_kg": 0.0025227272727272726,
+  "core_mass_kg": 0.00840909090909091,
+  "piece_com_diagonal_inertia_kg_m2": 1.3454545454545454e-7,
+  "core_com_diagonal_inertia_kg_m2": 4.204545454545455e-7,
+  "limitation": "Published total mass is a reference, not a measured inertia tensor or an exact GAN internal mechanism reconstruction."
+}
