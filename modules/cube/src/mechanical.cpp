@@ -22,6 +22,8 @@ Json settings = {{"shell_gap_m", .00005},
                  {"cap_inner_m", {.01460, .01265, .01085}},
                  {"cap_outer_m", {.0162, .0143, .0125}},
                  {"cap_angle_deg", {43., 21.5, 31.}},
+                 {"cap_merge_quads", 0},
+                 {"cap_sectors", 16},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
                  {"turn_duration_s", 1.5},
@@ -59,6 +61,12 @@ void load_settings(const std::filesystem::path& path) {
     if (key == "alignment_regrasp_attempts" &&
         (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
       throw std::invalid_argument("alignment_regrasp_attempts must be an integer in [0,2]");
+    if (key == "cap_merge_quads" &&
+        (!v.is_number_integer() || (v.get<double>() != 0 && v.get<double>() != 1)))
+      throw std::invalid_argument("cap_merge_quads must be zero or one");
+    if (key == "cap_sectors" && (!v.is_number_integer() || v.get<double>() < 8 ||
+                                 v.get<double>() > 32 || std::fmod(v.get<double>(), 4) != 0))
+      throw std::invalid_argument("cap_sectors must be a multiple of four in [8,32]");
     settings[key] = v;
   }
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
@@ -124,7 +132,7 @@ std::string scene() {
   const auto outer = settings["cap_outer_m"].get<std::array<double, 3>>();
   auto angle = settings["cap_angle_deg"].get<std::array<double, 3>>();
   for (auto& a : angle) a *= pi / 180;
-  const int rings = 3, sectors = 16;
+  const int rings = 3, sectors = settings["cap_sectors"].get<int>();
   for (int type = 0; type < 3; ++type) {
     auto point = [&](int r, int s) {
       double p = 2 * pi * s / sectors;
@@ -137,18 +145,27 @@ std::string scene() {
       double t = limit * r / rings;
       return Vec(std::sin(t) * std::cos(p), std::sin(t) * std::sin(p), std::cos(t));
     };
-    auto wedge = [&](Vec a, Vec b, Vec c) {
+    auto wedge = [&](const std::vector<Vec>& points) {
       std::string name =
           "cap_" + std::to_string(type) + "_" + std::to_string(cap_meshes[type].size());
-      mesh(assets, name,
-           {inner[type] * a, inner[type] * b, inner[type] * c, outer[type] * a, outer[type] * b,
-            outer[type] * c});
+      std::vector<Vec> vertices;
+      for (double radius : {inner[type], outer[type]})
+        for (const auto& p : points) vertices.push_back(radius * p);
+      mesh(assets, name, vertices);
       cap_meshes[type].push_back(name);
     };
     for (int r = 0; r < rings; ++r)
       for (int s = 0; s < sectors; ++s) {
-        wedge(point(r, s), point(r + 1, s), point(r + 1, s + 1));
-        if (r) wedge(point(r, s), point(r + 1, s + 1), point(r, s + 1));
+        const Vec a = point(r, s), b = point(r + 1, s), c = point(r + 1, s + 1),
+                  d = point(r, s + 1);
+        // 同平面四边形的两个楔体可合并，非共面单元保留原三角分割，避免填平内腔。
+        const Vec normal = (b - a).cross(c - a).normalized();
+        if (r && value("cap_merge_quads") != 0 && std::abs(normal.dot(d - a)) < 1e-12)
+          wedge({a, b, c, d});
+        else {
+          wedge({a, b, c});
+          if (r) wedge({a, c, d});
+        }
       }
   }
   for (int x = -1; x <= 1; ++x)

@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <opencv2/imgcodecs.hpp>
@@ -6,6 +7,20 @@
 #include "rm/cube.hpp"
 using namespace rm;
 using namespace rm::cube;
+
+namespace {
+struct Timers {
+  mjfTime previous = mjcb_time;
+  Timers() {
+    mjcb_time = []() {
+      return std::chrono::duration<double, std::milli>(
+                 std::chrono::steady_clock::now().time_since_epoch())
+          .count();
+    };
+  }
+  ~Timers() { mjcb_time = previous; }
+};
+}  // namespace
 
 // 仅供故障复现：在独立进程初始化时恢复快照，不能把本程序输出拼成完整物理还原录像。
 int main(int argc, char** argv) {
@@ -176,6 +191,9 @@ int main(int argc, char** argv) {
       return Json{
           {"body", body ? body : ""}, {"geom", geom ? geom : ""}, {"mesh", mesh ? mesh : ""}};
     };
+    Timers timers;
+    for (auto& timer : d->timer) timer = {};
+    const auto wall_started = std::chrono::steady_clock::now();
     for (int k = 1; k <= static_cast<int>(total_steps); ++k) {
       double u = std::min(1., double(k) / ramp);
       d->ctrl[actuator] = start + (target - start) * u * u * u * (10 + u * (-15 + 6 * u));
@@ -230,6 +248,12 @@ int main(int argc, char** argv) {
         if (d->warning[i].number) throw std::runtime_error("MuJoCo warning");
     }
     mj_forward(m, d);
+    report["dynamics_wall_time_s"] =
+        std::chrono::duration<double>(std::chrono::steady_clock::now() - wall_started).count();
+    report["geoms"] = m->ngeom;
+    for (int i = 0; i < mjNTIMER; ++i)
+      report["timers"][mjTIMERSTRING[i]] = {{"milliseconds", d->timer[i].duration},
+                                            {"calls", d->timer[i].number}};
     double pos_error = 0, angle_error = 0;
     report["pieces"] = Json::array();
     for (const auto& p : pieces) {
