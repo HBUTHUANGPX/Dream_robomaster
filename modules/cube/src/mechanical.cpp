@@ -10,6 +10,7 @@
 
 #include "mechanical_rx.hpp"
 #include "rm/cube.hpp"
+#include "rm/mechanical_plan.hpp"
 #include "rm/rx_gripper.hpp"
 #include "video.hpp"
 
@@ -31,6 +32,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"internal_contact_impedance", .9999},
                  {"alignment_timeout_s", 2.},
                  {"alignment_regrasp_attempts", 2},
+                 {"robot_search_ms", 1000.},
                  {"rx_alignment_position_m", .0005},
                  {"rx_alignment_angle_rad", .02},
                  {"rx_core_position_m", .001},
@@ -74,6 +76,8 @@ void load_settings(const std::filesystem::path& path) {
     throw std::invalid_argument("Invalid timing or torque");
   if (value("internal_contact_impedance") <= 0 || value("internal_contact_impedance") >= 1)
     throw std::invalid_argument("Contact impedance must be between zero and one");
+  if (value("robot_search_ms") > 60000)
+    throw std::invalid_argument("robot_search_ms must be in [0,60000]");
   if (value("rx_alignment_position_m") <= 0 || value("rx_alignment_position_m") >= .005 ||
       value("rx_alignment_angle_rad") <= 0 || value("rx_alignment_angle_rad") >= pi / 4 ||
       value("rx_core_position_m") <= 0 || value("rx_core_position_m") >= .005)
@@ -273,7 +277,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                  {"steps", Json::array()}};
   std::filesystem::path out = root / "output/cube-mechanical/current", config, rx_bundle;
   std::string sequence = "R U F";
-  bool solve = false, record = false, prepared = false;
+  bool solve = false, record = false, prepared = false, plan_only = false;
+  std::optional<double> search_ms_override;
   try {
     for (int i = 1; i < argc; ++i) {
       const std::string arg = argv[i];
@@ -296,10 +301,17 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         solve = true;
       else if (arg == "--record")
         record = true;
-      else if (arg == "--help" || arg == "-h") {
+      else if (arg == "--plan-only")
+        plan_only = true;
+      else if (arg == "--search-ms") {
+        const auto text = next();
+        size_t used = 0;
+        search_ms_override = std::stod(text, &used);
+        if (used != text.size()) throw std::invalid_argument("Invalid search budget");
+      } else if (arg == "--help" || arg == "-h") {
         std::cout << "机械魔方原型：./rm cube --mechanical [--scramble \"R U F\"] [--solve] "
                      "[--record] [--output 输出目录] [--mechanical-config "
-                     "参数JSON] [--rx-bundle RX目录]"
+                     "参数JSON] [--rx-bundle RX目录] [--search-ms 毫秒] [--plan-only]"
                      "\n默认使用固定核心试验台；指定RX目录则使用自由核心与摩擦夹爪。"
                      "棱角块靠卡脚保持；RX模式包含被动磁吸定位近似。"
                      "录像为1倍速，需要EGL和FFmpeg。\n";
@@ -308,9 +320,30 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         throw std::invalid_argument("Unsupported mechanical option: " + arg);
     }
     if (!config.empty()) load_settings(config);
+    if (search_ms_override) settings["robot_search_ms"] = *search_ms_override;
+    if (!std::isfinite(value("robot_search_ms")) || value("robot_search_ms") < 0 ||
+        value("robot_search_ms") > 60000)
+      throw std::invalid_argument("robot_search_ms must be in [0,60000]");
     if (record) settings["record_fps"] = 30.;
     const auto requested = split_moves(sequence);
     for (const auto& move : requested) parse_move(move);
+    if (plan_only) {
+      if (solve || record) throw std::invalid_argument("Plan-only cannot solve or record physics");
+      auto plan = plan_mechanical_moves(requested, Mat::Identity(), value("turn_duration_s"),
+                                        value("robot_search_ms"));
+      std::filesystem::create_directories(out);
+      std::ofstream file(out / "plan.json");
+      file << Json{{"planning_only", true},
+                   {"moves", requested},
+                   {"parameters", settings},
+                   {"optimization", plan.report},
+                   {"actions", plan_json(plan.actions)}}
+                  .dump(2);
+      file.close();
+      if (!file) throw std::runtime_error("Cannot write mechanical plan");
+      std::cout << plan.report << std::endl;
+      return 0;
+    }
     if (value("record_fps") > 60 ||
         (value("record_fps") != 0 &&
          (value("record_fps") < 1 || std::floor(value("record_fps")) != value("record_fps"))))
@@ -733,7 +766,10 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     }
     auto execute_moves = [&](const std::vector<std::string>& moves) {
       if (rx) {
-        auto plan = compile_moves(moves, robot_orientation, true);
+        auto selected = plan_mechanical_moves(moves, robot_orientation, value("turn_duration_s"),
+                                              value("robot_search_ms"));
+        report["planning"].push_back(selected.report);
+        auto& plan = selected.actions;
         for (const auto& a : plan) {
           report["current_action"] = a.json();
           if (a.kind == "jaw")
