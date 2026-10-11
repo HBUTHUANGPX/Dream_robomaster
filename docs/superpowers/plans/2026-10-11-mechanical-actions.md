@@ -32,3 +32,11 @@
 仿真23.05秒、计算338.18秒；最终最大位置误差0.447毫米、姿态误差1.325°，超出0.02弧度的最终限值。
 输出位于 `output/cube-mechanical/optimized-uf2-solve/`。
 软件路径等价不保证摩擦执行稳定；暂不启动优化路径的完整录像，先单独验证现有有限重夹恢复。
+
+## 后续恢复验证
+
+同日仅将 `alignment_regrasp_attempts` 从0改为1，重新从初始状态执行 `U F2` 打乱及还原。
+退出码0，`passed:true`、`solved:true`。仿真24.50秒、计算362.93秒。
+最终检查触发一次A爪开合，最终位置误差0.280毫米、姿态误差0.684°。
+配置已保存为 `modules/cube/configs/mechanical-rx-optimized.json`；最终验收线未变。
+下一步以 `R U F2 L' D B` 六步打乱后求解验证多面换手，不录制长视频。
