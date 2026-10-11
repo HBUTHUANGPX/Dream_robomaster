@@ -28,11 +28,13 @@ Json settings = {{"shell_gap_m", .00005},
                  {"cap_sectors", 16},
                  {"cap_rings", {3, 3, 3}},
                  {"cap_collision_mode", 0},
+                 {"bearing_collision_mode", 0},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
                  {"turn_duration_s", 1.5},
                  {"timestep_s", .0005},
                  {"internal_contact_impedance", .9999},
+                 {"internal_contact_dimension", 3},
                  {"alignment_timeout_s", 2.},
                  {"alignment_regrasp_attempts", 2},
                  {"robot_search_ms", 1000.},
@@ -42,6 +44,7 @@ Json settings = {{"shell_gap_m", .00005},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_tip_friction", 1.2},
+                 {"rx_tip_contact_time_s", .004},
                  {"rx_bearing_friction_nm", .002},
                  {"rx_detent_torque_nm", .04},
                  {"record_fps", 0.}};
@@ -79,6 +82,12 @@ void load_settings(const std::filesystem::path& path) {
     if (key == "cap_collision_mode" &&
         (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
       throw std::invalid_argument("cap_collision_mode must be an integer in [0,2]");
+    if (key == "bearing_collision_mode" &&
+        (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
+      throw std::invalid_argument("bearing_collision_mode must be an integer in [0,2]");
+    if (key == "internal_contact_dimension" &&
+        (!v.is_number_integer() || (v.get<double>() != 1 && v.get<double>() != 3)))
+      throw std::invalid_argument("internal_contact_dimension must be one or three");
     settings[key] = v;
   }
   if (value("turn_duration_s") <= 0 || value("timestep_s") <= 0 || value("timestep_s") > .001 ||
@@ -86,6 +95,8 @@ void load_settings(const std::filesystem::path& path) {
     throw std::invalid_argument("Invalid timing or torque");
   if (value("internal_contact_impedance") <= 0 || value("internal_contact_impedance") >= 1)
     throw std::invalid_argument("Contact impedance must be between zero and one");
+  if (value("rx_tip_contact_time_s") < .001 || value("rx_tip_contact_time_s") > .1)
+    throw std::invalid_argument("RX tip contact time must be in [.001,.1] seconds");
   if (value("robot_search_ms") > 60000)
     throw std::invalid_argument("robot_search_ms must be in [0,60000]");
   if (value("rx_alignment_position_m") <= 0 || value("rx_alignment_position_m") >= .005 ||
@@ -139,6 +150,8 @@ void mesh(std::ostream& s, const std::string& name, const std::vector<Vec>& vs) 
 }
 std::string scene() {
   parts.clear();
+  const bool torpedo = value("bearing_collision_mode") == 2;
+  const double core_radius = torpedo ? .009 : .0107;
   std::ostringstream assets, bodies, motors, plugins;
   std::array<std::vector<std::string>, 3> cap_meshes;
   std::array<std::vector<std::pair<Vec, Vec>>, 3> cap_rims, cap_spokes;
@@ -183,7 +196,7 @@ std::string scene() {
         for (const auto& [a, b] : segments) {
           const Vec delta = b - a;
           const double t = std::clamp(-a.dot(delta) / delta.squaredNorm(), 0., 1.);
-          if ((a + t * delta).norm() - radius < .0107)
+          if ((a + t * delta).norm() - radius < core_radius)
             throw std::invalid_argument("Capsule cap intersects spherical core");
         }
       };
@@ -293,8 +306,33 @@ std::string scene() {
                 .normalized()
                 .eval();
           };
-          for (int i = 0; i < 8; ++i) {
+          if (torpedo) {
+            // 两侧凸缘进入角足下方，横梁与颈部连接。原球芯缩小以保留内腔。
+            auto rail = [&](double a, double b) -> Vec { return .0098 * surface(a, b); };
+            auto capsule = [&](const Vec& p, const Vec& q, double radius) {
+              const Vec delta = q - p;
+              const double t = std::clamp(-p.dot(delta) / delta.squaredNorm(), 0., 1.);
+              if ((p + t * delta).norm() - radius < core_radius)
+                throw std::invalid_argument("Torpedo bearing intersects spherical core");
+              bodies << "<geom type='capsule' fromto='" << xyz(p) << " " << xyz(q) << "' size='"
+                     << radius << "' rgba='.8 .5 .2 1' group='3'/>";
+            };
+            for (double b : {-8., 8.})
+              for (int a = -20; a < 20; a += 5) capsule(rail(a, b), rail(a + 5, b), .00065);
+            for (double a : {-20., 20.}) capsule(rail(a, -8), rail(a, 8), .00065);
+            capsule(rail(0, -8), rail(0, 8), .00035);
+          }
+          for (int i = 0; !torpedo && i < 8; ++i) {
             const double a = -20 + 5 * i, b = a + 5;
+            if (value("bearing_collision_mode") == 1) {
+              // 用原凸片两端截面的中心作轴线，圆截面消除薄片侧棱的楔入。
+              // 横截面收窄，半球端帽越过原端面；不能视为与原薄片完全等价。
+              const Vec p = .011275 * (surface(a, -2.5) + surface(a, 2.5)) / 2;
+              const Vec q = .011275 * (surface(b, -2.5) + surface(b, 2.5)) / 2;
+              bodies << "<geom type='capsule' fromto='" << xyz(p) << " " << xyz(q)
+                     << "' size='.000425' rgba='.8 .5 .2 1' group='3'/>";
+              continue;
+            }
             std::vector<Vec> vertices;
             for (double r : {.01085, .0117})
               for (auto v : {surface(a, -2.5), surface(b, -2.5), surface(b, 2.5), surface(a, 2.5)})
@@ -305,7 +343,8 @@ std::string scene() {
           }
         }
         if (nonzero > 1)
-          bodies << "<geom type='capsule' fromto='" << xyz(n * .0112) << " " << xyz(n * (.018))
+          bodies << "<geom type='capsule' fromto='"
+                 << xyz(n * (torpedo && nonzero == 2 ? .00965 : .0112)) << " " << xyz(n * .018)
                  << "' size='.0004' rgba='.6 .6 .6 1' group='3'/>";
         bodies << "<site name='" << name << "_center' pos='" << xyz(c) << "' size='.0001'/>";
         for (int axis = 0; axis < 3; ++axis)
@@ -332,12 +371,12 @@ std::string scene() {
        "iterations='100' cone='elliptic' impratio='10'/><size memory='256M'/><default><geom "
        "friction='.03 .0001 .00001' solref='.001 1' solimp='"
     << value("internal_contact_impedance") << ' ' << value("internal_contact_impedance")
-    << " .0001' "
-       "condim='3'/></default><visual><global offwidth='800' offheight='600'/></visual><asset>"
+    << " .0001' condim='" << settings["internal_contact_dimension"].get<int>()
+    << "'/></default><visual><global offwidth='800' offheight='600'/></visual><asset>"
     << assets.str()
-    << "</asset><worldbody><light pos='.1 -.2 .5'/><geom type='sphere' pos='0 0 .1' size='.0107' "
-       "rgba='.5 .3 .2 1' group='3'/>"
-    << bodies.str() << "</worldbody><actuator>" << motors.str() << "</actuator></mujoco>";
+    << "</asset><worldbody><light pos='.1 -.2 .5'/><geom type='sphere' pos='0 0 .1' size='"
+    << core_radius << "' rgba='.5 .3 .2 1' group='3'/>" << bodies.str() << "</worldbody><actuator>"
+    << motors.str() << "</actuator></mujoco>";
   return s.str();
 }
 }  // namespace
@@ -429,7 +468,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     const bool rx = !rx_bundle.empty();
     auto xml = scene();
     scene_file << (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
-                                            value("rx_tip_friction"))
+                                            value("rx_tip_friction"),
+                                            value("rx_tip_contact_time_s"))
                       : xml);
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");

@@ -29,7 +29,8 @@ Node add(Node n, const char* tag,
 }
 }  // namespace
 std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::path& bundle,
-                                double bearing_friction, double tip_friction) {
+                                double bearing_friction, double tip_friction,
+                                double tip_contact_time) {
   std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> doc(
       xmlReadMemory(xml.data(), xml.size(), "mechanical.xml", nullptr, XML_PARSE_NONET),
       xmlFreeDoc);
@@ -79,7 +80,7 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
              {"condim", "4"},
              {"friction", std::to_string(tip_friction) + " " + std::to_string(tip_friction) +
                               (tip_friction > 0 ? " .002 .0001 .0001" : " 0 0 0")},
-             {"solref", ".004 1"},
+             {"solref", std::to_string(tip_contact_time) + " 1"},
              {"solimp", ".99 .999 .001"},
              {"margin", "0"}});
   auto equality = child(root, "equality");

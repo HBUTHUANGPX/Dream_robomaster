@@ -7,6 +7,10 @@
 `retention_before_f2.json` 来自同日选择性分层的六步流程，保存还原第4步F2脱块前的状态。
 `turn_before_r.json` 来自历史完整二十步流程首次R前的状态，供各几何方案进行普通转层计时对照。
 `rim_before_f2.json` 来自承托环六步流程的还原F2前，供中心轴向位移及软限位诊断。
+`rim_before_f2_centered_diagnostic.json` 由该快照派生，只在独立诊断初始化时整体居中。
+它对20个自由棱角块和核心施加相同平移，保留内部相对位姿、速度和夹爪状态。
+平移量为原核心位置相对 `(0,0,0.1)` 的负偏差，不得用于正式运行的中途纠偏。
+`contact_redesign_results.json` 保存本轮实测摘要和场景参数，不依赖历史输出目录才能阅读结果。
 该计时快照的几何元数据已补为三层合并基准；状态数组和转动目标没有修改。
 本资产由仿真程序生成，不包含RX网格；RX资产来源与许可证见[资产清单](../rx_gripper/manifest.json)。
 
@@ -20,6 +24,7 @@
 | `retention_before_f2.json` | 14375 | `6aa9b92ecb89b30b37e1a2e93f4266b809e2ee22907aaa5efce49d6b6026ac83` |
 | `turn_before_r.json` | 13137 | `2ffa6d41f3d6be2f70a5db4651d7da768f720d8d4225ffbc0fcb01902effc110` |
 | `rim_before_f2.json` | 14473 | `4c70eb6d529b623ee0eba72482a80a935e5f1a2b5a89ef8d65ef7460808d9e0c` |
+| `rim_before_f2_centered_diagnostic.json` | 13668 | `960e83d3bd3dd451103757d2a213e3278aa84b084446f863a7c3554e355712de` |
 
 ## 复现
 
@@ -47,6 +52,8 @@ build/bin/rm_cube_mechanical_replay \
 比较F2脱块时，使用 `retention_before_f2.json`；其原几何配置为 `mechanical-rx-selective-rings-experimental.json`。
 比较普通R的性能时，改用 `turn_before_r.json`，只比较 `speed_comparable:true` 的运行。
 诊断承托环自身的F2失败时，以 `mechanical-rx-rim-experimental.json` 生成场景，使用 `rim_before_f2.json`。
+偏心对照改用 `rim_before_f2_centered_diagnostic.json`，场景不变；这不是连续还原验收。
+圆滑底托、双向倒扣和柔软指垫的配置及判据见[接触结构实验](../../docs/mechanical-contact-redesign.md)。
 原几何此次单步诊断退出非零，是已知失败；不要把失败提前终止或脱块后的计时用于速度比较。
 当前诊断工具每100步检查每块的径向脱出，早停时记录 `escaped_piece` 和 `stop_reason`。
 历史版本没有逐块检查，可能在脱块后仍继续积分；其计时不能用于性能比较。

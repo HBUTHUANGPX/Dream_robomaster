@@ -1,0 +1,1100 @@
+{
+  "date": "2026-10-11",
+  "base_commit": "3fb3d8b",
+  "snapshot": "assets/mechanical_cube/rim_before_f2.json",
+  "snapshot_sha256": "4c70eb6d529b623ee0eba72482a80a935e5f1a2b5a89ef8d65ef7460808d9e0c",
+  "note": "本次实测摘要，来源路径仅记录历史输出位置；复现依赖Git中的配置、快照和生成器。部分运行同时有编译或其他仿真负载，计时不是严格性能基准。source_scene决定几何；快照parameters不代表替换场景的设置。",
+  "runs": [
+    {
+      "id": "rim-f2-centered-diagnostic",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": false,
+      "duration_s": 1.6500000000078785,
+      "dynamics_wall_time_s": 14.422001046,
+      "position_error_m": 0.0006737001542167538,
+      "orientation_error_rad": 0.019296329149729105,
+      "core_orientation_error_rad": 0.008308412605934238,
+      "core_position_m": [
+        -0.00008959360976950738,
+        0.00005087070221064396,
+        0.09998707608560177
+      ],
+      "max_center_outward_m": 0,
+      "geoms": 1253,
+      "mean_contacts": 140.60030303030302,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "output/cube-mechanical/rim-f2-centered-initial.json",
+      "source_scene": "output/cube-mechanical/rim-static/scene.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_20",
+          "geom": "piece_20_shell",
+          "mesh": "piece_20_shell"
+        },
+        "geom1": {
+          "body": "piece_10",
+          "geom": "piece_10_shell",
+          "mesh": "piece_10_shell"
+        },
+        "normal_n": 5.655550989323152,
+        "time_s": 48.4255000000492
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 0,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rim-rounded-bearing-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": false,
+      "duration_s": 1.6500000000078785,
+      "dynamics_wall_time_s": 14.236133807,
+      "position_error_m": 0.002044001883554751,
+      "orientation_error_rad": 0.07979595217912697,
+      "core_orientation_error_rad": 0.02805255658646936,
+      "core_position_m": [
+        -0.0010445922875424972,
+        0.00016442783903051472,
+        0.0999164585795763
+      ],
+      "max_center_outward_m": 0.0031858116479445736,
+      "geoms": 1253,
+      "mean_contacts": 134.99363636363637,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rim-rounded-bearing.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "A_l_finger2_link_extension",
+          "geom": "A_left_tip",
+          "mesh": ""
+        },
+        "geom1": {
+          "body": "piece_23",
+          "geom": "piece_23_shell",
+          "mesh": "piece_23_shell"
+        },
+        "normal_n": 10.749248971804167,
+        "time_s": 48.54150000004975
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rim-rounded-bearing-r",
+      "mode": "diagnostic_replay",
+      "pose_passed": true,
+      "stopped_early": false,
+      "duration_s": 1.6500000000005066,
+      "dynamics_wall_time_s": 15.229942137,
+      "position_error_m": 0.00040205187519729013,
+      "orientation_error_rad": 0.006888095428888273,
+      "core_orientation_error_rad": 0.001431640638848126,
+      "core_position_m": [
+        0.000007947331994753266,
+        -0.000011539775825447675,
+        0.09997229754752188
+      ],
+      "max_center_outward_m": 0,
+      "geoms": 1253,
+      "mean_contacts": 139.89969696969698,
+      "parameters": {
+        "alignment_regrasp_attempts": 0,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          3,
+          3
+        ],
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 30,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/turn_before_r.json",
+      "source_scene": "output/cube-mechanical/rim-rounded-bearing.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_22",
+          "geom": "piece_22_shell",
+          "mesh": "piece_22_shell"
+        },
+        "geom1": {
+          "body": "piece_21",
+          "geom": "piece_21_shell",
+          "mesh": "piece_21_shell"
+        },
+        "normal_n": 4.80637805719462,
+        "time_s": 2.957500000000155
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rim-bevel15-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": true,
+      "stop_reason": "piece_escaped_radial_retention",
+      "escaped_piece": "piece_18",
+      "duration_s": 1.2500000000059686,
+      "dynamics_wall_time_s": 9.32439259,
+      "position_error_m": 0.03444765376499639,
+      "orientation_error_rad": 0.7627530237840908,
+      "core_orientation_error_rad": 0.030568717780798046,
+      "core_position_m": [
+        -0.0016417555738925638,
+        0.00040730197825197053,
+        0.10000697652172101
+      ],
+      "max_center_outward_m": 0.002363485785980053,
+      "geoms": 1253,
+      "mean_contacts": 131.4196,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rim-bevel-0.0015.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_0",
+          "geom": "",
+          "mesh": ""
+        },
+        "geom1": {
+          "body": "piece_9",
+          "geom": "",
+          "mesh": "piece_9_bearing_1"
+        },
+        "normal_n": 34.12514843282516,
+        "time_s": 48.54800000004978
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 0,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004,
+        "shell_bevel_m": 0.0015
+      }
+    },
+    {
+      "id": "rim-bevel20-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": true,
+      "stop_reason": "piece_escaped_radial_retention",
+      "escaped_piece": "piece_9",
+      "duration_s": 0.5000000000023874,
+      "dynamics_wall_time_s": 3.967780073,
+      "position_error_m": 0.054196481174082656,
+      "orientation_error_rad": 2.904486510928016,
+      "core_orientation_error_rad": 0.09638100269060736,
+      "core_position_m": [
+        -0.0008393627618368812,
+        0.0017882664023016858,
+        0.0987718440506397
+      ],
+      "max_center_outward_m": 0.0036226949561768648,
+      "geoms": 1253,
+      "mean_contacts": 136.622,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rim-bevel-0.002.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_20",
+          "geom": "piece_20_shell",
+          "mesh": "piece_20_shell"
+        },
+        "geom1": {
+          "body": "piece_10",
+          "geom": "piece_10_shell",
+          "mesh": "piece_10_shell"
+        },
+        "normal_n": 9.917245561493903,
+        "time_s": 48.15600000004791
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 0,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004,
+        "shell_bevel_m": 0.002
+      }
+    },
+    {
+      "id": "rounded-bearing-six",
+      "passed": false,
+      "escape_piece": "piece_5",
+      "error": "Piece escaped radial retention",
+      "wall_time_s": 474.920900527,
+      "geoms": 1253,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "bearing_collision_mode": 1,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "final_checkpoint": {
+        "contacts": 161,
+        "core_orientation_error_rad": 0.022721772389061968,
+        "core_position": "-0.00101275965171 0.000699316613322    0.099965389547",
+        "facelet_position_component_error_m": 0.00022978976703144985,
+        "move": "before F2",
+        "orientation_error_rad": 0.008045458277564765,
+        "position_error_m": 0.0004019470373130274,
+        "time_s": 47.85000000004645
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "torpedo-generated-static",
+      "passed": true,
+      "solved": true,
+      "wall_time_s": 20.062111246,
+      "geoms": 1385,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "bearing_collision_mode": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_dimension": 3,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_contact_time_s": 0.004,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "final_checkpoint": {
+        "contacts": 148,
+        "core_orientation_error_rad": 0.0003989433805156462,
+        "core_position": "-1.09180530319e-06  4.98838667412e-06    0.0999907962518",
+        "facelet_position_component_error_m": 0.0002247834743703582,
+        "move": "final",
+        "orientation_error_rad": 0.0054952622032551956,
+        "position_error_m": 0.0003987725534711807,
+        "time_s": 1.8999999999998463
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 2,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rounded-bearing-normal-r",
+      "mode": "diagnostic_replay",
+      "pose_passed": true,
+      "stopped_early": false,
+      "duration_s": 1.6500000000005066,
+      "dynamics_wall_time_s": 5.899548279,
+      "position_error_m": 0.0004020732810409884,
+      "orientation_error_rad": 0.0070316958311708415,
+      "core_orientation_error_rad": 0.0013774742134683633,
+      "core_position_m": [
+        0.00000988299304318795,
+        -0.000011339319371224031,
+        0.09997704976056393
+      ],
+      "max_center_outward_m": 0,
+      "geoms": 1253,
+      "mean_contacts": 155.9151515151515,
+      "parameters": {
+        "alignment_regrasp_attempts": 0,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          3,
+          3
+        ],
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 30,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/turn_before_r.json",
+      "source_scene": "output/cube-mechanical/rim-rounded-bearing-normal.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_20",
+          "geom": "piece_20_shell",
+          "mesh": "piece_20_shell"
+        },
+        "geom1": {
+          "body": "piece_21",
+          "geom": "piece_21_shell",
+          "mesh": "piece_21_shell"
+        },
+        "normal_n": 4.751744826221749,
+        "time_s": 2.4704999999999924
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 1,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rounded-bearing-normal-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": true,
+      "stop_reason": "piece_escaped_radial_retention",
+      "escaped_piece": "piece_9",
+      "duration_s": 0.4500000000021487,
+      "dynamics_wall_time_s": 1.928734187,
+      "position_error_m": 0.05560214678162631,
+      "orientation_error_rad": 2.901430380113833,
+      "core_orientation_error_rad": 0.025834867048001815,
+      "core_position_m": [
+        -0.001232878682678657,
+        -3.5041162894611113e-8,
+        0.09964457296213636
+      ],
+      "max_center_outward_m": 0.00323836020983267,
+      "geoms": 1253,
+      "mean_contacts": 152.68444444444444,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rim-rounded-bearing-normal.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_20",
+          "geom": "piece_20_shell",
+          "mesh": "piece_20_shell"
+        },
+        "geom1": {
+          "body": "piece_10",
+          "geom": "piece_10_shell",
+          "mesh": "piece_10_shell"
+        },
+        "normal_n": 15.269341995049743,
+        "time_s": 48.121000000047744
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 1,
+        "rx_tip_contact_time_s": 0.004
+      }
+    },
+    {
+      "id": "rounded-bearing-tip008-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": false,
+      "duration_s": 1.6500000000078785,
+      "dynamics_wall_time_s": 14.048157507,
+      "position_error_m": 0.0009516592493615915,
+      "orientation_error_rad": 0.027355805861845196,
+      "core_orientation_error_rad": 0.021210071308362864,
+      "core_position_m": [
+        -0.0010797362693033337,
+        -0.000011767055156357432,
+        0.09989908752148452
+      ],
+      "max_center_outward_m": 0.0005628090007130904,
+      "geoms": 1253,
+      "mean_contacts": 137.6030303030303,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rounded-bearing-tip-.008.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_11",
+          "geom": "piece_11_shell",
+          "mesh": "piece_11_shell"
+        },
+        "geom1": {
+          "body": "piece_13",
+          "geom": "piece_13_shell",
+          "mesh": "piece_13_shell"
+        },
+        "normal_n": 12.43719466942685,
+        "time_s": 47.977000000047056
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.008
+      }
+    },
+    {
+      "id": "rounded-bearing-tip016-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": false,
+      "duration_s": 1.6500000000078785,
+      "dynamics_wall_time_s": 14.650658751,
+      "position_error_m": 0.0004623251432081671,
+      "orientation_error_rad": 0.012096600486949181,
+      "core_orientation_error_rad": 0.015953898363108492,
+      "core_position_m": [
+        -0.0010354921604474009,
+        0.0000970274768684971,
+        0.09990700452836108
+      ],
+      "max_center_outward_m": 0.00026969111356345727,
+      "geoms": 1253,
+      "mean_contacts": 146.33454545454546,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rounded-bearing-tip-.016.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_1",
+          "geom": "piece_1_shell",
+          "mesh": "piece_1_shell"
+        },
+        "geom1": {
+          "body": "piece_10",
+          "geom": "piece_10_shell",
+          "mesh": "piece_10_shell"
+        },
+        "normal_n": 7.369359469737328,
+        "time_s": 48.42400000004919
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.016
+      }
+    },
+    {
+      "id": "rounded-bearing-tip016-r",
+      "mode": "diagnostic_replay",
+      "pose_passed": true,
+      "stopped_early": false,
+      "duration_s": 1.6500000000005066,
+      "dynamics_wall_time_s": 15.688816736,
+      "position_error_m": 0.00040169455850225244,
+      "orientation_error_rad": 0.0077589410668879874,
+      "core_orientation_error_rad": 0.002186789514136636,
+      "core_position_m": [
+        -0.00000422322526484001,
+        -0.000009110785794618752,
+        0.09996222917016886
+      ],
+      "max_center_outward_m": 0,
+      "geoms": 1253,
+      "mean_contacts": 154.78969696969696,
+      "parameters": {
+        "alignment_regrasp_attempts": 0,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          3,
+          3
+        ],
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 30,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/turn_before_r.json",
+      "source_scene": "output/cube-mechanical/rounded-bearing-tip-.016.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_20",
+          "geom": "piece_20_shell",
+          "mesh": "piece_20_shell"
+        },
+        "geom1": {
+          "body": "piece_21",
+          "geom": "piece_21_shell",
+          "mesh": "piece_21_shell"
+        },
+        "normal_n": 4.212314657433627,
+        "time_s": 2.5665000000000244
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 3,
+        "rx_tip_contact_time_s": 0.016
+      }
+    },
+    {
+      "id": "compliant-tip-normal-f2",
+      "mode": "diagnostic_replay",
+      "pose_passed": false,
+      "stopped_early": false,
+      "duration_s": 1.6500000000078785,
+      "dynamics_wall_time_s": 7.08650962,
+      "position_error_m": 0.00039847697114409747,
+      "orientation_error_rad": 0.007343865730917562,
+      "core_orientation_error_rad": 0.013243215153246437,
+      "core_position_m": [
+        -0.001038146837914377,
+        0.00006558392549432806,
+        0.09991845434352316
+      ],
+      "max_center_outward_m": 0.0004310298662852607,
+      "geoms": 1253,
+      "mean_contacts": 162.10545454545453,
+      "parameters": {
+        "alignment_regrasp_attempts": 1,
+        "alignment_timeout_s": 2,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_collision_mode": 1,
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_merge_quads": 1,
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_sectors": 16,
+        "internal_contact_impedance": 0.99,
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "robot_search_ms": 1000,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_alignment_position_m": 0.002,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_core_position_m": 0.002,
+        "rx_detent_torque_nm": 0.08,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "timestep_s": 0.0005,
+        "turn_duration_s": 1.5
+      },
+      "source_snapshot": "assets/mechanical_cube/rim_before_f2.json",
+      "source_scene": "output/cube-mechanical/rounded-bearing-tip016-normal.xml",
+      "peak_contact": {
+        "geom0": {
+          "body": "piece_1",
+          "geom": "piece_1_shell",
+          "mesh": "piece_1_shell"
+        },
+        "geom1": {
+          "body": "piece_10",
+          "geom": "piece_10_shell",
+          "mesh": "piece_10_shell"
+        },
+        "normal_n": 7.144271885262179,
+        "time_s": 48.534000000049716
+      },
+      "scene_settings": {
+        "cap_collision_mode": 1,
+        "bearing_collision_mode": 1,
+        "internal_contact_dimension": 1,
+        "rx_tip_contact_time_s": 0.016
+      }
+    }
+  ],
+  "retention": [
+    {
+      "geometry": "rim",
+      "center_opening_m": 0.001,
+      "sample_count": 140,
+      "static_interference_count": 0,
+      "unblocked_count": 0,
+      "max_first_contact_m": 0.0013000000000000002
+    },
+    {
+      "geometry": "torpedo_connected",
+      "center_opening_m": 0.001,
+      "sample_count": 140,
+      "static_interference_count": 0,
+      "unblocked_count": 0,
+      "max_first_contact_m": 0.0005
+    }
+  ]
+}
