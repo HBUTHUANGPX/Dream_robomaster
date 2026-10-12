@@ -2,6 +2,7 @@
 
 #include <libxml/parser.h>
 
+#include <cmath>
 #include <iomanip>
 #include <sstream>
 
@@ -33,7 +34,9 @@ Node add(Node n, const char* tag,
 }  // namespace
 std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::path& bundle,
                                 double bearing_friction, double tip_friction,
-                                double tip_contact_time, double cube_mass, bool corner_spheres) {
+                                double tip_contact_time, double cube_mass, bool corner_spheres,
+                                double sphere_radius, double sphere_offset,
+                                double tip_torsional_friction) {
   std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> doc(
       xmlReadMemory(xml.data(), xml.size(), "mechanical.xml", nullptr, XML_PARSE_NONET),
       xmlFreeDoc);
@@ -94,17 +97,20 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
           std::istringstream position(get(n, "pos"));
           if (!(position >> x >> y >> z)) throw std::runtime_error("Invalid RX tip position");
           int index = 0;
-          for (double dx : {-.005, .005})
-            for (double dz : {-.005, .005}) {
+          for (double dx : {-sphere_offset, sphere_offset})
+            for (double dz : {-sphere_offset, sphere_offset}) {
               auto sphere = xmlCopyNode(n, 1);
               xmlAddChild(parent, sphere);
               const auto sphere_name =
                   name.substr(0, name.size() - 4) + "_corner_" + std::to_string(index++) + "_tip";
               std::ostringstream p;
-              p << std::setprecision(17) << x + dx << " " << y << " " << z + dz;
+              p << std::setprecision(17) << x + dx << " "
+                << y - std::copysign(.003 - sphere_radius, y) << " " << z + dz;
               set(sphere, "name", sphere_name);
               set(sphere, "type", "sphere");
-              set(sphere, "size", ".003");
+              std::ostringstream radius;
+              radius << std::setprecision(17) << sphere_radius;
+              set(sphere, "size", radius.str());
               set(sphere, "pos", p.str());
               set(sphere, "mass", "0");
               set(sphere, "contype", "1");
@@ -126,14 +132,17 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
     if (get(n, "name") == "A_wrist" || get(n, "name") == "B_wrist") set(n, "pos", "0 0 .1");
   auto contact = child(root, "contact");
   if (!contact) contact = add(root, "contact");
+  const double torsional = tip_friction > 0 ? tip_torsional_friction : 0;
+  std::ostringstream friction;
+  friction << std::setprecision(17) << tip_friction << " " << tip_friction << " " << torsional
+           << (tip_friction > 0 ? " .0001 .0001" : " 0 0");
   for (const auto& tip : tips)
     for (auto& shell : shells)
       add(contact, "pair",
           {{"geom1", tip},
            {"geom2", shell},
-           {"condim", "4"},
-           {"friction", std::to_string(tip_friction) + " " + std::to_string(tip_friction) +
-                            (tip_friction > 0 ? " .002 .0001 .0001" : " 0 0 0")},
+           {"condim", torsional > 0 ? "4" : "3"},
+           {"friction", friction.str()},
            {"solref", std::to_string(tip_contact_time) + " 1"},
            {"solimp", ".99 .999 .001"},
            {"margin", "0"}});

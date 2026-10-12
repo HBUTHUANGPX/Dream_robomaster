@@ -10,6 +10,7 @@
 
 #include "mechanical_rx.hpp"
 #include "rm/cube.hpp"
+#include "rm/cube_magnets.hpp"
 #include "rm/mechanical_plan.hpp"
 #include "rm/mechanical_sdf.hpp"
 #include "rm/rx_gripper.hpp"
@@ -32,6 +33,8 @@ Json settings = {{"cube_mass_kg", .088},
                  {"cap_rings", {3, 3, 3}},
                  {"cap_collision_mode", 0},
                  {"retention_mode", 0},
+                 {"ball_damping_nm_s", .00002},
+                 {"cube_magnet_peak_force_n", 0.},
                  {"bearing_collision_mode", 0},
                  {"preload_stiffness_n_m", 500.},
                  {"preload_reference_m", -.0015},
@@ -57,8 +60,12 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_jaw_settle_s", .15},
                  {"rx_wrist_kp", 20.},
                  {"rx_wrist_kv", 1.},
+                 {"rx_wrist_zero_jerk", 0},
                  {"rx_tip_friction", 1.2},
+                 {"tip_torsional_friction_m", .002},
                  {"rx_tip_corner_spheres", 0},
+                 {"rx_tip_sphere_radius_m", .003},
+                 {"rx_tip_sphere_offset_m", .005},
                  {"rx_tip_contact_time_s", .004},
                  {"rx_bearing_friction_nm", .002},
                  {"rx_detent_torque_nm", .04},
@@ -98,6 +105,8 @@ void load_settings(const std::filesystem::path& path) {
       throw std::invalid_argument("rx_wrist_tn must be 0 or 1");
     if (key == "rx_tip_corner_spheres" && v.get<double>() != 0 && v.get<double>() != 1)
       throw std::invalid_argument("rx_tip_corner_spheres must be 0 or 1");
+    if (key == "rx_wrist_zero_jerk" && v.get<double>() != 0 && v.get<double>() != 1)
+      throw std::invalid_argument("rx_wrist_zero_jerk must be 0 or 1");
     if (key == "retention_mode" && (v.get<double>() != 0 && v.get<double>() != 1))
       throw std::invalid_argument("retention_mode must be 0 or 1");
     if (key == "cap_collision_mode" &&
@@ -123,8 +132,18 @@ void load_settings(const std::filesystem::path& path) {
     throw std::invalid_argument("Invalid timing or torque");
   if (value("internal_contact_impedance") <= 0 || value("internal_contact_impedance") >= 1)
     throw std::invalid_argument("Contact impedance must be between zero and one");
+  if (value("tip_torsional_friction_m") > .01)
+    throw std::invalid_argument("Tip torsional friction must be in [0,.01] m");
   if (value("rx_tip_contact_time_s") < .001 || value("rx_tip_contact_time_s") > .1)
     throw std::invalid_argument("RX tip contact time must be in [.001,.1] seconds");
+  if (value("rx_tip_sphere_radius_m") < .0005 || value("rx_tip_sphere_radius_m") > .003 ||
+      value("rx_tip_sphere_offset_m") < value("rx_tip_sphere_radius_m") ||
+      value("rx_tip_sphere_offset_m") + value("rx_tip_sphere_radius_m") > .008 + 1e-12)
+    throw std::invalid_argument("RX corner spheres must fit the pad and not overlap");
+  if (value("cube_magnet_peak_force_n") > 2)
+    throw std::invalid_argument("Cube magnet force must be in [0,2] N");
+  if (value("ball_damping_nm_s") > .01)
+    throw std::invalid_argument("Ball damping must be in [0,.01] Nm s/rad");
   if (value("friction_impedance_ratio") < 1 || value("friction_impedance_ratio") > 1000)
     throw std::invalid_argument("Friction impedance ratio must be in [1,1000]");
   if (value("robot_search_ms") > 60000)
@@ -299,10 +318,28 @@ std::string scene() {
                  << "' kp='.3' kv='.003' forcerange='" << -value("max_torque_nm") << " "
                  << value("max_torque_nm") << "'/>";
         } else if (guided)
-          bodies << "<joint name='guide_" << name
-                 << "' type='ball' damping='.00002' armature='.00000001'/>";
+          bodies << "<joint name='guide_" << name << "' type='ball' damping='"
+                 << value("ball_damping_nm_s") << "' armature='.00000001'/>";
         else
           bodies << "<freejoint/>";
+        // 棱角接缝两侧各埋入1.5毫米；位置随块运动，不依赖当前逻辑排列。
+        if (nonzero >= 2) {
+          auto magnet_site = [&](int axis, int sign) {
+            Vec p = c;
+            p[axis] += sign * (pitch_m / 2 - .0015);
+            bodies << "<site name='cube_" << (nonzero == 3 ? "corner" : "edge") << "_magnet_"
+                   << name << "_" << axis << "_" << (sign > 0 ? "p" : "n") << "' pos='" << xyz(p)
+                   << "' size='.001' rgba='1 .7 .1 1' group='3'/>";
+          };
+          for (int axis = 0; axis < 3; ++axis) {
+            if (nonzero == 3)
+              magnet_site(axis, -static_cast<int>(slot[axis]));
+            else if (slot[axis] == 0) {
+              magnet_site(axis, -1);
+              magnet_site(axis, 1);
+            }
+          }
+        }
         bodies << "<inertial pos='" << xyz(c) << "' mass='" << .003 * value("cube_mass_kg") / .088
                << "' diaginertia='" << xyz(Vec::Constant(.00000016 * value("cube_mass_kg") / .088))
                << "'/>";
@@ -489,7 +526,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           const double turn = value("rx_wrist_speed_rad_s") > 0
                                   ? wrist_duration((a % 6 < 2 ? 1 : 2) * pi / 2,
                                                    factor * value("rx_wrist_speed_rad_s"),
-                                                   factor * value("rx_wrist_accel_rad_s2"), dt)
+                                                   factor * value("rx_wrist_accel_rad_s2"), dt,
+                                                   value("rx_wrist_zero_jerk") != 0)
                                   : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
           motion_costs->duration[a][mode] =
               a % 6 >= 4 ? (std::max(1L, std::lround(value("rx_jaw_duration_s") / dt)) +
@@ -531,16 +569,22 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::ofstream scene_file(out / "scene.xml");
     const bool rx = !rx_bundle.empty();
     auto xml = scene();
-    scene_file << (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
-                                            value("rx_tip_friction"),
-                                            value("rx_tip_contact_time_s"), value("cube_mass_kg"),
-                                            value("rx_tip_corner_spheres") != 0)
+    scene_file << (rx ? mechanical_rx_scene(
+                            xml, rx_bundle, value("rx_bearing_friction_nm"),
+                            value("rx_tip_friction"), value("rx_tip_contact_time_s"),
+                            value("cube_mass_kg"), value("rx_tip_corner_spheres") != 0,
+                            value("rx_tip_sphere_radius_m"), value("rx_tip_sphere_offset_m"),
+                            value("tip_torsional_friction_m"))
                       : xml);
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");
     Simulation sim(out / "scene.xml");
     auto* m = sim.model;
     auto* d = sim.data;
+    CubeMagnets magnets(m);
+    if (value("cube_magnet_peak_force_n") > 0 &&
+        (magnets.corner_count() != 24 || magnets.edge_count() != 24))
+      throw std::runtime_error("Cube magnets require 24 corner and 24 edge sites");
     report["equalities"] = m->neq;
     report["actuators"] = m->nu;
     report["geoms"] = m->ngeom;
@@ -557,6 +601,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     report["cube_shells"] = cube_shells;
     report["fixed_core_test_rig"] = !rx;
     report["gripper"] = rx ? "rx_friction" : "none";
+    report["cube_magnets"] = {{"peak_pair_force_n", value("cube_magnet_peak_force_n")},
+                              {"range_m", .006},
+                              {"model", "experimental_compact_radial_potential"}};
     report["passive_detent"] = rx ? "torque=-amplitude*sin(4*angle)-0.0005*velocity" : "none";
     if (m->neq != (rx ? 9 : 0))
       throw std::runtime_error("Unexpected mechanical equality constraints");
@@ -693,6 +740,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     };
     auto advance = [&](double t, bool check_contacts = false) {
       for (int k = 0; k < std::lround(t / m->opt.timestep); ++k) {
+        if (value("cube_magnet_peak_force_n") > 0) mju_zero(d->qfrc_applied, m->nv);
         if (rx) {
           // 固定周期势能的负梯度，模拟被动磁吸定位；不读取规划目标。
           for (char f : faces) {
@@ -703,6 +751,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                 .0005 * d->qvel[v];
           }
         }
+        magnets.apply(m, d, value("cube_magnet_peak_force_n"));
         if (wrist_tn) wrist_tn->before_step(m, d);
         mj_step(m, d);
         if (wrist_tn) {
@@ -864,7 +913,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       const double factor = empty ? value("rx_wrist_empty_multiplier") : 1.;
       if (controlled)
         duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
-                                  factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep);
+                                  factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep,
+                                  value("rx_wrist_zero_jerk") != 0);
       int count = std::max(1L, std::lround(duration / m->opt.timestep));
       duration = count * m->opt.timestep;
       int v = turning ? m->jnt_dofadr[m->actuator_trnid[2 * a]] : -1;
@@ -877,7 +927,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       }
       double peak_error = 0, peak_speed = 0, peak_torque = 0, began = d->time;
       for (int k = 1; k <= count; ++k) {
-        auto ref = wrist_sample(start, target, duration, k * m->opt.timestep);
+        auto ref = wrist_sample(start, target, duration, k * m->opt.timestep,
+                                turning && value("rx_wrist_zero_jerk") != 0);
         d->ctrl[a] = ref.position;
         if (controlled)
           d->ctrl[a] += ((value("rx_wrist_kv") + m->dof_damping[v]) * ref.velocity +

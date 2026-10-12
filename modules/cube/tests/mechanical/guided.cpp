@@ -1,13 +1,19 @@
 #include <mujoco/mujoco.h>
 
+#include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <memory>
+#include <numbers>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "replay_structure.hpp"
+#include "rm/cube_magnets.hpp"
 
 namespace {
 void need(bool condition, const char* message) {
@@ -106,6 +112,11 @@ int main(int argc, char** argv) {
                      m->geom_bodyid[g] == m->geom_bodyid[box],
                  "四球应固定在原指垫刚体上");
             ++sphere_count;
+            near(m->geom_pos[3 * g + 1] -
+                     std::copysign(m->geom_size[3 * g], m->geom_pos[3 * box + 1]),
+                 m->geom_pos[3 * box + 1] -
+                     std::copysign(m->geom_size[3 * box + 1], m->geom_pos[3 * box + 1]),
+                 "改变球半径不得移动原夹持接触面");
             for (int k = 0; k < 3; ++k)
               need(std::abs(m->geom_pos[3 * g + k] - m->geom_pos[3 * box + k]) +
                            m->geom_size[3 * g] <=
@@ -148,6 +159,154 @@ int main(int argc, char** argv) {
           need(name && std::string_view(name).ends_with("_shell"), "显式 pair 不得激活内部几何");
         }
       }
+    rm::cube::CubeMagnets magnets(m.get());
+    if (magnets.corner_count() || magnets.edge_count()) {
+      need(magnets.corner_count() == 24 && magnets.edge_count() == 24, "磁吸点应为24角加24棱");
+      mj_resetData(m.get(), d.get());
+      magnets.apply(m.get(), d.get(), .3);
+      const double solved_energy = magnets.potential(m.get(), d.get(), .3);
+      need(solved_energy < 0, "初始排列磁吸势能应为负");
+      // 仅用于区分浮点噪声，不是实验标定的势垒或扭矩阈值。
+      constexpr double energy_tolerance = 1e-12, perturbation = .01;
+      constexpr double quarter_turn = std::numbers::pi / 2;
+      constexpr int scan_steps = 900;  // 每0.1度采样一次，窄于采样间距的势能井仍可能漏检。
+      bool magnetic_stability = true;
+      std::vector<mjtNum> direction(m->nv, 0);
+      auto sample = [&](double angle) {
+        mj_resetData(m.get(), d.get());
+        mj_integratePos(m.get(), d->qpos, direction.data(), angle);
+        magnets.apply(m.get(), d.get(), .3);
+        const double energy = magnets.potential(m.get(), d.get(), .3);
+        // direction是单位层转角的广义速度，内积给出与层转角共轭的扭矩。
+        const double torque = mju_dot(d->qfrc_applied, direction.data(), m->nv);
+        need(std::isfinite(energy) && std::isfinite(torque), "磁吸扫描出现非有限值");
+        return std::pair{energy, torque};
+      };
+      int nonrestoring_balls = 0, penetrating_balls = 0;
+      double deepest_ball_penetration = 0;
+      auto check_restoring = [&](const char* name, int axis, double angle, double reference,
+                                 double reference_energy, bool require_restoring = true) {
+        const auto [energy, torque] = sample(angle);
+        const double work = torque * (angle - reference);
+        if (energy - reference_energy <= energy_tolerance || work >= -energy_tolerance) {
+          if (!require_restoring) {
+            // 单块可在间隙内被吸向接触面。磁吸单独的负刚度不是整体机构失稳判据。
+            ++nonrestoring_balls;
+            mj_collision(m.get(), d.get());
+            double penetration = 0;
+            for (int i = 0; i < d->ncon; ++i) {
+              const auto& contact = d->contact[i];
+              const char* a = mj_id2name(m.get(), mjOBJ_GEOM, contact.geom[0]);
+              const char* b = mj_id2name(m.get(), mjOBJ_GEOM, contact.geom[1]);
+              if (a && b && std::string_view(a).ends_with("_shell") &&
+                  std::string_view(b).ends_with("_shell"))
+                penetration = std::max(penetration, -contact.dist);
+            }
+            penetrating_balls += penetration > 1e-12;
+            deepest_ball_penetration = std::max(deepest_ball_penetration, penetration);
+            return;
+          }
+          magnetic_stability = false;
+          std::cerr << std::setprecision(12) << "磁吸复位检查失败 对象=" << name << " 轴=" << axis
+                    << " 角度rad=" << angle << " 参考角rad=" << reference
+                    << " 势能增量J=" << energy - reference_energy << " 虚功J=" << work << '\n';
+        }
+      };
+      int perturbed_balls = 0;
+      for (int b = 1; b < m->nbody; ++b) {
+        const char* name = mj_id2name(m.get(), mjOBJ_BODY, b);
+        if (!name || !std::string_view(name).starts_with("piece_")) continue;
+        const int j = m->body_jntadr[b];
+        if (m->jnt_type[j] != mjJNT_BALL) continue;
+        ++perturbed_balls;
+        for (int axis = 0; axis < 3; ++axis) {
+          std::fill(direction.begin(), direction.end(), 0);
+          direction[m->jnt_dofadr[j] + axis] = 1;
+          for (int sign : {-1, 1})
+            check_restoring(name, axis, sign * perturbation, 0, solved_energy, false);
+        }
+      }
+      std::cout << "单块磁吸诊断：非恢复方向=" << nonrestoring_balls
+                << "，其中外壳穿透=" << penetrating_balls
+                << "，最深穿透m=" << deepest_ball_penetration
+                << "；仅作接触耦合诊断，不要求磁吸独立稳定全部自由度\n";
+      need(perturbed_balls == 20, "磁吸扰动检查必须覆盖20个ball的三个轴和正负方向");
+      for (int axis = 0; axis < 3; ++axis)
+        for (int side : {-1, 1}) {
+          std::fill(direction.begin(), direction.end(), 0);
+          int layer_balls = 0;
+          for (int b = 1; b < m->nbody; ++b) {
+            const char* name = mj_id2name(m.get(), mjOBJ_BODY, b);
+            if (!name || !std::string_view(name).starts_with("piece_")) continue;
+            const int site =
+                mj_name2id(m.get(), mjOBJ_SITE, (std::string(name) + "_center").c_str());
+            if (side * m->site_pos[3 * site + axis] < .01) continue;
+            const int j = m->body_jntadr[b];
+            if (m->jnt_type[j] == mjJNT_BALL) {
+              direction[m->jnt_dofadr[j] + axis] = side;
+              ++layer_balls;
+            } else {
+              // 中心没有磁吸site，但仍随整层绕外法向转动。
+              direction[m->jnt_dofadr[j]] = side * m->jnt_axis[3 * j + axis];
+            }
+          }
+          need(layer_balls == 8, "层扫描必须包含4角4棱");
+          const std::string layer = std::string(axis == 0   ? "X"
+                                                : axis == 1 ? "Y"
+                                                            : "Z") +
+                                    (side > 0 ? "+" : "-");
+          for (double endpoint : {0., quarter_turn}) {
+            const double energy = sample(endpoint).first;
+            near(energy, solved_energy, "层转动两端必须具有同等磁吸势能");
+            for (int v = 0; v < m->nv; ++v)
+              near(d->qfrc_applied[v], 0, "对齐排列不应存在磁吸净广义力");
+            for (int sign : {-1, 1})
+              check_restoring(layer.c_str(), axis, endpoint + sign * perturbation, endpoint,
+                              energy);
+          }
+          // 合法曲线先上升，再下降；中间允许零斜率平台。
+          // 一旦下降后又显著回升，就存在额外势能井（包含平底井）。
+          double peak_layer_torque = 0, peak_angle = 0;
+          double running_peak = solved_energy, running_min = solved_energy, min_angle = 0;
+          bool descending = false, extra_well = false;
+          double well_angle = 0, well_depth = 0;
+          for (int k = 0; k <= scan_steps; ++k) {
+            const double angle = quarter_turn * k / scan_steps;
+            const auto [energy, torque] = sample(angle);
+            if (std::abs(torque) > peak_layer_torque) {
+              peak_layer_torque = std::abs(torque);
+              peak_angle = angle;
+            }
+            if (!descending) {
+              running_peak = std::max(running_peak, energy);
+              if (running_peak - energy > energy_tolerance) {
+                descending = true;
+                running_min = energy;
+                min_angle = angle;
+              }
+            } else if (energy < running_min) {
+              running_min = energy;
+              min_angle = angle;
+            } else if (energy - running_min > energy_tolerance) {
+              extra_well = true;
+              if (energy - running_min > well_depth) {
+                well_angle = min_angle;
+                well_depth = energy - running_min;
+              }
+            }
+          }
+          std::cout << std::setprecision(12) << "磁吸层扫描 层=" << layer
+                    << " 单对峰值力N=0.3 采样间距deg=0.1 peak_layer_torque=" << peak_layer_torque
+                    << " 单位=N*m 峰值角度rad=" << peak_angle << " 额外势能井=" << extra_well
+                    << '\n';
+          if (extra_well) {
+            magnetic_stability = false;
+            std::cerr << "额外磁吸势能井 层=" << layer << " 井底角度rad=" << well_angle
+                      << " 回升势能J=" << well_depth << '\n';
+          }
+        }
+      need(magnetic_stability, "磁吸局部复位或层转动势能检查失败，详见上述观测");
+    }
     // 缺失一个 ball 的无 preload 模型必须被 replay 分类器拒绝。
     m->jnt_type[first_ball] = mjJNT_HINGE;
     bool rejected = false;

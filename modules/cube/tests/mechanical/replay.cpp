@@ -6,6 +6,7 @@
 
 #include "replay_structure.hpp"
 #include "rm/cube.hpp"
+#include "rm/cube_magnets.hpp"
 #include "rm/mechanical_sdf.hpp"
 #include "rm/rx_wrist_tn.hpp"
 #include "rm/wrist_motion.hpp"
@@ -41,11 +42,13 @@ int main(int argc, char** argv) {
                                         "timestep_s",
                                         "rx_jaw_torque_nm",
                                         "rx_detent_torque_nm",
+                                        "cube_magnet_peak_force_n",
                                         "settle_duration_s",
                                         "tip_torsional_friction_m",
                                         "internal_contact_impedance",
                                         "rx_wrist_kp",
                                         "rx_wrist_kv",
+                                        "rx_wrist_zero_jerk",
                                         "rx_wrist_speed_rad_s",
                                         "rx_wrist_accel_rad_s2",
                                         "rx_wrist_empty_multiplier",
@@ -67,8 +70,11 @@ int main(int argc, char** argv) {
       if (!item.is_number() || !std::isfinite(item.get<double>()))
         throw std::invalid_argument("Invalid replay parameter: " + key);
       const double value = item.get<double>();
+      if (key == "rx_wrist_zero_jerk" && value != 0 && value != 1)
+        throw std::invalid_argument("Invalid wrist profile");
       if (value < 0 || ((key == "turn_duration_s" || key == "timestep_s") && value == 0) ||
           (key == "timestep_s" && value > .001) ||
+          (key == "tip_torsional_friction_m" && value > .01) ||
           (key == "internal_contact_impedance" && (value <= 0 || value >= 1)))
         throw std::invalid_argument("Invalid replay parameter: " + key);
     }
@@ -103,6 +109,7 @@ int main(int argc, char** argv) {
     if (state.size() != size_t(mj_stateSize(m, spec)))
       throw std::runtime_error("State/model size mismatch");
     mj_setState(m, d, state.data(), spec);
+    const std::vector<mjtNum> restored_forces(d->qfrc_applied, d->qfrc_applied + m->nv);
     m->opt.timestep = parameters.at("timestep_s").get<double>();
     if (parameters.contains("internal_contact_impedance"))
       for (int g = 0; g < m->ngeom; ++g) {
@@ -118,8 +125,13 @@ int main(int argc, char** argv) {
         const char* n = mj_id2name(m, mjOBJ_GEOM, m->pair_geom1[p]);
         const char* other = mj_id2name(m, mjOBJ_GEOM, m->pair_geom2[p]);
         if ((n && std::string_view(n).ends_with("_tip")) ||
-            (other && std::string_view(other).ends_with("_tip")))
-          m->pair_friction[5 * p + 2] = parameters.at("tip_torsional_friction_m");
+            (other && std::string_view(other).ends_with("_tip"))) {
+          const double torsional = parameters.value("rx_tip_friction", 1.2) > 0
+                                       ? parameters.at("tip_torsional_friction_m").get<double>()
+                                       : 0;
+          m->pair_friction[5 * p + 2] = torsional;
+          m->pair_dim[p] = torsional > 0 ? 4 : 3;
+        }
       }
     for (auto h : {"A", "B"}) {
       int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(h) + "_fingers_actuator").c_str());
@@ -136,6 +148,25 @@ int main(int argc, char** argv) {
     }
     std::optional<RxWristTn> wrist_tn;
     if (parameters.value("rx_wrist_tn", 0.) == 1) wrist_tn.emplace(m);
+    CubeMagnets magnets(m);
+    if (parameters.value("cube_magnet_peak_force_n", 0.) > 0 &&
+        (magnets.corner_count() != 24 || magnets.edge_count() != 24))
+      throw std::runtime_error("Cube magnets require 24 corner and 24 edge sites");
+    if (parameters.value("cube_magnet_peak_force_n", 0.) > 2)
+      throw std::invalid_argument("Cube magnet force must be in [0,2] N");
+    // 快照包含旧外力；初始求值和每一步都按覆盖后的参数重建。
+    auto update_passive_forces = [&]() {
+      mju_zero(d->qfrc_applied, m->nv);
+      for (char f : faces) {
+        int j = mj_name2id(m, mjOBJ_JOINT, ("hinge_" + std::string(1, f)).c_str()),
+            v = m->jnt_dofadr[j];
+        d->qfrc_applied[v] = -parameters.at("rx_detent_torque_nm").get<double>() *
+                                 std::sin(4 * d->qpos[m->jnt_qposadr[j]]) -
+                             .0005 * d->qvel[v];
+      }
+      magnets.apply(m, d, parameters.value("cube_magnet_peak_force_n", 0.));
+    };
+    update_passive_forces();
     mj_forward(m, d);
     int core = mj_name2id(m, mjOBJ_BODY, "mechanical_core");
     auto position = [&]() -> Vec { return Eigen::Map<const Vec>(d->xpos + 3 * core); };
@@ -162,11 +193,12 @@ int main(int argc, char** argv) {
     if (controlled) {
       const double factor =
           mode == "empty" ? parameters.value("rx_wrist_empty_multiplier", 1.5) : 1.;
-      ramp_steps = std::round(
-          wrist_duration(target - start,
-                         factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
-                         factor * parameters.value("rx_wrist_accel_rad_s2", 80.), timestep) /
-          timestep);
+      ramp_steps =
+          std::round(wrist_duration(target - start,
+                                    factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
+                                    factor * parameters.value("rx_wrist_accel_rad_s2", 80.),
+                                    timestep, parameters.value("rx_wrist_zero_jerk", 0.) != 0) /
+                     timestep);
 
       total_steps = ramp_steps + settle_steps;
       std::vector<mjtNum> mass(m->nv * m->nv);
@@ -233,6 +265,8 @@ int main(int argc, char** argv) {
     Json report = {
         {"mode", "diagnostic_replay"}, {"acceptance", "pose_only"}, {"action", action},
         {"parameters", parameters},    {"stopped_early", false},    {"trace", Json::array()}};
+    report["restored_qfrc_applied"] = restored_forces;
+    report["initial_qfrc_applied"] = std::vector<mjtNum>(d->qfrc_applied, d->qfrc_applied + m->nv);
     report["source_scene"] = argv[1];
     report["source_snapshot"] = argv[2];
     report["sdf_initpoints"] = m->opt.sdf_initpoints;
@@ -255,6 +289,14 @@ int main(int argc, char** argv) {
         int body = m->geom_bodyid[c.geom[1 - side]];
         mjtNum f[6];
         mj_contactForce(m, d, i, f);
+        const int tip_geom = c.geom[side];
+        const Mat tip_rotation = Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>(
+            d->geom_xmat + 9 * tip_geom);
+        const Vec local_position =
+            tip_rotation.transpose() *
+            (Eigen::Map<const Vec>(c.pos) - Eigen::Map<const Vec>(d->geom_xpos + 3 * tip_geom));
+        // 保留 MuJoCo c.frame 法向（geom[0] 指向 geom[1]），不按 tip 所在侧翻转。
+        const Vec local_normal = tip_rotation.transpose() * Eigen::Map<const Vec>(c.frame);
         report["initial_tip_contacts"].push_back(
             {{"tip", tip},
              {"body", mj_id2name(m, mjOBJ_BODY, body)},
@@ -263,9 +305,64 @@ int main(int argc, char** argv) {
              {"torsion_nm", f[3]},
              {"torsional_friction_m", c.friction[2]},
              {"position_m", {c.pos[0], c.pos[1], c.pos[2]}},
+             {"tip_local_contact_position_m",
+              {local_position.x(), local_position.y(), local_position.z()}},
+             {"tip_local_normal_axis", {local_normal.x(), local_normal.y(), local_normal.z()}},
              {"normal_axis", {c.frame[0], c.frame[1], c.frame[2]}}});
       }
     }
+    report["tip_contact_normal_note"] =
+        "normal_axis 和 tip_local_normal_axis 均保留 MuJoCo c.frame 法向，"
+        "从 geom[0] 指向 geom[1]，不按 tip 所在侧翻转；本地坐标系为 tip geom。";
+    report["tip_contact_sampling_note"] =
+        "trace 在 mj_step 后读取接触、力、geom 位姿和速度缓存，不调用 mj_forward；"
+        "time_s 为积分后时间，缓存来自该步最后一次动力学求值，不保证对应积分后状态。"
+        "每20步或最大法向力超过100 N时采样，不能捕获采样间的全部接触变化。";
+    auto tip_contacts = [&]() {
+      Json contacts = Json::array();
+      for (int i = 0; i < d->ncon; ++i) {
+        const auto& c = d->contact[i];
+        if (c.geom[0] < 0 || c.geom[1] < 0) continue;
+        for (int side = 0; side < 2; ++side) {
+          const int tip_geom = c.geom[side], shell_geom = c.geom[1 - side];
+          const char* tip = mj_id2name(m, mjOBJ_GEOM, tip_geom);
+          const char* shell = mj_id2name(m, mjOBJ_GEOM, shell_geom);
+          if (!tip || !std::string_view(tip).ends_with("_tip") || !shell ||
+              !std::string_view(shell).ends_with("_shell"))
+            continue;
+          mjtNum f[6];
+          mj_contactForce(m, d, i, f);
+          const double tangent = std::hypot(f[1], f[2]);
+          // RX 的两条切向摩擦系数相同；mu 取接触实际使用的 friction[0]。
+          const double denominator = c.friction[0] * f[0];
+          Json utilization = nullptr;
+          if (f[0] > 1e-9 && denominator > 0 && std::isfinite(denominator) &&
+              std::isfinite(tangent / denominator))
+            utilization = tangent / denominator;
+          auto contact_velocity = [&](int geom) -> Vec {
+            mjtNum velocity[6];
+            // 世界坐标方向、geom 中心处的速度，顺序为角速度、线速度。
+            mj_objectVelocity(m, d, mjOBJ_GEOM, geom, velocity, 0);
+            const Vec offset =
+                Eigen::Map<const Vec>(c.pos) - Eigen::Map<const Vec>(d->geom_xpos + 3 * geom);
+            return Eigen::Map<const Vec>(velocity + 3) +
+                   Eigen::Map<const Vec>(velocity).cross(offset);
+          };
+          const Vec relative = contact_velocity(tip_geom) - contact_velocity(shell_geom);
+          const Vec normal = Eigen::Map<const Vec>(c.frame);
+          const Vec tangential_velocity = relative - normal * normal.dot(relative);
+          const char* body = mj_id2name(m, mjOBJ_BODY, m->geom_bodyid[shell_geom]);
+          contacts.push_back({{"tip", tip},
+                              {"body", body ? body : ""},
+                              {"normal_n", f[0]},
+                              {"tangent_norm_n", tangent},
+                              {"friction_utilization", utilization},
+                              {"relative_tangent_speed_m_s", tangential_velocity.norm()},
+                              {"torsion_nm", f[3]}});
+        }
+      }
+      return contacts;
+    };
     double peak = 0;
     int simulated_steps = 0, max_contacts = 0;
     double contact_sum = 0;
@@ -279,24 +376,25 @@ int main(int argc, char** argv) {
     };
     Timers timers;
     for (auto& timer : d->timer) timer = {};
+    int peak_solver_iterations = 0, solver_limit_steps = 0;
     const auto wall_started = std::chrono::steady_clock::now();
     for (int k = 1; k <= static_cast<int>(total_steps); ++k) {
-      auto ref = wrist_sample(start, target, ramp * timestep, k * timestep);
+      auto ref = wrist_sample(start, target, ramp * timestep, k * timestep,
+                              !jaw && parameters.value("rx_wrist_zero_jerk", 0.) != 0);
       d->ctrl[actuator] = ref.position;
       if (controlled)
         d->ctrl[actuator] +=
             ((parameters.value("rx_wrist_kv", 1.) + m->dof_damping[wrist_dof]) * ref.velocity +
              inertia * ref.acceleration) /
             parameters.value("rx_wrist_kp", 20.);
-      for (char f : faces) {
-        int j = mj_name2id(m, mjOBJ_JOINT, ("hinge_" + std::string(1, f)).c_str()),
-            v = m->jnt_dofadr[j];
-        d->qfrc_applied[v] = -parameters.at("rx_detent_torque_nm").get<double>() *
-                                 std::sin(4 * d->qpos[m->jnt_qposadr[j]]) -
-                             .0005 * d->qvel[v];
-      }
+      update_passive_forces();
       if (wrist_tn) wrist_tn->before_step(m, d);
       mj_step(m, d);
+      int iterations = 0;
+      for (int island = 0; island < std::min(mjNISLAND, std::max(1, d->nisland)); ++island)
+        iterations = std::max(iterations, d->solver_niter[island]);
+      peak_solver_iterations = std::max(peak_solver_iterations, iterations);
+      solver_limit_steps += iterations >= m->opt.iterations;
       if (wrist_tn) wrist_tn->after_step(d);
       ++simulated_steps;
       for (int address : center_addresses)
@@ -334,6 +432,7 @@ int main(int argc, char** argv) {
         report["trace"].push_back(
             {{"time_s", d->time},
              {"contacts", d->ncon},
+             {"tip_contacts", tip_contacts()},
              {"max_normal_n", force},
              {"position_error_m", pos},
              {"orientation_error_rad", angle},
@@ -406,6 +505,9 @@ int main(int argc, char** argv) {
     Vec error_vector = core_error.axis() * core_error.angle();
     report["core_rotation_error_vector"] = {error_vector.x(), error_vector.y(), error_vector.z()};
     report["core_position_m"] = {position().x(), position().y(), position().z()};
+    report["solver"] = {{"iteration_limit", m->opt.iterations},
+                        {"peak_iterations", peak_solver_iterations},
+                        {"steps_at_limit", solver_limit_steps}};
     report["duration_s"] = d->time - began;
     report["pose_passed"] = !report.value("stopped_early", false) && pos_error < .0005 &&
                             angle_error < .02 && core_angle < .02 &&

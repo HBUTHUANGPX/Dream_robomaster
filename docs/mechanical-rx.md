@@ -523,3 +523,82 @@ node modules/cube/tools/benchmark-mechanical-motion.mjs \
 小球回放的块体误差仍为1.06毫米，未通过严格姿态验收。14 rad/s核心偏移约3.00毫米，改善较小。
 这些回放只改变几何并恢复旧状态，不包含新几何下重新夹持的历史，因此必须另做从上料开始的完整序列测试。
 几何图及完整试验结果见[四角小球资产](../assets/mechanical_cube/README.md#四角小球指垫)。
+
+## 接触稳定性对照参数
+
+以下参数用于实验，不替换已验证的完整录像配置。保持原质量、力矩和验收标准。
+在仓库根目录使用前述批量复测工具；每项须保留完整参数和失败报告。
+
+| 参数 | 含义与默认值 |
+| --- | --- |
+| `rx_tip_sphere_radius_m` | 小球半径，默认0.003米，允许0.0005～0.003米 |
+| `rx_tip_sphere_offset_m` | 四角中心在面内的正负偏移，默认0.005米；不小于半径，与半径之和不超过0.008米 |
+| `ball_damping_nm_s` | 20个导向球关节的阻尼，默认0.00002牛米秒/弧度；不修改RX连杆或中心轴阻尼 |
+| `rx_wrist_zero_jerk` | 默认0；设为1使用端点加加速度为零的七次腕轴曲线，同时更新规划时长，夹爪曲线保持不变 |
+| `cube_magnet_peak_force_n` | 实验性棱角磁吸单对峰值力，默认0关闭，允许0～2牛；不改变关节与碰撞结构 |
+
+球半径变化时，球心沿接触法线移动，保持原最内侧接触平面和净空包络。
+七次曲线仍受速度和加速度上限约束，但时长通常增加，不能将效果全部归因于曲线平滑。
+腕速设为0的旧固定时长模式不自动约束速度与加速度。
+
+磁吸结构参考[GAN356 M 厂家说明](https://www.gancube.cn/en/gan356m/)中的48颗磁铁。
+角块各3个磁吸点，棱块各2个；两侧各埋深1.5毫米，以6毫米范围的光滑径向势能近似吸力。
+力的大小由当前距离计算，成对等大反向；不读取颜色、目标排列或求解动作。
+强度、埋深和力曲线没有实测标定，不能据此声称复现某款实物魔方。
+中心轴原有被动定位力矩仍单独保留。实验结果须区分两种回正机制。
+
+四角小球与0.3牛棱角磁吸已取得一条完整20步录像；同参数另外两条序列失败，仍为实验配置。
+完整视频、参数和报告见[仓库资产](../assets/mechanical_cube/README.md#四角小球与棱角磁吸对照)。
+复现前须完成本页RX资产准备与构建，在仓库根目录运行；新输出目录不得复用历史结果。
+
+```bash
+./rm cube --mechanical --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --mechanical-config assets/mechanical_cube/corner_magnets_20_parameters.json \
+  --scramble "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2" \
+  --solve --record --output output/cube-mechanical/corner-magnets-recording
+```
+
+命令结束后检查 `report.json` 的 `passed` 与 `solved` 均为 `true`，再查看 `demo.mp4`。
+失败时保留报告与诊断快照，按本页故障处理定位首次异常，不将失败录像标为完整还原。
+
+磁吸的单块自由度不能只按磁势能判断稳定性。对当前0.65毫米倒角场景，120项单块扰动中有48项磁势能下降。
+扰动0.01弧度时这些方向均导致外壳穿透，最深约0.218毫米；扰动0.001弧度时仍有负刚度，但保留约0.023毫米间隙。
+这表示磁吸可把块推向接触面，后续必须由实体接触承载。六个合法整层转动的端点均有恢复力矩。
+0.1度间隔的六层扫描未发现额外势能井，单对0.3牛时峰值层磁力矩约0.01514牛米。
+这些静态检查不能代替完整动力学验收。原始数据见 `assets/mechanical_cube/magnet_local_stability.tsv`。
+
+完成C++构建后，可在仓库根目录对已生成场景复测静态诊断：
+
+```bash
+cmake --build build --target rm_cube_magnet_stability
+build/bin/rm_cube_magnet_stability \
+  output/cube-mechanical/corner-magnets-recording/scene.xml \
+  > output/cube-mechanical/corner-magnets-recording/magnet-stability.tsv
+```
+
+输出按扰动方向记录势能、虚功、接触穿透和几何最近距离。缺少场景时先完成前述录像命令。
+
+`tip_torsional_friction_m` 控制单个指尖接触的等效扭转摩擦半径，默认0.002米，允许0～0.01米。
+设为0时使用三维接触，仅保留法向和两个切向；多个接触点仍可通过力臂传递扭矩。
+非零时保留第四维扭转摩擦。该选项用于比较方形接触面和四球近似，不代表橡胶接触斑的实测尺寸。
+
+## 四球磁吸三序列通过配置
+
+`modules/cube/configs/mechanical-rx-spheres.json` 固定本轮三序列通过的完整参数。
+腕速4 rad/s、加速度40 rad/s²，内部使用三维摩擦接触，单对磁吸峰值0.3牛。
+没有增加固定动作等待、对齐等待或重抓，也没有修改最终验收限制。
+三条20步打乱均完成完整还原，执行时间112.196～113.897秒，最终位置误差0.206～0.283毫米。
+完整验证报告保存在 `assets/mechanical_cube/corner_magnets_v4_validation.json`。
+该结论限定为已运行的三条序列，不代表任意打乱或实物机器人的可靠上限。
+
+在仓库根目录，按前述RX准备条件完成构建后运行：
+
+```bash
+./rm cube --mechanical --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --mechanical-config modules/cube/configs/mechanical-rx-spheres.json \
+  --scramble "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2" \
+  --solve --record --output output/cube-mechanical/spheres-validation
+```
+
+完成后检查报告中的 `passed`、`solved`；失败时保留输出并使用独立回放诊断，不续录失败状态。
+单个指尖接触仍保留0.002米扭转摩擦半径。取消它、增加内部接触阻抗或扩大倒角均未获得更好的跨序列结果。

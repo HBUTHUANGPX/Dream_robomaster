@@ -96,3 +96,10 @@ target_link_libraries(rm_cube_mechanical_guided_tests PRIVATE rm_cube_core)
 add_executable(rm_cube_wrist_motion_tests tests/test_wrist_motion.cpp)
 target_link_libraries(rm_cube_wrist_motion_tests PRIVATE rm_cube_core)
 add_test(NAME cube_wrist_motion COMMAND rm_cube_wrist_motion_tests)
+
+add_executable(rm_cube_magnets_tests tests/test_cube_magnets.cpp)
+target_link_libraries(rm_cube_magnets_tests PRIVATE rm_cube_core)
+add_test(NAME cube_magnets COMMAND rm_cube_magnets_tests)
+# 独立静态磁吸与外壳接触诊断，不推进连续还原状态。
+add_executable(rm_cube_magnet_stability EXCLUDE_FROM_ALL tests/mechanical/magnet_stability.cpp)
+target_link_libraries(rm_cube_magnet_stability PRIVATE rm_cube_core)
