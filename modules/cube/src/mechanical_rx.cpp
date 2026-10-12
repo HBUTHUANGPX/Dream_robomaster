@@ -33,7 +33,7 @@ Node add(Node n, const char* tag,
 }  // namespace
 std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::path& bundle,
                                 double bearing_friction, double tip_friction,
-                                double tip_contact_time, double cube_mass) {
+                                double tip_contact_time, double cube_mass, bool corner_spheres) {
   std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> doc(
       xmlReadMemory(xml.data(), xml.size(), "mechanical.xml", nullptr, XML_PARSE_NONET),
       xmlFreeDoc);
@@ -75,22 +75,68 @@ std::string mechanical_rx_scene(const std::string& xml, const std::filesystem::p
     n = next;
   }
   append_rx_grippers(root, bundle);
+  std::vector<std::string> tips;
+  // 保留原方块的质量与惯性、净空包络；四球只替换接触几何。
+  auto replace_tips = [&](auto&& self, Node parent) -> void {
+    for (auto n = parent->children; n;) {
+      auto next = n->next;
+      const auto name = get(n, "name");
+      if (n->type == XML_ELEMENT_NODE && xmlStrEqual(n->name, BAD_CAST "geom") &&
+          (name == "A_left_tip" || name == "A_right_tip" || name == "B_left_tip" ||
+           name == "B_right_tip")) {
+        if (!corner_spheres) {
+          tips.push_back(name);
+        } else {
+          set(n, "contype", "0");
+          set(n, "conaffinity", "0");
+          set(n, "rgba", ".1 .15 .2 .15");
+          double x, y, z;
+          std::istringstream position(get(n, "pos"));
+          if (!(position >> x >> y >> z)) throw std::runtime_error("Invalid RX tip position");
+          int index = 0;
+          for (double dx : {-.005, .005})
+            for (double dz : {-.005, .005}) {
+              auto sphere = xmlCopyNode(n, 1);
+              xmlAddChild(parent, sphere);
+              const auto sphere_name =
+                  name.substr(0, name.size() - 4) + "_corner_" + std::to_string(index++) + "_tip";
+              std::ostringstream p;
+              p << std::setprecision(17) << x + dx << " " << y << " " << z + dz;
+              set(sphere, "name", sphere_name);
+              set(sphere, "type", "sphere");
+              set(sphere, "size", ".003");
+              set(sphere, "pos", p.str());
+              set(sphere, "mass", "0");
+              set(sphere, "contype", "1");
+              set(sphere, "conaffinity", "15");
+              set(sphere, "rgba", ".1 .65 .85 1");
+              tips.push_back(sphere_name);
+            }
+        }
+      } else if (n->type == XML_ELEMENT_NODE) {
+        self(self, n);
+      }
+      n = next;
+    }
+  };
+  replace_tips(replace_tips, world);
+  if (tips.size() != (corner_spheres ? 16 : 4))
+    throw std::runtime_error("Invalid RX contact tip count");
   for (auto n = world->children; n; n = n->next)
     if (get(n, "name") == "A_wrist" || get(n, "name") == "B_wrist") set(n, "pos", "0 0 .1");
   auto contact = child(root, "contact");
   if (!contact) contact = add(root, "contact");
-  for (auto h : {"A", "B"})
-    for (auto side : {"left", "right"})
-      for (auto& shell : shells)
-        add(contact, "pair",
-            {{"geom1", std::string(h) + "_" + side + "_tip"},
-             {"geom2", shell},
-             {"condim", "4"},
-             {"friction", std::to_string(tip_friction) + " " + std::to_string(tip_friction) +
-                              (tip_friction > 0 ? " .002 .0001 .0001" : " 0 0 0")},
-             {"solref", std::to_string(tip_contact_time) + " 1"},
-             {"solimp", ".99 .999 .001"},
-             {"margin", "0"}});
+  for (const auto& tip : tips)
+    for (auto& shell : shells)
+      add(contact, "pair",
+          {{"geom1", tip},
+           {"geom2", shell},
+           {"condim", "4"},
+           {"friction", std::to_string(tip_friction) + " " + std::to_string(tip_friction) +
+                            (tip_friction > 0 ? " .002 .0001 .0001" : " 0 0 0")},
+           {"solref", std::to_string(tip_contact_time) + " 1"},
+           {"solimp", ".99 .999 .001"},
+           {"margin", "0"}});
   auto equality = child(root, "equality");
   add(equality, "weld",
       {{"name", "mechanical_loading_fixture"},

@@ -161,6 +161,7 @@ Ubuntu缺少字体时安装 `fonts-noto-cjk`。脚本仅接受验收成功的报
 | `rx_jaw_duration_s` | `0.5` | 夹爪开合轨迹时间，大于0且不超过2秒 |
 | `rx_jaw_settle_s` | `0.15` | 历史动作后静置时间，范围0至2秒；无等待配置为0 |
 | `rx_tip_friction` | `1.2` | 指尖与外壳接触的滑动摩擦系数；设为零时同时去除该接触的扭转和滚动摩擦 |
+| `rx_tip_corner_spheres` | `0` | 1将每个指垫的方块碰撞替换为四角小球；0保留原方块 |
 | `rx_tip_contact_time_s` | `0.004` | 指尖与外壳接触的时间常数，范围0.001至0.1秒；较大值用于更软指垫的实验近似 |
 | `rx_bearing_friction_nm` | `0.002` | 中心轴恒定摩擦阻力 |
 | `rx_detent_torque_nm` | `0.04` | 被动定位力矩的峰值 |
@@ -497,3 +498,28 @@ node modules/cube/tools/benchmark-mechanical-motion.mjs \
 本轮18项试验与初次基准均已保留，[连续录像、完整报告及失败记录](../assets/mechanical_cube/README.md#无等待完整录像与边界试验)随Git保存。
 最终录像在63.5035秒即时验收通过，加入结尾展示后为64.034秒视频，正常速度播放。
 本次集成测试通过25项C++、19项Rust、35项网页与入口测试；夹爪独立回放按0.4秒执行800步并通过姿态验收。
+
+## 四角小球指垫实验
+
+实验配置为 `modules/cube/configs/mechanical-rx-corner-spheres.json`，默认方块配置保持不变。
+每个指垫有四个直径6毫米的小球，沿原接触面两个方向各偏移正负5毫米；两只夹爪共16球。
+小球位于同一原指垫刚体上，没有新增关节。原方块改为半透明、无碰撞的质量及净空参照。
+小球不增加质量，编译模型的指垫与颈部总质量仍为2克；原质量分布与惯性保持。
+16×6×16毫米外包络保持，回腕净空沿用该保守包络。
+每个球与26块外壳建立原摩擦参数的显式接触，共416对。夹持检查合计同侧四球的接触力。
+腕轴、夹爪力矩、摩擦、质量、轨迹和验收阈值均未为小球放宽，也没有新增等待。
+
+在仓库根目录完成本页准备后执行。失败时保留原始报告，不将完成打乱当作完成还原：
+
+```bash
+./rm cube --mechanical \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --mechanical-config modules/cube/configs/mechanical-rx-corner-spheres.json \
+  --scramble "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2" \
+  --solve --output output/cube-mechanical/corner-spheres-reproduce
+```
+
+本轮初始夹持通过。旧失败前状态换用新接触几何的独立回放中，16 rad/s动作能完成，核心偏移约0.60毫米；原方块在偏移5.17毫米时提前停止。
+小球回放的块体误差仍为1.06毫米，未通过严格姿态验收。14 rad/s核心偏移约3.00毫米，改善较小。
+这些回放只改变几何并恢复旧状态，不包含新几何下重新夹持的历史，因此必须另做从上料开始的完整序列测试。
+几何图及完整试验结果见[四角小球资产](../assets/mechanical_cube/README.md#四角小球指垫)。

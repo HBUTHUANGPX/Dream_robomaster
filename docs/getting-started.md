@@ -238,3 +238,4 @@ printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-r
 
 使用前馈控制和74克质量基准，见[快速腕轴入口](mechanical-rx.md#快速腕轴控制与质量基准)。
 取消动作间等待并测量速度边界，见[无等待执行实验](mechanical-rx.md#无等待执行边界)。
+比较方块与四角小球接触，见[小球指垫实验](mechanical-rx.md#四角小球指垫实验)。

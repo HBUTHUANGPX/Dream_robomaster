@@ -87,6 +87,38 @@ int main(int argc, char** argv) {
              "ball 局部旋转或父核心变换错误");
     }
     need(shells == 26 && ball_count == 20, "必须有26个 shell 和20个 ball");
+    const bool spheres = mj_name2id(m.get(), mjOBJ_GEOM, "A_left_corner_0_tip") >= 0;
+    if (spheres) {
+      int sphere_count = 0;
+      for (const auto* hand : {"A", "B"})
+        for (const auto* side : {"left", "right"}) {
+          const std::string prefix = std::string(hand) + "_" + side;
+          const int box = mj_name2id(m.get(), mjOBJ_GEOM, (prefix + "_tip").c_str());
+          need(box >= 0 && !m->geom_contype[box] && !m->geom_conaffinity[box],
+               "四球模式的原方块不得参与碰撞");
+          near(m->body_mass[m->geom_bodyid[box]], .002, "四球不得增加指垫与颈部的总质量");
+          for (int p = 0; p < m->npair; ++p)
+            need(m->pair_geom1[p] != box && m->pair_geom2[p] != box, "显式接触不得重新启用方块");
+          for (int i = 0; i < 4; ++i) {
+            const int g = mj_name2id(m.get(), mjOBJ_GEOM,
+                                     (prefix + "_corner_" + std::to_string(i) + "_tip").c_str());
+            need(g >= 0 && m->geom_type[g] == mjGEOM_SPHERE &&
+                     m->geom_bodyid[g] == m->geom_bodyid[box],
+                 "四球应固定在原指垫刚体上");
+            ++sphere_count;
+            for (int k = 0; k < 3; ++k)
+              need(std::abs(m->geom_pos[3 * g + k] - m->geom_pos[3 * box + k]) +
+                           m->geom_size[3 * g] <=
+                       m->geom_size[3 * box + k] + 1e-10,
+                   "小球超出原有回腕净空包络");
+            int pairs = 0;
+            for (int p = 0; p < m->npair; ++p)
+              pairs += m->pair_geom1[p] == g || m->pair_geom2[p] == g;
+            need(pairs == 26, "每个小球应与26块外壳配置摩擦接触");
+          }
+        }
+      need(sphere_count == 16, "两夹爪共应有16个小球");
+    }
     for (int g = m->body_geomadr[core]; g < m->body_geomadr[core] + m->body_geomnum[core]; ++g)
       need(!m->geom_contype[g] && !m->geom_conaffinity[g], "核心只能作为视觉几何");
     if (argc == 3) {

@@ -58,6 +58,7 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_wrist_kp", 20.},
                  {"rx_wrist_kv", 1.},
                  {"rx_tip_friction", 1.2},
+                 {"rx_tip_corner_spheres", 0},
                  {"rx_tip_contact_time_s", .004},
                  {"rx_bearing_friction_nm", .002},
                  {"rx_detent_torque_nm", .04},
@@ -95,6 +96,8 @@ void load_settings(const std::filesystem::path& path) {
           throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
     if (key == "rx_wrist_tn" && v.get<double>() != 0 && v.get<double>() != 1)
       throw std::invalid_argument("rx_wrist_tn must be 0 or 1");
+    if (key == "rx_tip_corner_spheres" && v.get<double>() != 0 && v.get<double>() != 1)
+      throw std::invalid_argument("rx_tip_corner_spheres must be 0 or 1");
     if (key == "retention_mode" && (v.get<double>() != 0 && v.get<double>() != 1))
       throw std::invalid_argument("retention_mode must be 0 or 1");
     if (key == "cap_collision_mode" &&
@@ -530,7 +533,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     auto xml = scene();
     scene_file << (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
                                             value("rx_tip_friction"),
-                                            value("rx_tip_contact_time_s"), value("cube_mass_kg"))
+                                            value("rx_tip_contact_time_s"), value("cube_mass_kg"),
+                                            value("rx_tip_corner_spheres") != 0)
                       : xml);
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");
@@ -810,11 +814,16 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     auto tip_contacts = [&](const std::string& hand) {
       Json pads = Json::object();
       for (auto side : {"left", "right"}) {
-        int tip = mj_name2id(m, mjOBJ_GEOM, (hand + "_" + side + "_tip").c_str());
+        const std::string prefix = hand + "_" + side + "_";
+        auto is_tip = [&](int geom) {
+          const char* name = mj_id2name(m, mjOBJ_GEOM, geom);
+          return name && std::string_view(name).starts_with(prefix) &&
+                 std::string_view(name).ends_with("_tip");
+        };
         double normal = 0;
         for (int i = 0; i < d->ncon; ++i) {
           const auto& c = d->contact[i];
-          int other = c.geom[0] == tip ? c.geom[1] : c.geom[1] == tip ? c.geom[0] : -1;
+          int other = is_tip(c.geom[0]) ? c.geom[1] : is_tip(c.geom[1]) ? c.geom[0] : -1;
           if (other < 0) continue;
           const char* name = mj_id2name(m, mjOBJ_GEOM, other);
           if (!name || !std::string(name).ends_with("_shell")) continue;
