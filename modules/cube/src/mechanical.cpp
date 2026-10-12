@@ -55,12 +55,14 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_wrist_speed_rad_s", 0.},
                  {"rx_wrist_accel_rad_s2", 80.},
                  {"rx_wrist_empty_multiplier", 1.5},
+                 {"rx_wrist_whole_multiplier", 1.},
                  {"rx_wrist_settle_s", .15},
                  {"rx_jaw_duration_s", .5},
                  {"rx_jaw_settle_s", .15},
                  {"rx_wrist_kp", 20.},
                  {"rx_wrist_kv", 1.},
                  {"rx_wrist_zero_jerk", 0},
+                 {"rx_wrist_brake_half_turn", 0},
                  {"rx_tip_friction", 1.2},
                  {"tip_torsional_friction_m", .002},
                  {"rx_tip_corner_spheres", 0},
@@ -105,8 +107,9 @@ void load_settings(const std::filesystem::path& path) {
       throw std::invalid_argument("rx_wrist_tn must be 0 or 1");
     if (key == "rx_tip_corner_spheres" && v.get<double>() != 0 && v.get<double>() != 1)
       throw std::invalid_argument("rx_tip_corner_spheres must be 0 or 1");
-    if (key == "rx_wrist_zero_jerk" && v.get<double>() != 0 && v.get<double>() != 1)
-      throw std::invalid_argument("rx_wrist_zero_jerk must be 0 or 1");
+    if ((key == "rx_wrist_zero_jerk" || key == "rx_wrist_brake_half_turn") &&
+        v.get<double>() != 0 && v.get<double>() != 1)
+      throw std::invalid_argument(key + " must be 0 or 1");
     if (key == "retention_mode" && (v.get<double>() != 0 && v.get<double>() != 1))
       throw std::invalid_argument("retention_mode must be 0 or 1");
     if (key == "cap_collision_mode" &&
@@ -122,7 +125,8 @@ void load_settings(const std::filesystem::path& path) {
   }
   if (value("cube_mass_kg") < .01 || value("cube_mass_kg") > 1 ||
       value("rx_wrist_accel_rad_s2") <= 0 || value("rx_wrist_empty_multiplier") < 1 ||
-      value("rx_wrist_empty_multiplier") > 4 || value("rx_wrist_kp") <= 0 ||
+      value("rx_wrist_empty_multiplier") > 4 || value("rx_wrist_whole_multiplier") <= 0 ||
+      value("rx_wrist_whole_multiplier") > 1 || value("rx_wrist_kp") <= 0 ||
       value("rx_wrist_settle_s") > 2 || value("rx_wrist_speed_rad_s") > 30 ||
       value("rx_jaw_duration_s") <= 0 || value("rx_jaw_duration_s") > 2 ||
       value("rx_jaw_settle_s") > 2)
@@ -521,14 +525,18 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       motion_costs.emplace();
       for (int a = 0; a < 12; ++a)
         for (int mode = 0; mode < 3; ++mode) {
-          const double factor = mode == 2 ? value("rx_wrist_empty_multiplier") : 1.;
+          const double factor = mode == 2   ? value("rx_wrist_empty_multiplier")
+                                : mode == 0 ? value("rx_wrist_whole_multiplier")
+                                            : 1.;
           const double dt = value("timestep_s");
-          const double turn = value("rx_wrist_speed_rad_s") > 0
-                                  ? wrist_duration((a % 6 < 2 ? 1 : 2) * pi / 2,
-                                                   factor * value("rx_wrist_speed_rad_s"),
-                                                   factor * value("rx_wrist_accel_rad_s2"), dt,
-                                                   value("rx_wrist_zero_jerk") != 0)
-                                  : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
+          const double turn =
+              value("rx_wrist_speed_rad_s") > 0
+                  ? wrist_duration((a % 6 < 2 ? 1 : 2) * pi / 2,
+                                   factor * value("rx_wrist_speed_rad_s"),
+                                   factor * value("rx_wrist_accel_rad_s2"), dt,
+                                   value("rx_wrist_zero_jerk") != 0,
+                                   mode != 2 && value("rx_wrist_brake_half_turn") != 0)
+                  : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
           motion_costs->duration[a][mode] =
               a % 6 >= 4 ? (std::max(1L, std::lround(value("rx_jaw_duration_s") / dt)) +
                             std::lround(value("rx_jaw_settle_s") / dt)) *
@@ -628,8 +636,17 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       wrist_tn.emplace(m);
     }
     report["wrist_tn_enabled"] = wrist_tn.has_value();
-    if (wrist_tn)
+    if (wrist_tn) {
       report["wrist_tn_profile"] = "RX-P2 S conservative 0.05 rpm; virtual wrist selection";
+      report["wrist_tn"] = Json::array();
+      for (const auto& a : wrist_tn->axes)
+        report["wrist_tn"].push_back({{"actuator", mj_id2name(m, mjOBJ_ACTUATOR, a.actuator)},
+                                      {"peak_speed_rad_s", 0.},
+                                      {"peak_torque_nm", 0.},
+                                      {"max_excess_nm", 0.},
+                                      {"reduced_steps", 0},
+                                      {"static_limit_nm", a.static_limit}});
+    }
     const int core = rx ? mj_name2id(m, mjOBJ_BODY, "mechanical_core") : -1;
     auto core_position = [&]() -> Vec {
       return rx ? Vec(Eigen::Map<const Vec>(d->xpos + 3 * core)) : Vec(0, 0, .1);
@@ -715,22 +732,24 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     double peak_tip_normal = 0, peak_tip_tangent = 0, peak_turn_tangent = 0;
     double next_frame = 0;
     std::map<std::string, bool> closed{{"A", false}, {"B", false}};
+    // 几何归属不随积分变化，避免在每个接触、每个物理步重复分配名称字符串。
+    std::vector<int> contact_owner(m->ngeom);
+    for (int g = 0; g < m->ngeom; ++g) {
+      const char* name = mj_id2name(m, mjOBJ_BODY, m->geom_bodyid[g]);
+      const std::string_view body = name ? name : "";
+      contact_owner[g] = body.starts_with("A_")                                    ? 1
+                         : body.starts_with("B_")                                  ? 2
+                         : body.starts_with("piece_") || body == "mechanical_core" ? 3
+                                                                                   : 0;
+    }
     auto check_rotation_contacts = [&]() {
+      const std::array<bool, 2> open{!closed["A"], !closed["B"]};
       for (int i = 0; i < d->ncon; ++i) {
         const auto& c = d->contact[i];
-        auto owner = [&](int g) {
-          int body = m->geom_bodyid[g];
-          const char* n = mj_id2name(m, mjOBJ_BODY, body);
-          std::string b = n ? n : "";
-          return b.starts_with("A_")                                 ? 1
-                 : b.starts_with("B_")                               ? 2
-                 : b.starts_with("piece_") || b == "mechanical_core" ? 3
-                                                                     : 0;
-        };
-        int a = owner(c.geom[0]), b = owner(c.geom[1]);
+        int a = contact_owner[c.geom[0]], b = contact_owner[c.geom[1]];
         bool bad = (a == 1 && b == 2) || (a == 2 && b == 1);
         for (int h = 1; h <= 2; ++h)
-          if (!closed[h == 1 ? "A" : "B"] && ((a == h && b == 3) || (b == h && a == 3))) bad = true;
+          if (open[h - 1] && ((a == h && b == 3) || (b == h && a == 3))) bad = true;
         if (bad) {
           mjtNum f[6];
           mj_contactForce(m, d, i, f);
@@ -751,20 +770,25 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                 .0005 * d->qvel[v];
           }
         }
-        magnets.apply(m, d, value("cube_magnet_peak_force_n"));
         if (wrist_tn) wrist_tn->before_step(m, d);
-        mj_step(m, d);
+        if (value("cube_magnet_peak_force_n") > 0) {
+          // 场景固定使用 implicitfast；分步接口复用运动学，避免磁吸再计算一次。
+          mj_step1(m, d);
+          magnets.apply_prepared(m, d, value("cube_magnet_peak_force_n"));
+          mj_step2(m, d);
+        } else {
+          mj_step(m, d);
+        }
         if (wrist_tn) {
           wrist_tn->after_step(d);
-          {
-            report["wrist_tn"] = Json::array();
-            for (const auto& a : wrist_tn->axes)
-              report["wrist_tn"].push_back({{"actuator", mj_id2name(m, mjOBJ_ACTUATOR, a.actuator)},
-                                            {"peak_speed_rad_s", a.peak_speed_rad_s},
-                                            {"peak_torque_nm", a.peak_torque_nm},
-                                            {"max_excess_nm", a.max_excess_nm},
-                                            {"reduced_steps", a.reduced_steps},
-                                            {"static_limit_nm", a.static_limit}});
+          // 保留逐步峰值记录，复用报告对象，避免反复构造数组和字段。
+          for (size_t h = 0; h < wrist_tn->axes.size(); ++h) {
+            const auto& a = wrist_tn->axes[h];
+            auto& row = report["wrist_tn"][h];
+            row["peak_speed_rad_s"] = a.peak_speed_rad_s;
+            row["peak_torque_nm"] = a.peak_torque_nm;
+            row["max_excess_nm"] = a.max_excess_nm;
+            row["reduced_steps"] = a.reduced_steps;
           }
         }
         if (check_contacts) check_rotation_contacts();
@@ -910,11 +934,16 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       bool controlled = turning && value("rx_wrist_speed_rad_s") > 0;
       const bool empty = report.contains("current_action") &&
                          report["current_action"].value("mode", "") == "empty";
-      const double factor = empty ? value("rx_wrist_empty_multiplier") : 1.;
+      const double factor = empty ? value("rx_wrist_empty_multiplier")
+                            : report.contains("current_action") &&
+                                    report["current_action"].value("mode", "") == "whole"
+                                ? value("rx_wrist_whole_multiplier")
+                                : 1.;
       if (controlled)
         duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
                                   factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep,
-                                  value("rx_wrist_zero_jerk") != 0);
+                                  value("rx_wrist_zero_jerk") != 0,
+                                  !empty && value("rx_wrist_brake_half_turn") != 0);
       int count = std::max(1L, std::lround(duration / m->opt.timestep));
       duration = count * m->opt.timestep;
       int v = turning ? m->jnt_dofadr[m->actuator_trnid[2 * a]] : -1;
@@ -928,7 +957,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       double peak_error = 0, peak_speed = 0, peak_torque = 0, began = d->time;
       for (int k = 1; k <= count; ++k) {
         auto ref = wrist_sample(start, target, duration, k * m->opt.timestep,
-                                turning && value("rx_wrist_zero_jerk") != 0);
+                                turning && value("rx_wrist_zero_jerk") != 0,
+                                controlled && !empty && value("rx_wrist_brake_half_turn") != 0);
         d->ctrl[a] = ref.position;
         if (controlled)
           d->ctrl[a] += ((value("rx_wrist_kv") + m->dof_damping[v]) * ref.velocity +
@@ -951,6 +981,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
              {"mode", report["current_action"].value("mode", "")},
              {"start_time_s", began},
              {"duration_s", duration},
+             {"midpoint_brake", controlled && !empty && value("rx_wrist_brake_half_turn") != 0 &&
+                                    std::abs(std::abs(target - start) - pi) < 1e-9},
              {"settle_s", value("rx_wrist_settle_s")},
              {"peak_tracking_error_rad", peak_error},
              {"peak_speed_rad_s", peak_speed},

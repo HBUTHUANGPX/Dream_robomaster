@@ -1,0 +1,2661 @@
+{
+  "runs": [
+    {
+      "name": "fast-original",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 1,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 12,
+        "rx_wrist_accel_rad_s2": 120,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX physical readout alignment failed: scramble readout",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "R2",
+        "target": 0
+      },
+      "wall_time_s": 24.550243955,
+      "last_pose": {
+        "contacts": 67,
+        "core_orientation_error_rad": 0.005851786111147674,
+        "core_position": "-0.000143432034317  0.000119643867046    0.0999544098912",
+        "facelet_position_component_error_m": 0.00036709034659830955,
+        "move": "scramble readout",
+        "orientation_error_rad": 0.015023297971114815,
+        "position_error_m": 0.0004770180079531608,
+        "time_s": 34.92449999998473
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.55,
+        "end_speed_rad_s": -0.021068672200057315,
+        "end_tracking_error_rad": 0.0005569938561520187,
+        "feedforward_inertia_kg_m2": 0.010195379784635625,
+        "midpoint_brake": true,
+        "mode": "face",
+        "peak_speed_rad_s": 10.743079756891929,
+        "peak_torque_nm": 2.832062867749599,
+        "peak_tracking_error_rad": 0.004980886513925364,
+        "settle_s": 0,
+        "start_time_s": 34.374499999982106,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 6.204636942715968,
+          "right": 6.748041957209942
+        },
+        "gap_m": 0.05427824531947674,
+        "hand": "A",
+        "time_s": 34.374499999982106
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693528802684,
+          "peak_torque_nm": 3.651056894411866,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 18.001649510771195,
+          "peak_torque_nm": 4.3466187134472705,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "3e043ec77f1993ede24fa1e0bd001c2664526d20183a69739f167ee9a4d59e4e"
+    },
+    {
+      "name": "fast-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 1,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 12,
+        "rx_wrist_accel_rad_s2": 120,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX lost cube support",
+      "action": {
+        "hand": "A",
+        "kind": "yaw",
+        "mode": "face",
+        "move": "D'",
+        "target": 1.5707963267948966
+      },
+      "wall_time_s": 20.543970615,
+      "last_pose": {
+        "contacts": 77,
+        "core_orientation_error_rad": 0.05818893638750912,
+        "core_position": "-0.00098480532929  0.00167151538375    0.100110455431",
+        "facelet_position_component_error_m": 0.001053747835259737,
+        "move": "before D'",
+        "orientation_error_rad": 0.04666574635868868,
+        "position_error_m": 0.0014209607078378178,
+        "time_s": 27.84699999998045
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.275,
+        "end_speed_rad_s": 0.016615223896055343,
+        "end_tracking_error_rad": -0.0005212905101173285,
+        "feedforward_inertia_kg_m2": 0.010195748544536538,
+        "midpoint_brake": false,
+        "mode": "whole",
+        "peak_speed_rad_s": 10.722957790074314,
+        "peak_torque_nm": 2.734627674351046,
+        "peak_tracking_error_rad": 0.005115163385049137,
+        "settle_s": 0,
+        "start_time_s": 27.071999999982257,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 10.659610915257698,
+          "right": 1.978552884683755
+        },
+        "gap_m": 0.054456445906328026,
+        "hand": "A",
+        "time_s": 27.84699999998045
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693562469963,
+          "peak_torque_nm": 3.65850505158204,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140419190265304,
+          "peak_torque_nm": 3.6585068981962365,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "d021eceb5dcffec2d5ab0c3917b9f20d70956a610d0adb74e4ffb0d04111deb0"
+    },
+    {
+      "name": "fast-different",
+      "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 1,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 12,
+        "rx_wrist_accel_rad_s2": 120,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: final",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "L2",
+        "target": 0
+      },
+      "wall_time_s": 48.537460747,
+      "execution_time_s": 64.49100000012591,
+      "last_pose": {
+        "contacts": 73,
+        "core_orientation_error_rad": 0.014469211157499582,
+        "core_position": "1.88796043499e-05 4.51363812864e-05   0.0998294519819",
+        "facelet_position_component_error_m": 0.0005016830095573516,
+        "move": "final",
+        "orientation_error_rad": 0.020450824198704316,
+        "position_error_m": 0.0006467252497644657,
+        "time_s": 64.49100000012591
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.275,
+        "end_speed_rad_s": -0.021411005005229685,
+        "end_tracking_error_rad": 0.0007245851849450316,
+        "feedforward_inertia_kg_m2": 0.010195533306297647,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 10.735352657715383,
+        "peak_torque_nm": 2.8200481444381182,
+        "peak_tracking_error_rad": 0.0050162895307995226,
+        "settle_s": 0,
+        "start_time_s": 64.2160000001246,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 5.128149464189392,
+          "right": 7.824250095000121
+        },
+        "gap_m": 0.05429015560482631,
+        "hand": "A",
+        "time_s": 63.94100000012328
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693179195923,
+          "peak_torque_nm": 3.6585034240245164,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693616376986,
+          "peak_torque_nm": 3.658507359066391,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "21d3aabf3ee8e91b4b9a121dc446f44223413e581f2b9595b12afe3f6d8ca47e"
+    },
+    {
+      "name": "friction-original",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: scramble readout",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "R2",
+        "target": 0
+      },
+      "wall_time_s": 83.076220462,
+      "last_pose": {
+        "contacts": 64,
+        "core_orientation_error_rad": 0.0036544231589315875,
+        "core_position": "-5.17568538752e-05  0.000215317907281    0.0999509982826",
+        "facelet_position_component_error_m": 0.00045187196649535007,
+        "move": "scramble readout",
+        "orientation_error_rad": 0.018028146921754022,
+        "position_error_m": 0.0005132103248477656,
+        "time_s": 39.65750000000733
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.010071189960618477,
+        "end_tracking_error_rad": 0.00031049771525623235,
+        "feedforward_inertia_kg_m2": 0.010195446616847572,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.017745912229708,
+        "peak_torque_nm": 1.9542815780973655,
+        "peak_tracking_error_rad": 0.004031199519805906,
+        "settle_s": 0,
+        "start_time_s": 39.28900000000557,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 8.058959099501559,
+          "right": 4.878586337600647
+        },
+        "gap_m": 0.05429660887301249,
+        "hand": "B",
+        "time_s": 38.92050000000381
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723145770147584,
+          "peak_torque_nm": 2.7479493260943997,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.722944344947162,
+          "peak_torque_nm": 2.747950374976739,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "70bca13b7cd6a4a63caefd29aa7b5f5ff454e206169000073c3f645b00f3d05d"
+    },
+    {
+      "name": "friction-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: final",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "U",
+        "target": 0
+      },
+      "wall_time_s": 158.985538792,
+      "execution_time_s": 75.66250000017925,
+      "last_pose": {
+        "contacts": 64,
+        "core_orientation_error_rad": 0.016493334691146007,
+        "core_position": "-9.06649539571e-05  7.48412808391e-05    0.0998775607264",
+        "facelet_position_component_error_m": 0.0004176372112216359,
+        "move": "final",
+        "orientation_error_rad": 0.018889758322399426,
+        "position_error_m": 0.0005463362571781346,
+        "time_s": 75.66250000017925
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": 0.010237574418959445,
+        "end_tracking_error_rad": -0.0003648932277460259,
+        "feedforward_inertia_kg_m2": 0.010195458191907128,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.018459290701724,
+        "peak_torque_nm": 1.972694305767007,
+        "peak_tracking_error_rad": 0.003924572412197513,
+        "settle_s": 0,
+        "start_time_s": 75.29400000017749,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.500226095724259,
+          "right": 8.323684553635113
+        },
+        "gap_m": 0.05430426882504762,
+        "hand": "A",
+        "time_s": 75.29400000017749
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723155248493132,
+          "peak_torque_nm": 2.747951038576886,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 12.00228758984158,
+          "peak_torque_nm": 2.7479510833606753,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "5e68005ce16127b2d570e30dceb36279d4a7a4aa02a85b2f6063bd6151537df8"
+    },
+    {
+      "name": "friction-different",
+      "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: final",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "L2",
+        "target": 0
+      },
+      "wall_time_s": 155.50622591,
+      "execution_time_s": 74.18900000017221,
+      "last_pose": {
+        "contacts": 64,
+        "core_orientation_error_rad": 0.012312262626401838,
+        "core_position": "-0.00124474780952 0.000825592185253    0.099917730733",
+        "facelet_position_component_error_m": 0.00077811154239334,
+        "move": "final",
+        "orientation_error_rad": 0.03919762980510027,
+        "position_error_m": 0.00105492628111309,
+        "time_s": 74.18900000017221
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.010095497408265788,
+        "end_tracking_error_rad": -0.0000483861431043035,
+        "feedforward_inertia_kg_m2": 0.010195548068889514,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.009244814029286,
+        "peak_torque_nm": 2.067361881126928,
+        "peak_tracking_error_rad": 0.003746771685137429,
+        "settle_s": 0,
+        "start_time_s": 73.82050000017045,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.843881262595024,
+          "right": 8.069737340686146
+        },
+        "gap_m": 0.0542977540934563,
+        "hand": "A",
+        "time_s": 73.4520000001687
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723154835265415,
+          "peak_torque_nm": 2.747947811272226,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723154997399353,
+          "peak_torque_nm": 2.747950168619269,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "aaf20e7dc4a139505594a2f8b7f712b1ad2bf51a31a292424c17d8878addf831"
+    },
+    {
+      "name": "compliant-original-original",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 10,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX lost cube support",
+      "action": {
+        "hand": "A",
+        "kind": "yaw",
+        "mode": "face",
+        "move": "U2",
+        "target": -3.141592653589793
+      },
+      "wall_time_s": 57.51618322,
+      "last_pose": {
+        "contacts": 69,
+        "core_orientation_error_rad": 0.04172926192076055,
+        "core_position": "-0.00116732699755 0.000448517101174     0.10001283679",
+        "facelet_position_component_error_m": 0.0001700751943257972,
+        "move": "before U2",
+        "orientation_error_rad": 0.007727178124102789,
+        "position_error_m": 0.00021298385094945926,
+        "time_s": 28.8549999999781
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.00829354188289552,
+        "end_tracking_error_rad": 0.00024437167772910223,
+        "feedforward_inertia_kg_m2": 0.01019535437858445,
+        "midpoint_brake": false,
+        "mode": "whole",
+        "peak_speed_rad_s": 7.999020925199405,
+        "peak_torque_nm": 1.871554999510721,
+        "peak_tracking_error_rad": 0.003808504955177483,
+        "settle_s": 0,
+        "start_time_s": 27.986499999980126,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 6.30758131746589,
+          "right": 6.944910825252469
+        },
+        "gap_m": 0.05426467858907847,
+        "hand": "B",
+        "time_s": 28.8549999999781
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723145770140073,
+          "peak_torque_nm": 2.7479493298948796,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.722944346713847,
+          "peak_torque_nm": 2.7479503766291486,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "2136628cf61f12b4f0080750741ab076824c1ef0a40253a05744a753d0fb712c"
+    },
+    {
+      "name": "compliant-inverse-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 10,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX lost cube support",
+      "action": {
+        "hand": "A",
+        "kind": "yaw",
+        "mode": "face",
+        "move": "R2",
+        "target": -3.141592653589793
+      },
+      "wall_time_s": 56.146040636,
+      "last_pose": {
+        "contacts": 64,
+        "core_orientation_error_rad": 0.03603217003644372,
+        "core_position": "-0.00122201983208 0.000754793165487   0.0997897393116",
+        "facelet_position_component_error_m": 0.0001987118508348304,
+        "move": "before R2",
+        "orientation_error_rad": 0.007728852579946643,
+        "position_error_m": 0.00024379884523602593,
+        "time_s": 29.041999999977666
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.008366688499601798,
+        "end_tracking_error_rad": 0.00024299918621590235,
+        "feedforward_inertia_kg_m2": 0.010195419541075605,
+        "midpoint_brake": false,
+        "mode": "whole",
+        "peak_speed_rad_s": 7.998943084752086,
+        "peak_torque_nm": 1.8712714702727595,
+        "peak_tracking_error_rad": 0.0038098001347166566,
+        "settle_s": 0,
+        "start_time_s": 28.17349999997969,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 5.307047261815625,
+          "right": 7.918579765225035
+        },
+        "gap_m": 0.05429605185388609,
+        "hand": "B",
+        "time_s": 29.041999999977666
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723145867321275,
+          "peak_torque_nm": 2.7479492714466573,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.722944486827592,
+          "peak_torque_nm": 2.747951086437837,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "092e9a6c52b470ca389aebdf95c137bcbbaefeacf5baf6c189b5cfcd19b9225b"
+    },
+    {
+      "name": "compliant-different-different",
+      "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 10,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 1
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: R",
+      "action": {
+        "hand": "A",
+        "kind": "layer_lock",
+        "mode": "",
+        "move": "R",
+        "target": 0
+      },
+      "wall_time_s": 102.17043463,
+      "last_pose": {
+        "contacts": 77,
+        "core_orientation_error_rad": 0.029406317031564964,
+        "core_position": " -0.00110839508706 -0.000571268747239    0.0996244558963",
+        "facelet_position_component_error_m": 0.0015083114632779247,
+        "move": "R",
+        "orientation_error_rad": 0.07322723863489745,
+        "position_error_m": 0.002025733540427328,
+        "time_s": 52.940500000070756
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": 0.00952446319218583,
+        "end_tracking_error_rad": -0.0005721546826481656,
+        "feedforward_inertia_kg_m2": 0.01019554536989188,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.012812102990896,
+        "peak_torque_nm": 2.05743404196312,
+        "peak_tracking_error_rad": 0.0033964436462443626,
+        "settle_s": 0,
+        "start_time_s": 52.572000000068996,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 2.4694729969517075,
+          "right": 10.428828603188263
+        },
+        "gap_m": 0.05436553759463813,
+        "hand": "A",
+        "time_s": 52.572000000068996
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723154835267,
+          "peak_torque_nm": 2.7441233794428115,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723154997394882,
+          "peak_torque_nm": 2.744083638878827,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "1ed7d61541ba45be0180dfb9e793959041f1afca97eead55f58ea482549fc3b5"
+    },
+    {
+      "name": "load-original-original",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 0,
+        "rx_wrist_whole_multiplier": 0.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "D'",
+        "target": 0
+      },
+      "wall_time_s": 187.998299841,
+      "execution_time_s": 88.44000000024026,
+      "final_pose": {
+        "contacts": 62,
+        "facelet_position_component_error_m": 0.00016954101302942698,
+        "orientation_error_rad": 0.006566275172124982,
+        "position_error_m": 0.00020735901470944303,
+        "time_s": 88.44000000024026
+      },
+      "last_pose": {
+        "contacts": 62,
+        "core_orientation_error_rad": 0.005249453942134824,
+        "core_position": "-0.000229193252543  2.48004434783e-06    0.0999470912455",
+        "facelet_position_component_error_m": 0.00016954101302942698,
+        "move": "final",
+        "orientation_error_rad": 0.006566275172124982,
+        "position_error_m": 0.00020735901470944303,
+        "time_s": 88.44000000024026
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.011530374643658957,
+        "end_tracking_error_rad": 0.00029072352045013026,
+        "feedforward_inertia_kg_m2": 0.010195489262151598,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.017939213905521,
+        "peak_torque_nm": 1.9577086095137446,
+        "peak_tracking_error_rad": 0.004041777402825075,
+        "settle_s": 0,
+        "start_time_s": 88.0715000002385,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.46499248556084,
+          "right": 8.367010003104557
+        },
+        "gap_m": 0.054301216706654935,
+        "hand": "A",
+        "time_s": 88.0715000002385
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723193134892783,
+          "peak_torque_nm": 2.7479576805199173,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723145859354547,
+          "peak_torque_nm": 2.747950460897215,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "ba6bdb23e01a8766821f17c73ede2811eee276b87ac9ebb0c83d148dccfdba58"
+    },
+    {
+      "name": "load-inverse-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 0,
+        "rx_wrist_whole_multiplier": 0.5
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX core slipped: scramble readout",
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "R'",
+        "target": 0
+      },
+      "wall_time_s": 99.976636764,
+      "last_pose": {
+        "contacts": 56,
+        "core_orientation_error_rad": 0.014498908988814452,
+        "core_position": " -0.0013665207824 0.000949977877566   0.0998810784151",
+        "facelet_position_component_error_m": 0.0002887263143636909,
+        "move": "scramble readout",
+        "orientation_error_rad": 0.017462735798261974,
+        "position_error_m": 0.0003596649459647575,
+        "time_s": 47.23050000004349
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.3685,
+        "end_speed_rad_s": -0.010829493191566352,
+        "end_tracking_error_rad": 0.00014576389573983794,
+        "feedforward_inertia_kg_m2": 0.01019561678233907,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 8.01256241076874,
+        "peak_torque_nm": 1.9707346392463592,
+        "peak_tracking_error_rad": 0.0037935461042614693,
+        "settle_s": 0,
+        "start_time_s": 46.86200000004173,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 11.128972687826327,
+          "right": 1.7342091379544762
+        },
+        "gap_m": 0.05438581542073319,
+        "hand": "A",
+        "time_s": 46.86200000004173
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723145783827471,
+          "peak_torque_nm": 2.7479492650307975,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 12.002286197206566,
+          "peak_torque_nm": 2.7479489808805226,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "e486ddcacdaf8d7d51d12dfb818f15dc5534761c9d76acec0de4239f1bfab97d"
+    },
+    {
+      "name": "load-different-different",
+      "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 8,
+        "rx_wrist_accel_rad_s2": 80,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5,
+        "rx_wrist_brake_half_turn": 0,
+        "rx_wrist_whole_multiplier": 0.5
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX mechanical pose mismatch: before R",
+      "action": {
+        "hand": "A",
+        "kind": "yaw",
+        "mode": "face",
+        "move": "R",
+        "target": 0
+      },
+      "wall_time_s": 130.706267328,
+      "last_pose": {
+        "contacts": 78,
+        "core_orientation_error_rad": 0.02095278841039313,
+        "core_position": "-0.00107913334309 0.000532589190321    0.100134346833",
+        "facelet_position_component_error_m": 0.0017574835104784622,
+        "move": "before R",
+        "orientation_error_rad": 0.0917493437689588,
+        "position_error_m": 0.0022802196930040946,
+        "time_s": 61.7675000001129
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.275,
+        "end_speed_rad_s": 0.015587283853970105,
+        "end_tracking_error_rad": -0.0004145317079136124,
+        "feedforward_inertia_kg_m2": 0.010261505562655775,
+        "midpoint_brake": false,
+        "mode": "empty",
+        "peak_speed_rad_s": 10.721938226808518,
+        "peak_torque_nm": 2.7440834267384844,
+        "peak_tracking_error_rad": 0.005029474849838955,
+        "settle_s": 0,
+        "start_time_s": 60.9925000001092,
+        "target": 1.5707963267948966
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 1.5466773595046162,
+          "right": 11.291738712132759
+        },
+        "gap_m": 0.05447978806611059,
+        "hand": "A",
+        "time_s": 61.7675000001129
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.723154838074151,
+          "peak_torque_nm": 2.744122904734013,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 10.72315495558254,
+          "peak_torque_nm": 2.7479000426935727,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "3685bc4d3d8447018da3945ff37e2cd0d9e2acc2a88994165c75607cf15fb143"
+    },
+    {
+      "name": "jaw-original-magnet-v4-original",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 4,
+        "rx_wrist_accel_rad_s2": 40,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.25,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "D'",
+        "target": 0
+      },
+      "wall_time_s": 205.815397806,
+      "execution_time_s": 96.89650000028064,
+      "final_pose": {
+        "contacts": 65,
+        "facelet_position_component_error_m": 0.00015326857239186462,
+        "orientation_error_rad": 0.006339195066530199,
+        "position_error_m": 0.00018773827744411682,
+        "time_s": 96.89650000028064
+      },
+      "last_pose": {
+        "contacts": 65,
+        "core_orientation_error_rad": 0.0018887574389729466,
+        "core_position": "-1.65325454817e-05 -5.38236159255e-06      0.10000912589",
+        "facelet_position_component_error_m": 0.00015326857239186462,
+        "move": "final",
+        "orientation_error_rad": 0.006339195066530199,
+        "position_error_m": 0.00018773827744411682,
+        "time_s": 96.89650000028064
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.7365,
+        "end_speed_rad_s": -0.001914904153837413,
+        "end_tracking_error_rad": 0.00003756729757319589,
+        "feedforward_inertia_kg_m2": 0.010195431435135889,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 4.013761585353945,
+        "peak_torque_nm": 0.915674950460371,
+        "peak_tracking_error_rad": 0.0025656256484289375,
+        "settle_s": 0,
+        "start_time_s": 96.16000000027712,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.476120756964136,
+          "right": 8.394556816867892
+        },
+        "gap_m": 0.054291980563834406,
+        "hand": "A",
+        "time_s": 96.16000000027712
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.001365962283986,
+          "peak_torque_nm": 1.3242145273149504,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.0013597556749145,
+          "peak_torque_nm": 1.3242155513889884,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "424d500064be7c7f90daf40ba028af35b366ce3980fe0a001f3f0a50e0cacac2"
+    },
+    {
+      "name": "jaw-inverse-magnet-v4-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 4,
+        "rx_wrist_accel_rad_s2": 40,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.25,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "U",
+        "target": 0
+      },
+      "wall_time_s": 203.502925436,
+      "execution_time_s": 95.44150000027369,
+      "final_pose": {
+        "contacts": 59,
+        "facelet_position_component_error_m": 0.000362999340027602,
+        "orientation_error_rad": 0.015348777765227722,
+        "position_error_m": 0.0004498006947745261,
+        "time_s": 95.44150000027369
+      },
+      "last_pose": {
+        "contacts": 59,
+        "core_orientation_error_rad": 0.013003889376877582,
+        "core_position": "-0.000166287591726 -5.60412284369e-05    0.0998846289644",
+        "facelet_position_component_error_m": 0.000362999340027602,
+        "move": "final",
+        "orientation_error_rad": 0.015348777765227722,
+        "position_error_m": 0.0004498006947745261,
+        "time_s": 95.44150000027369
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.7365,
+        "end_speed_rad_s": 0.0017666865935372107,
+        "end_tracking_error_rad": -0.00009857344706391367,
+        "feedforward_inertia_kg_m2": 0.010195391650057516,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 4.018372511247632,
+        "peak_torque_nm": 0.9264399032348862,
+        "peak_tracking_error_rad": 0.0025305381706377528,
+        "settle_s": 0,
+        "start_time_s": 94.70500000027018,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 5.7582338041428045,
+          "right": 6.851449492827756
+        },
+        "gap_m": 0.05427078278656243,
+        "hand": "A",
+        "time_s": 94.70500000027018
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.001366130910476,
+          "peak_torque_nm": 1.3242151285278396,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.001400340956725,
+          "peak_torque_nm": 1.324214917136885,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "8160b669dc93438ceb2d80a7713e914b770b9a44b976de2e538e2323ba352736"
+    },
+    {
+      "name": "jaw-different-magnet-v4-different",
+      "scramble": "F R U2 B' L D2 R' F2 U B2 L' U2 F' D R2 B U' L2 D' R",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 4,
+        "rx_wrist_accel_rad_s2": 40,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.25,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "L2",
+        "target": 0
+      },
+      "wall_time_s": 201.999408315,
+      "execution_time_s": 94.69600000027013,
+      "final_pose": {
+        "contacts": 61,
+        "facelet_position_component_error_m": 0.00020539900561724472,
+        "orientation_error_rad": 0.010647959134623238,
+        "position_error_m": 0.00026633216238453066,
+        "time_s": 94.69600000027013
+      },
+      "last_pose": {
+        "contacts": 61,
+        "core_orientation_error_rad": 0.007473077178428753,
+        "core_position": " 0.000124753440293 -6.11303114525e-05    0.0999598235117",
+        "facelet_position_component_error_m": 0.00020539900561724472,
+        "move": "final",
+        "orientation_error_rad": 0.010647959134623238,
+        "position_error_m": 0.00026633216238453066,
+        "time_s": 94.69600000027013
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 1.473,
+        "end_speed_rad_s": -0.00052503457428198,
+        "end_tracking_error_rad": 0.000036013836387104475,
+        "feedforward_inertia_kg_m2": 0.01019541841813993,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 3.987776810203355,
+        "peak_torque_nm": 0.8342774701198579,
+        "peak_tracking_error_rad": 0.002917749928644797,
+        "settle_s": 0,
+        "start_time_s": 93.2230000002631,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 8.77954613298685,
+          "right": 4.042223141351088
+        },
+        "gap_m": 0.05430036414599668,
+        "hand": "A",
+        "time_s": 92.48650000025958
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.001400920157519,
+          "peak_torque_nm": 1.324211688666125,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.001401605283602,
+          "peak_torque_nm": 1.3242133315749811,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "6f438d751cd12a593083cd9c0dce98fb5dd16402ca83dcc1516d9dae6a2d34a9"
+    },
+    {
+      "name": "cache-control-magnet-300",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 1,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 12,
+        "rx_wrist_accel_rad_s2": 120,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "D'",
+        "target": 0
+      },
+      "wall_time_s": 46.803382732,
+      "execution_time_s": 63.50350000012119,
+      "final_pose": {
+        "contacts": 66,
+        "facelet_position_component_error_m": 0.0002845655124758921,
+        "orientation_error_rad": 0.0128587809035731,
+        "position_error_m": 0.0003539952611304998,
+        "time_s": 63.50350000012119
+      },
+      "last_pose": {
+        "contacts": 66,
+        "core_orientation_error_rad": 0.019047089386070273,
+        "core_position": "-0.000405181681102  0.000405118922192    0.0998215645562",
+        "facelet_position_component_error_m": 0.0002845655124758921,
+        "move": "final",
+        "orientation_error_rad": 0.0128587809035731,
+        "position_error_m": 0.0003539952611304998,
+        "time_s": 63.50350000012119
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.275,
+        "end_speed_rad_s": -0.021932771876992246,
+        "end_tracking_error_rad": 0.0005584410158808237,
+        "feedforward_inertia_kg_m2": 0.010195558747326628,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 10.741827844925163,
+        "peak_torque_nm": 2.818099711697414,
+        "peak_tracking_error_rad": 0.005086325791484492,
+        "settle_s": 0,
+        "start_time_s": 63.22850000011988,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.532629077042276,
+          "right": 8.538783010564547
+        },
+        "gap_m": 0.05433244359195004,
+        "hand": "B",
+        "time_s": 63.22850000011988
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693528802684,
+          "peak_torque_nm": 3.6542614617743823,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 18.002597682005693,
+          "peak_torque_nm": 4.338419410427264,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "b8657bab74529491fb52733c9b11f4d3c68b97f9afa6a554f84f744e324051dd"
+    },
+    {
+      "name": "split-control-magnet-300",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 1,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 12,
+        "rx_wrist_accel_rad_s2": 120,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.5,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "D'",
+        "target": 0
+      },
+      "wall_time_s": 45.191251307,
+      "execution_time_s": 63.50350000012119,
+      "final_pose": {
+        "contacts": 66,
+        "facelet_position_component_error_m": 0.0002845655124758921,
+        "orientation_error_rad": 0.0128587809035731,
+        "position_error_m": 0.0003539952611304998,
+        "time_s": 63.50350000012119
+      },
+      "last_pose": {
+        "contacts": 66,
+        "core_orientation_error_rad": 0.019047089386070273,
+        "core_position": "-0.000405181681102  0.000405118922192    0.0998215645562",
+        "facelet_position_component_error_m": 0.0002845655124758921,
+        "move": "final",
+        "orientation_error_rad": 0.0128587809035731,
+        "position_error_m": 0.0003539952611304998,
+        "time_s": 63.50350000012119
+      },
+      "last_wrist": {
+        "actuator": "B_yaw_drive",
+        "duration_s": 0.275,
+        "end_speed_rad_s": -0.021932771876992246,
+        "end_tracking_error_rad": 0.0005584410158808237,
+        "feedforward_inertia_kg_m2": 0.010195558747326628,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 10.741827844925163,
+        "peak_torque_nm": 2.818099711697414,
+        "peak_tracking_error_rad": 0.005086325791484492,
+        "settle_s": 0,
+        "start_time_s": 63.22850000011988,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 4.532629077042276,
+          "right": 8.538783010564547
+        },
+        "gap_m": 0.05433244359195004,
+        "hand": "B",
+        "time_s": 63.22850000011988
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 13.140693528802684,
+          "peak_torque_nm": 3.6542614617743823,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 18.002597682005693,
+          "peak_torque_nm": 4.338419410427264,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "bf943ca6bd13b06a267de47b16e65fcc0be79985acd746d43619c5b07127a6cf"
+    },
+    {
+      "name": "jaw-half-matched-half-inverse",
+      "scramble": "R2 U' B L' D2 F U2 R B2 D L2 F' U R2 B' D' L F2 U' R'",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.00025,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 3.9989723191241753,
+        "rx_wrist_accel_rad_s2": 40,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.25,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 0,
+        "signal": null
+      },
+      "passed": true,
+      "action": {
+        "hand": "",
+        "kind": "checkpoint",
+        "mode": "",
+        "move": "U",
+        "target": 0
+      },
+      "wall_time_s": 381.321553947,
+      "execution_time_s": 95.44149999947108,
+      "final_pose": {
+        "contacts": 68,
+        "facelet_position_component_error_m": 0.0003110979273461155,
+        "orientation_error_rad": 0.012693095297267738,
+        "position_error_m": 0.00039040075424692403,
+        "time_s": 95.44149999947108
+      },
+      "last_pose": {
+        "contacts": 68,
+        "core_orientation_error_rad": 0.01265190013295052,
+        "core_position": "-0.000183670385813 -9.45920873163e-05    0.0999074355285",
+        "facelet_position_component_error_m": 0.0003110979273461155,
+        "move": "final",
+        "orientation_error_rad": 0.012693095297267738,
+        "position_error_m": 0.00039040075424692403,
+        "time_s": 95.44149999947108
+      },
+      "last_wrist": {
+        "actuator": "A_yaw_drive",
+        "duration_s": 0.7365,
+        "end_speed_rad_s": 0.0009989542619317396,
+        "end_tracking_error_rad": -0.00006748200564697485,
+        "feedforward_inertia_kg_m2": 0.010195395091023284,
+        "midpoint_brake": false,
+        "mode": "face",
+        "peak_speed_rad_s": 4.018245172087956,
+        "peak_torque_nm": 0.926707182482545,
+        "peak_tracking_error_rad": 0.0016836445931134314,
+        "settle_s": 0,
+        "start_time_s": 94.70499999948849,
+        "target": 0
+      },
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 5.141742424137814,
+          "right": 7.5123107207940585
+        },
+        "gap_m": 0.05427363805456552,
+        "hand": "A",
+        "time_s": 94.70499999948849
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.000091833449331,
+          "peak_torque_nm": 1.3137914148132097,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 6.000126186851325,
+          "peak_torque_nm": 1.3137911321851448,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "852bfcff22370d31b78e8aeed8391c9a9ed33bcb0c42cbe010aa536fa40332fd"
+    },
+    {
+      "name": "jaw-eighth-jaw-eighth",
+      "scramble": "R U F2 L' D B R2 U' F L2 D' B2 R' U2 F' D2 L B' U R2",
+      "parameters": {
+        "internal_contact_impedance": 0.99,
+        "rx_detent_torque_nm": 0.08,
+        "rx_alignment_position_m": 0.002,
+        "rx_alignment_angle_rad": 0.08726646259971647,
+        "rx_core_position_m": 0.002,
+        "alignment_regrasp_attempts": 0,
+        "cap_merge_quads": 1,
+        "cap_sectors": 16,
+        "cap_rings": [
+          3,
+          2,
+          2
+        ],
+        "cap_collision_mode": 1,
+        "robot_search_ms": 1000,
+        "bearing_collision_mode": 1,
+        "rx_tip_contact_time_s": 0.008,
+        "internal_contact_dimension": 3,
+        "friction_impedance_ratio": 100,
+        "retention_mode": 1,
+        "timestep_s": 0.0005,
+        "rx_wrist_tn": 1,
+        "cube_mass_kg": 0.074,
+        "rx_wrist_speed_rad_s": 4,
+        "rx_wrist_accel_rad_s2": 40,
+        "rx_wrist_empty_multiplier": 1.5,
+        "rx_wrist_kp": 80,
+        "rx_wrist_kv": 2,
+        "rx_wrist_settle_s": 0,
+        "rx_jaw_settle_s": 0,
+        "alignment_timeout_s": 0,
+        "cube_magnet_peak_force_n": 0.3,
+        "tip_torsional_friction_m": 0.002,
+        "rx_wrist_zero_jerk": 0,
+        "rx_tip_sphere_radius_m": 0.003,
+        "rx_tip_sphere_offset_m": 0.005,
+        "ball_damping_nm_s": 0.00002,
+        "cap_angle_deg": [
+          43,
+          21.5,
+          31
+        ],
+        "cap_inner_m": [
+          0.0146,
+          0.01265,
+          0.01085
+        ],
+        "cap_outer_m": [
+          0.0162,
+          0.0143,
+          0.0125
+        ],
+        "max_torque_nm": 0.03,
+        "preload_reference_m": -0.0015,
+        "preload_stiffness_n_m": 500,
+        "record_fps": 0,
+        "rx_bearing_friction_nm": 0.002,
+        "rx_jaw_duration_s": 0.125,
+        "rx_jaw_torque_nm": 0.3,
+        "rx_tip_corner_spheres": 1,
+        "rx_tip_friction": 1.2,
+        "shell_bevel_m": 0.00065,
+        "shell_gap_m": 0.00005,
+        "turn_duration_s": 1.5
+      },
+      "status": {
+        "code": 1,
+        "signal": null
+      },
+      "passed": false,
+      "error": "RX jaw contact/clearance failed: A",
+      "wall_time_s": 1.216777093,
+      "last_jaw": {
+        "closed": true,
+        "forces_n": {
+          "left": 0,
+          "right": 0
+        },
+        "gap_m": 0.05909581235103355,
+        "hand": "A",
+        "time_s": 0.4250000000000003
+      },
+      "wrist_tn": [
+        {
+          "actuator": "A_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 0.0000629169900533941,
+          "peak_torque_nm": 0.00025360444188624677,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        },
+        {
+          "actuator": "B_yaw_drive",
+          "max_excess_nm": 0,
+          "peak_speed_rad_s": 0.00002616334845370268,
+          "peak_torque_nm": 0.00007871116970503759,
+          "reduced_steps": 0,
+          "static_limit_nm": 15
+        }
+      ],
+      "report_sha256": "c59c8851528cfdc4effec3c20907d38ac347c01b86281ae8c71b3e0c9dfef962"
+    }
+  ]
+}

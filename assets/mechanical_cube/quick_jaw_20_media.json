@@ -1,0 +1,33 @@
+{
+  "playback_speed": 1,
+  "split_frame": 1461,
+  "files": [
+    {
+      "file": "quick_jaw_20_demo.mp4",
+      "sha256": "0c47b82ae7750aa4a5b91ba762db5ccf981ec8c603d4f0a7fd782adc00772ef8",
+      "width": 800,
+      "height": 600,
+      "r_frame_rate": "30/1",
+      "duration": "97.400000",
+      "nb_frames": "2922"
+    },
+    {
+      "file": "quick_jaw_20_part1.mp4",
+      "sha256": "8615e175591e0947ef1d3666cb6abcc855837b27d374d8171de8c375837cc419",
+      "width": 800,
+      "height": 600,
+      "r_frame_rate": "30/1",
+      "duration": "48.700000",
+      "nb_frames": "1461"
+    },
+    {
+      "file": "quick_jaw_20_part2.mp4",
+      "sha256": "61d698a4c8ede1fd6505ab52d7d377018699f847df53e443ed19e8ad03d12efe",
+      "width": 800,
+      "height": 600,
+      "r_frame_rate": "30/1",
+      "duration": "48.700000",
+      "nb_frames": "1461"
+    }
+  ]
+}

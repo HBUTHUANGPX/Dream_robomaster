@@ -49,9 +49,11 @@ int main(int argc, char** argv) {
                                         "rx_wrist_kp",
                                         "rx_wrist_kv",
                                         "rx_wrist_zero_jerk",
+                                        "rx_wrist_brake_half_turn",
                                         "rx_wrist_speed_rad_s",
                                         "rx_wrist_accel_rad_s2",
                                         "rx_wrist_empty_multiplier",
+                                        "rx_wrist_whole_multiplier",
                                         "rx_wrist_settle_s",
                                         "rx_jaw_duration_s",
                                         "rx_jaw_settle_s"};
@@ -70,10 +72,12 @@ int main(int argc, char** argv) {
       if (!item.is_number() || !std::isfinite(item.get<double>()))
         throw std::invalid_argument("Invalid replay parameter: " + key);
       const double value = item.get<double>();
-      if (key == "rx_wrist_zero_jerk" && value != 0 && value != 1)
+      if ((key == "rx_wrist_zero_jerk" || key == "rx_wrist_brake_half_turn") && value != 0 &&
+          value != 1)
         throw std::invalid_argument("Invalid wrist profile");
       if (value < 0 || ((key == "turn_duration_s" || key == "timestep_s") && value == 0) ||
           (key == "timestep_s" && value > .001) ||
+          (key == "rx_wrist_whole_multiplier" && (value <= 0 || value > 1)) ||
           (key == "tip_torsional_friction_m" && value > .01) ||
           (key == "internal_contact_impedance" && (value <= 0 || value >= 1)))
         throw std::invalid_argument("Invalid replay parameter: " + key);
@@ -191,14 +195,16 @@ int main(int argc, char** argv) {
     const int wrist_dof = m->jnt_dofadr[m->actuator_trnid[2 * actuator]];
     double inertia = 0;
     if (controlled) {
-      const double factor =
-          mode == "empty" ? parameters.value("rx_wrist_empty_multiplier", 1.5) : 1.;
-      ramp_steps =
-          std::round(wrist_duration(target - start,
-                                    factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
-                                    factor * parameters.value("rx_wrist_accel_rad_s2", 80.),
-                                    timestep, parameters.value("rx_wrist_zero_jerk", 0.) != 0) /
-                     timestep);
+      const double factor = mode == "empty"   ? parameters.value("rx_wrist_empty_multiplier", 1.5)
+                            : mode == "whole" ? parameters.value("rx_wrist_whole_multiplier", 1.)
+                                              : 1.;
+      ramp_steps = std::round(
+          wrist_duration(target - start,
+                         factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
+                         factor * parameters.value("rx_wrist_accel_rad_s2", 80.), timestep,
+                         parameters.value("rx_wrist_zero_jerk", 0.) != 0,
+                         mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0) /
+          timestep);
 
       total_steps = ramp_steps + settle_steps;
       std::vector<mjtNum> mass(m->nv * m->nv);
@@ -379,8 +385,10 @@ int main(int argc, char** argv) {
     int peak_solver_iterations = 0, solver_limit_steps = 0;
     const auto wall_started = std::chrono::steady_clock::now();
     for (int k = 1; k <= static_cast<int>(total_steps); ++k) {
-      auto ref = wrist_sample(start, target, ramp * timestep, k * timestep,
-                              !jaw && parameters.value("rx_wrist_zero_jerk", 0.) != 0);
+      auto ref = wrist_sample(
+          start, target, ramp * timestep, k * timestep,
+          !jaw && parameters.value("rx_wrist_zero_jerk", 0.) != 0,
+          controlled && mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0);
       d->ctrl[actuator] = ref.position;
       if (controlled)
         d->ctrl[actuator] +=

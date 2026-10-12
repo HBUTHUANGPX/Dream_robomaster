@@ -42,6 +42,13 @@ class CubeMagnets {
     evaluate(m, d, strength_n, d);
   }
 
+  // 仅在 mj_step1 后、位姿未再修改时调用，复用已计算的运动学和力雅可比。
+  void apply_prepared(const mjModel* m, mjData* d, double strength_n) const {
+    validate(m, strength_n);
+    if (strength_n == 0 || corners_.empty() || edges_.empty()) return;
+    evaluate(m, d, strength_n, d);
+  }
+
   // 单位J。只读当前 site_xpos；应在 apply 或位姿刷新之后调用。
   double potential(const mjModel* m, const mjData* d, double strength_n) const {
     validate(m, strength_n);

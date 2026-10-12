@@ -219,3 +219,45 @@ TN力矩越界量为零，动态边界未低于静态限制，不将此记录作
 完整验证资产现有9份报告：3份基线、3份直接减半步长、3份匹配时长后减半步长；直接减半步长的失败没有删除。
 全部54组对照及可复测输入保存于接触稳定性结果和案例文件，共12组通过，其余42组失败。
 新增录像与分段逐帧重组对照覆盖3432帧，最低SSIM为0.99701；差异来自重新编码。
+
+## 开合提速与计算复用实验
+
+2026年10月12日新增以下资产，由本仓库连续接触仿真生成：
+
+- `motion_speed_cases.json`：完整输入参数及20步打乱序列，包含失败对照。
+- `motion_speed_results.json`：各组是否通过、失败位置、执行时间及原始报告校验值。
+- `motion_speed_reports.json.gz`：各组完整报告的压缩归档，保留实际动作及规划结果。
+- `jacobian_comparison.json`：同一初始R动作快照的稠密、稀疏约束雅可比对照。它只验证单步。
+- `step_reuse_timing.json`：旧、新、新、旧四次完整流程的计算计时和轨迹等价检查。
+
+复现前在仓库根目录完成[RX准备与构建](../../docs/mechanical-rx.md#准备与运行)。
+按[完整流程命令](../../docs/mechanical-rx.md#缩短夹爪开合与减少重复计算)运行新的0.25秒开合配置。
+批量复现全部成功与失败对照：
+
+```bash
+node modules/cube/tools/benchmark-mechanical-motion.mjs \
+  assets/mechanical_cube/motion_speed_cases.json \
+  output/cube-mechanical/motion-speed-recheck
+```
+
+输出目录应为新目录。部分试验预期失败，必须逐项查看报告，不能仅用批量工具的退出码判断。
+读取压缩报告可使用系统 `gzip`；若未安装，也可用文档检查已要求的Node.js读取：
+
+```bash
+node --input-type=module -e 'import fs from "node:fs"; import zlib from "node:zlib"; console.log(zlib.gunzipSync(fs.readFileSync("assets/mechanical_cube/motion_speed_reports.json.gz")).toString())'
+```
+
+计算计时仍有其他验证进程并行，记录用于本机对照，不承诺其他硬件得到相同比例。
+新的计算实现保持接触检查频率、物理参数与TN限幅；四次流程的各步位姿和腕轴统计完全一致。
+
+新录像为0.25秒开合配置的连续20步打乱、21步还原，原速播放：
+
+- [完整录像](quick_jaw_20_demo.mp4)：97.4秒、2922帧，包含0.5秒收尾，动作结束前后均通过验收。
+- [前半段](quick_jaw_20_part1.mp4)与[后半段](quick_jaw_20_part2.mp4)：各48.7秒、1461帧，按第1461帧连续切分，未跳过动作。
+- [录像报告](quick_jaw_20_report.json)与[视频校验记录](quick_jaw_20_media.json)：记录执行96.8965秒、帧数、分辨率和SHA256。
+
+两段用于时长受限的预览器。完整文件保留原始编码，分段文件仅重新编码，没有加速或拼接其他试验状态。
+压缩报告各项的 `sha256` 校验其 `report` 经 `JSON.stringify` 序列化后的字节；摘要中的 `report_sha256` 是原始报告文件的校验值。
+
+[细步长复核](quick_jaw_timestep_comparison.json)保持逆序流程的动作与运动时长一致，仅将积分步长减半，完整还原通过。
+对应完整报告也包含在压缩归档中。总计19项流程试验，覆盖失败配置、三条提速流程、旧新计算对照和步长复核。

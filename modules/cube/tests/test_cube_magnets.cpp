@@ -164,6 +164,29 @@ void check_forces() {
   }
 }
 
+void check_split_step() {
+  Fixture f;
+  f.m->opt.integrator = mjINT_IMPLICITFAST;
+  f.m->opt.timestep = .0005;
+  f.pose({.0024, .0012, -.0009});
+  rm::cube::CubeMagnets magnets(f.m.get());
+  std::unique_ptr<mjData, decltype(&mj_deleteData)> split(mj_makeData(f.m.get()), mj_deleteData);
+  mj_copyData(split.get(), f.m.get(), f.d.get());
+  for (int step = 0; step < 200; ++step) {
+    f.clear_force();
+    magnets.apply(f.m.get(), f.d.get(), strength);
+    mj_step(f.m.get(), f.d.get());
+    mju_zero(split->qfrc_applied, f.m->nv);
+    mj_step1(f.m.get(), split.get());
+    magnets.apply_prepared(f.m.get(), split.get(), strength);
+    mj_step2(f.m.get(), split.get());
+    for (int i = 0; i < f.m->nq; ++i)
+      near(split->qpos[i], f.d->qpos[i], 0, "分步磁吸改变了位置轨迹");
+    for (int i = 0; i < f.m->nv; ++i)
+      near(split->qvel[i], f.d->qvel[i], 0, "分步磁吸改变了速度轨迹");
+  }
+}
+
 void check_range_and_pairing() {
   Fixture f;
   rm::cube::CubeMagnets magnets(f.m.get());
@@ -227,6 +250,7 @@ void check_range_and_pairing() {
 int main() {
   try {
     check_forces();
+    check_split_step();
     check_range_and_pairing();
     Fixture old_scene(0);
     rm::cube::CubeMagnets magnets(old_scene.m.get());

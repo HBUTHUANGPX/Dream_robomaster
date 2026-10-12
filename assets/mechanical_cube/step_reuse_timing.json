@@ -1,0 +1,53 @@
+{
+  "fields": [
+    "actions",
+    "steps",
+    "wrist_motions",
+    "wrist_tn",
+    "final_pose",
+    "final_facelets",
+    "execution_time_s"
+  ],
+  "rows": [
+    {
+      "version": "before",
+      "code": 0,
+      "passed": true,
+      "solved": true,
+      "identical_physics": true,
+      "wall_time_s": 46.94504473,
+      "execution_time_s": 63.50350000012119
+    },
+    {
+      "version": "after",
+      "code": 0,
+      "passed": true,
+      "solved": true,
+      "identical_physics": true,
+      "wall_time_s": 45.106544463,
+      "execution_time_s": 63.50350000012119
+    },
+    {
+      "version": "after",
+      "code": 0,
+      "passed": true,
+      "solved": true,
+      "identical_physics": true,
+      "wall_time_s": 44.734803049,
+      "execution_time_s": 63.50350000012119
+    },
+    {
+      "version": "before",
+      "code": 0,
+      "passed": true,
+      "solved": true,
+      "identical_physics": true,
+      "wall_time_s": 46.147324346,
+      "execution_time_s": 63.50350000012119
+    }
+  ],
+  "before_mean_s": 46.546184538,
+  "after_mean_s": 44.920673756,
+  "reduction_percent": 3.4922535501764718,
+  "note": "同一机器按旧、新、新、旧交替运行；其他物理验证仍在并行，不能将小幅差异视为硬件无关保证。旧版本已包含几何归属缓存，此对照测量磁吸运动学和TN报告对象复用。"
+}

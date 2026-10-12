@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "solved": true,
+  "identical_actions": true,
+  "identical_wrist_profiles": true,
+  "identical_jaw_commands": true,
+  "baseline_pose": {
+    "contacts": 59,
+    "facelet_position_component_error_m": 0.000362999340027602,
+    "orientation_error_rad": 0.015348777765227722,
+    "position_error_m": 0.0004498006947745261,
+    "time_s": 95.44150000027369
+  },
+  "half_step_pose": {
+    "contacts": 68,
+    "facelet_position_component_error_m": 0.0003110979273461155,
+    "orientation_error_rad": 0.012693095297267738,
+    "position_error_m": 0.00039040075424692403,
+    "time_s": 95.44149999947108
+  },
+  "execution_time_s": 95.44149999947108
+}
