@@ -1,0 +1,52 @@
+{
+  "implementation_commit": "d599177",
+  "description": "4 rad/s四球磁吸配置的连续20步打乱与21步还原；分段仅为预览兼容，无加速、删帧或重播。",
+  "execution_time_s": 113.89650000036181,
+  "playback_speed": 1,
+  "frames": 3432,
+  "fps": 30,
+  "duration_s": 114.4,
+  "segments": [
+    {
+      "file": "corner_magnets_v4_part1.mp4",
+      "start_frame": 0,
+      "end_frame_exclusive": 1710,
+      "frames": 1710,
+      "duration_s": 57
+    },
+    {
+      "file": "corner_magnets_v4_part2.mp4",
+      "start_frame": 1710,
+      "end_frame_exclusive": 3432,
+      "frames": 1722,
+      "duration_s": 57.4
+    }
+  ],
+  "files": [
+    {
+      "file": "corner_magnets_v4_demo.mp4",
+      "bytes": 9449355,
+      "sha256": "f40c49e5b90a583a1d7aa3ad87f30cc9f07b88aba76481fd9fe4ac067d82b8bb"
+    },
+    {
+      "file": "corner_magnets_v4_part1.mp4",
+      "bytes": 4649807,
+      "sha256": "1058336af56349abb9f0cb4ad9e41d425944f4b8ac274f8953935c81eb9bb6cd"
+    },
+    {
+      "file": "corner_magnets_v4_part2.mp4",
+      "bytes": 5059513,
+      "sha256": "da7b78c1f9f76f9b3da170a57e6c1098522f49df52311e6b4237c1253180cdef"
+    },
+    {
+      "file": "corner_magnets_v4_report.json",
+      "bytes": 371612,
+      "sha256": "bd6ef01da2bacce3eb3eba82d63598d6ca73b5917c22deb91fc8e4e68d51e04f"
+    }
+  ],
+  "split_verification": {
+    "compared_frames": 3432,
+    "minimum_ssim": 0.99701,
+    "mean_ssim": 0.9988207377622358
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "description": "将参考速度设为基线量化后实际峰值3.9989723191241753 rad/s，保持所有腕轴起止角和时长一致，再把积分步长从0.5ms减至0.25ms。加速度40 rad/s²、空腕倍率1.5不变。比较已执行的全部机械动作、腕轴参考与开合指令，不只比较总时长。",
+  "comparisons": [
+    {
+      "sequence": "original",
+      "baseline_passed": true,
+      "half_step_passed": true,
+      "actions_identical": true,
+      "wrist_references_identical": true,
+      "jaw_commands_identical": true,
+      "baseline_position_error_m": 0.00020550454561722465,
+      "half_step_position_error_m": 0.00020678811291227183,
+      "baseline_execution_time_s": 113.89650000036181,
+      "half_step_execution_time_s": 113.89649999903467
+    },
+    {
+      "sequence": "inverse",
+      "baseline_passed": true,
+      "half_step_passed": true,
+      "actions_identical": true,
+      "wrist_references_identical": true,
+      "jaw_commands_identical": true,
+      "baseline_position_error_m": 0.0002827559009357193,
+      "half_step_position_error_m": 0.00027608535862890747,
+      "baseline_execution_time_s": 113.44150000035964,
+      "half_step_execution_time_s": 113.44149999904543
+    },
+    {
+      "sequence": "different",
+      "baseline_passed": true,
+      "half_step_passed": true,
+      "actions_identical": true,
+      "wrist_references_identical": true,
+      "jaw_commands_identical": true,
+      "baseline_position_error_m": 0.0002315911055813788,
+      "half_step_position_error_m": 0.00026244229796161083,
+      "baseline_execution_time_s": 112.19600000035369,
+      "half_step_execution_time_s": 112.19599999907489
+    }
+  ]
+}
