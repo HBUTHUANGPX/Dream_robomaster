@@ -207,9 +207,15 @@ MuJoCo 头文件和动态库必须位于 `.deps/mujoco/include` 与 `.deps/mujoc
 场景中的绝对网格路径由本机入口生成，移动仓库后需重新生成场景。
 候选支持范围、闭环初始化公式来源和验证边界见工具目录说明。
 
-## 当前完整动态演示
+## 历史完整动态演示
 
 快速配置已通过20步打乱与求解器生成的20步还原，执行时间214.198秒。
 工具峰值2 rad/s，90°约1.473秒；夹爪开合0.25秒，没有额外动作间等待。
-见 [完整视频](validation/full20_fast.mp4)、[物理报告](validation/full20_fast.json) 和 [验收条件](validation/README.md#当前完整打乱与还原)。
+见 [完整视频](validation/full20_fast.mp4)、[物理报告](validation/full20_fast.json) 和 [验收条件](validation/README.md#历史完整打乱与还原)。
 固定骨盆，仍使用原机关节执行器和摩擦夹持。
+
+## 当前提速演示
+
+当前匀速段与开爪对准配置已通过同一组20步打乱和20步还原，执行时间97.6535秒。
+相比历史214.198秒记录，用时减少54.4%。夹爪开合仍为0.25秒，转层或整转90°为0.574秒。
+见 [当前完整视频](validation/full20_cruise.mp4)、[物理报告](validation/full20_cruise.json) 和 [验收说明](validation/README.md#匀速段与开爪对准验收)。

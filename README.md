@@ -114,4 +114,5 @@ FAST-LIO 的 ROS 构建和容器回放尚未通过本机运行验收。
 
 魔方机械模式可用 `--rx-full-body assets/rx_full_body` 接入完整 RX。
 该实验固定骨盆，由原六轴双臂协调转动夹爪。
-运行条件、短序列命令及验证边界见 [RX 全身原机关节实验](docs/modules/cube.md#rx-全身原机关节实验)。
+运行条件、完整打乱还原命令及验证边界见 [RX 全身原机关节实验](docs/modules/cube.md#rx-全身原机关节实验)。
+当前配置完成20步打乱和20步还原需97.65秒，见 [完整1倍速视频](assets/rx_full_body/validation/full20_cruise.mp4)。

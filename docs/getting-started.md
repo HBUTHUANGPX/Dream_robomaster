@@ -242,6 +242,7 @@ printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-r
 
 ## 运行 RX 全身魔方实验
 
-先在仓库根目录完成 `./rm setup`，再按 [RX 全身原机关节实验](modules/cube.md#rx-全身原机关节实验) 执行短序列。
+先在仓库根目录完成 `./rm setup`，再按 [RX 全身原机关节实验](modules/cube.md#rx-全身原机关节实验) 执行20步打乱和完整还原。
+当前配置为 `modules/cube/configs/mechanical-rx-full-body-cruise.json`，历史配置仍保留用于复现。
 该模式固定骨盆，不包含站立平衡。录制需要 EGL 和 FFmpeg。
 检查报告中的 `passed` 后再使用录像作为验收结果。

@@ -55,6 +55,7 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_wrist_tn", 0},
                  {"rx_full_body_centering_gain_s", 0.},
+                 {"rx_full_body_realign_open", 0},
                  {"rx_wrist_speed_rad_s", 0.},
                  {"rx_wrist_accel_rad_s2", 80.},
                  {"rx_wrist_empty_multiplier", 1.5},
@@ -65,6 +66,7 @@ Json settings = {{"cube_mass_kg", .088},
                  {"rx_wrist_kp", 20.},
                  {"rx_wrist_kv", 1.},
                  {"rx_wrist_zero_jerk", 0},
+                 {"rx_wrist_cruise_fraction", 0.},
                  {"rx_wrist_brake_half_turn", 0},
                  {"rx_tip_friction", 1.2},
                  {"tip_torsional_friction_m", .002},
@@ -109,6 +111,10 @@ void load_settings(const std::filesystem::path& path) {
       for (const auto& item : v)
         if (!item.is_number_integer() || item.get<double>() < 1 || item.get<double>() > 4)
           throw std::invalid_argument("cap_rings entries must be integers in [1,4]");
+    if (key == "rx_wrist_cruise_fraction" && v.get<double>() > .9)
+      throw std::invalid_argument("rx_wrist_cruise_fraction must be in [0,0.9]");
+    if (key == "rx_full_body_realign_open" && v.get<double>() != 0 && v.get<double>() != 1)
+      throw std::invalid_argument("rx_full_body_realign_open must be 0 or 1");
     if (key == "rx_wrist_tn" && v.get<double>() != 0 && v.get<double>() != 1)
       throw std::invalid_argument("rx_wrist_tn must be 0 or 1");
     if (key == "rx_tip_corner_spheres" && v.get<double>() != 0 && v.get<double>() != 1)
@@ -549,7 +555,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                                    factor * value("rx_wrist_speed_rad_s"),
                                    factor * value("rx_wrist_accel_rad_s2"), dt,
                                    value("rx_wrist_zero_jerk") != 0,
-                                   mode != 2 && value("rx_wrist_brake_half_turn") != 0)
+                                   mode != 2 && value("rx_wrist_brake_half_turn") != 0,
+                                   value("rx_wrist_cruise_fraction"))
                   : std::max(1L, std::lround(value("turn_duration_s") / dt)) * dt;
           motion_costs->duration[a][mode] =
               a % 6 >= 4 ? (std::max(1L, std::lround(value("rx_jaw_duration_s") / dt)) +
@@ -653,7 +660,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::unique_ptr<RxFullBody> full_body;
     if (!full_body_bundle.empty())
       full_body = std::make_unique<RxFullBody>(m, d, full_body_bundle,
-                                               value("rx_full_body_centering_gain_s"));
+                                               value("rx_full_body_centering_gain_s"),
+                                               value("rx_full_body_realign_open") != 0);
     for (const char* hand : {"A", "B"}) {
       if (!rx || full_body) break;
       int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(hand) + "_yaw_drive").c_str());
@@ -810,7 +818,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         if (full_body || value("cube_magnet_peak_force_n") > 0) {
           // 场景固定使用 implicitfast；分步接口复用运动学，避免磁吸再计算一次。
           mj_step1(m, d);
-          if (full_body) full_body->control(d);
+          if (full_body) full_body->control(d, {closed["A"], closed["B"]});
           magnets.apply_prepared(m, d, value("cube_magnet_peak_force_n"));
           mj_step2(m, d);
         } else {
@@ -975,12 +983,14 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
                                   factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep,
                                   value("rx_wrist_zero_jerk") != 0,
-                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0);
+                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0,
+                                  value("rx_wrist_cruise_fraction"));
         const int count = std::lround(duration / m->opt.timestep);
         for (int k = 1; k <= count; k++) {
           auto ref = wrist_sample(start, target, duration, k * m->opt.timestep,
                                   value("rx_wrist_zero_jerk") != 0,
-                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0);
+                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0,
+                                  value("rx_wrist_cruise_fraction"));
           full_body->reference(h, ref.position, m->opt.timestep);
           advance(m->opt.timestep, true);
         }
@@ -1013,7 +1023,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
                                   factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep,
                                   value("rx_wrist_zero_jerk") != 0,
-                                  !empty && value("rx_wrist_brake_half_turn") != 0);
+                                  !empty && value("rx_wrist_brake_half_turn") != 0,
+                                  value("rx_wrist_cruise_fraction"));
       int count = std::max(1L, std::lround(duration / m->opt.timestep));
       duration = count * m->opt.timestep;
       int v = turning ? m->jnt_dofadr[m->actuator_trnid[2 * a]] : -1;
@@ -1028,7 +1039,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       for (int k = 1; k <= count; ++k) {
         auto ref = wrist_sample(start, target, duration, k * m->opt.timestep,
                                 turning && value("rx_wrist_zero_jerk") != 0,
-                                controlled && !empty && value("rx_wrist_brake_half_turn") != 0);
+                                controlled && !empty && value("rx_wrist_brake_half_turn") != 0,
+                                controlled ? value("rx_wrist_cruise_fraction") : 0.);
         d->ctrl[a] = ref.position;
         if (controlled)
           d->ctrl[a] += ((value("rx_wrist_kv") + m->dof_damping[v]) * ref.velocity +

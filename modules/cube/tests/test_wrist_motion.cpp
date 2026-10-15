@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 #include <numbers>
 
 #include "rm/wrist_motion.hpp"
@@ -56,5 +57,57 @@ int main() {
         throw std::runtime_error("Quarter turn profile changed");
     }
   }
+  for (double fraction : {.25, .5, .75, .9})
+    for (double angle : {-std::numbers::pi, std::numbers::pi / 2})
+      for (bool brake : {false, true}) {
+        const double t = wrist_duration(angle, 2., 10., .0005, false, brake, fraction);
+        if (brake && std::abs(angle) == std::numbers::pi) {
+          if (t != 2 * wrist_duration(angle/2, 2., 10., .0005, false, false, fraction))
+            throw std::runtime_error("匀速段半圈计费未包含两次刹车");
+          auto mid = wrist_sample(.7, .7+angle, t, t/2, false, true, fraction);
+          if (std::abs(mid.position-(.7+angle/2)) > 1e-12 ||
+              std::abs(mid.velocity) > 1e-12 || std::abs(mid.acceleration) > 1e-12)
+            throw std::runtime_error("匀速段半圈中点未刹停");
+        }
+        for (int k = 0; k <= 2000; ++k) {
+          const double time = t * k / 2000.;
+          auto r = wrist_sample(.7, .7 + angle, t, time, false, brake, fraction);
+          if (std::abs(r.velocity) > 2. + 1e-9 || std::abs(r.acceleration) > 10. + 1e-9)
+            throw std::runtime_error("匀速段曲线超过速度或加速度限制");
+          if (k > 0 && k < 2000) {
+            const double h = t * 1e-7;
+            auto a = wrist_sample(.7, .7 + angle, t, time - h, false, brake, fraction);
+            auto b = wrist_sample(.7, .7 + angle, t, time + h, false, brake, fraction);
+            if (std::abs((b.position - a.position) / (2*h) - r.velocity) > 1e-5 ||
+                std::abs((b.velocity - a.velocity) / (2*h) - r.acceleration) > 1e-4)
+              throw std::runtime_error("匀速段曲线的位置、速度、加速度不一致: f=" + std::to_string(fraction) +
+                  " k=" + std::to_string(k) + " brake=" + std::to_string(brake) +
+                  " dv=" + std::to_string((b.position-a.position)/(2*h)-r.velocity) +
+                  " da=" + std::to_string((b.velocity-a.velocity)/(2*h)-r.acceleration));
+          }
+        }
+        for (double time : {0., t}) {
+          auto r = wrist_sample(.7, .7 + angle, t, time, false, brake, fraction);
+          if (std::abs(r.position - (time == 0 ? .7 : .7 + angle)) > 1e-12 ||
+              std::abs(r.velocity) > 1e-12 || std::abs(r.acceleration) > 1e-12)
+            throw std::runtime_error("匀速段曲线端点不连续");
+        }
+      }
+  if (wrist_duration(std::numbers::pi / 2, 2., 10., .0005, false, false, .5) >=
+      .9 * wrist_duration(std::numbers::pi / 2, 2., 10., .0005))
+    throw std::runtime_error("相同运动限制下匀速段曲线未减少执行时间");
+  for (double fraction : {-1., 1., std::numeric_limits<double>::quiet_NaN()}) {
+    bool duration_rejected = false, sample_rejected = false;
+    try { wrist_duration(1., 2., 10., .001, false, false, fraction); }
+    catch (const std::invalid_argument&) { duration_rejected = true; }
+    try { wrist_sample(0., 1., 1., .5, false, false, fraction); }
+    catch (const std::invalid_argument&) { sample_rejected = true; }
+    if (!duration_rejected || !sample_rejected)
+      throw std::runtime_error("非法匀速段比例未被拒绝");
+  }
+  bool conflict_rejected = false;
+  try { wrist_duration(1., 2., 10., .001, true, false, .5); }
+  catch (const std::invalid_argument&) { conflict_rejected = true; }
+  if (!conflict_rejected) throw std::runtime_error("互斥轨迹参数未被拒绝");
   std::cout << "腕轨迹速度、加速度边界及端点检查通过\n";
 }

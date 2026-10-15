@@ -77,6 +77,53 @@ int main(int argc, char** argv) {
       throw std::runtime_error("中心偏移应反向补偿并限制在1毫米内");
     if (!std::equal(displaced.begin(), displaced.end(), d->qpos))
       throw std::runtime_error("中心补偿不得直接修正物体或关节状态");
+    rm::cube::RxFullBody aligned(m.get(), d.get(), root / "assets/rx_full_body", 4, true);
+    for (double displacement : {.0004, -.0004, .0004, -.0004}) {
+      d->qpos[m->jnt_qposadr[core_joint]] = displacement;
+      mj_forward(m.get(), d.get());
+      const std::vector<mjtNum> state(d->qpos, d->qpos + m->nq);
+      auto previous = aligned.report(d.get())["B"]["offset_m"];
+      for (int i = 0; i < 1500; ++i) {
+        aligned.control(d.get(), {true, false});
+        auto current = aligned.report(d.get())["B"]["offset_m"];
+        if (std::abs(current[0].get<double>() - previous[0].get<double>()) > .01*m->opt.timestep+1e-10)
+          throw std::runtime_error("开爪对准速度超过限制");
+        previous = current;
+      }
+      if (std::abs(previous[0].get<double>() - displacement) > 1e-8)
+        throw std::runtime_error("开爪参考未对准核心，或往返观测导致累积偏移");
+      if (!std::equal(state.begin(), state.end(), d->qpos))
+        throw std::runtime_error("开爪对准不得重设实际状态");
+    }
+    const int core_q = m->jnt_qposadr[core_joint];
+    d->qpos[core_q] = .003;
+    d->qpos[core_q+1] = -.004;
+    d->qpos[core_q+2] = .105;
+    mj_forward(m.get(), d.get());
+    const std::vector<mjtNum> far_state(d->qpos, d->qpos+m->nq);
+    auto offsets = [&]() {
+      const auto r = aligned.report(d.get());
+      std::array<rm::cube::Vec, 2> result;
+      for (int h=0; h<2; ++h) {
+        const auto& v = r[h ? "B" : "A"]["offset_m"];
+        result[h] = rm::cube::Vec(v[0], v[1], v[2]);
+      }
+      return result;
+    };
+    for (bool left_closed : {false, true}) {
+      auto previous = offsets();
+      for (int i=0; i<500; ++i) {
+        aligned.control(d.get(), {left_closed, !left_closed});
+        auto current = offsets();
+        for (int h=0; h<2; ++h)
+          if (current[h].norm() > .0010000001 ||
+              (current[h]-previous[h]).norm() > .01*m->opt.timestep+1e-10)
+            throw std::runtime_error("三维限幅或换手对准速度超过限制");
+        previous = current;
+      }
+    }
+    if (!std::equal(far_state.begin(), far_state.end(), d->qpos))
+      throw std::runtime_error("大偏差观测及换手不得改写实际状态");
     std::cout << report.dump(2) << "\n全身连接、原生执行器、目标位姿和接触参数隔离检查通过\n";
     return 0;
   } catch (const std::exception& e) {

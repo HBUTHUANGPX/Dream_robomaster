@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
                                         "rx_wrist_kp",
                                         "rx_wrist_kv",
                                         "rx_wrist_zero_jerk",
+                                        "rx_wrist_cruise_fraction",
                                         "rx_wrist_brake_half_turn",
                                         "rx_wrist_speed_rad_s",
                                         "rx_wrist_accel_rad_s2",
@@ -203,7 +204,8 @@ int main(int argc, char** argv) {
                          factor * parameters.at("rx_wrist_speed_rad_s").get<double>(),
                          factor * parameters.value("rx_wrist_accel_rad_s2", 80.), timestep,
                          parameters.value("rx_wrist_zero_jerk", 0.) != 0,
-                         mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0) /
+                         mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0,
+                         parameters.value("rx_wrist_cruise_fraction", 0.)) /
           timestep);
 
       total_steps = ramp_steps + settle_steps;
@@ -388,7 +390,8 @@ int main(int argc, char** argv) {
       auto ref = wrist_sample(
           start, target, ramp * timestep, k * timestep,
           !jaw && parameters.value("rx_wrist_zero_jerk", 0.) != 0,
-          controlled && mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0);
+          controlled && mode != "empty" && parameters.value("rx_wrist_brake_half_turn", 0.) != 0,
+          controlled ? parameters.value("rx_wrist_cruise_fraction", 0.) : 0.);
       d->ctrl[actuator] = ref.position;
       if (controlled)
         d->ctrl[actuator] +=

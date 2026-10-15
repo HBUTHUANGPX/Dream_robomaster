@@ -233,7 +233,9 @@ FAST-LIO 需要 Docker 和独立的存储空间，见[集成说明](../integrati
 ## RX 全身动作不可达或夹持失败
 
 仅在魔方机械模式使用 `--rx-full-body assets/rx_full_body`。
-先按 [整机短序列命令](modules/cube.md#rx-全身原机关节实验) 复现，再检查输出目录的 `report.json`。
+先按 [整机运行命令](modules/cube.md#rx-全身原机关节实验) 复现，再检查输出目录的 `report.json`。
 逆运动学不可达或关节越限时，核对 `grasp_pose.json` 与规划使用的腕角范围。
 预算不足时可增加 `--search-ms`，不得切回无关节限制的动作序列。
 夹持或姿态检查失败时保留报告和失败视频，不通过关闭碰撞、放大限位或直接改写块体位姿绕过检查。
+高速运行先复现已验收的 `mechanical-rx-full-body-cruise.json`；曲线、空转倍率和开爪对准必须一起比较。
+检查 `full_body.A.offset_m`、`full_body.B.offset_m`、末端跟踪误差及 `current_action`，区分参考偏心和实际跟踪失败。

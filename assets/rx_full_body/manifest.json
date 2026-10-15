@@ -42,14 +42,14 @@
     "urdf/rx_assy_v2_runtime_baseline.urdf": "92ebfc70c15b510b1ad760cba293ae9aa9bce36deb8255dfab277e33f3a3612a"
   },
   "generated_files": {
-    "README.md": "9f1b015b8408b1deebe0f30e76cee0263ead294b4ffa1448230937f5191548a9",
+    "README.md": "56e2b797e7b457e8cb103008f7cb65af2cafecab1cbdf03504b4fe95f7e15bd6",
     "grasp_pose.json": "aec5d1eaf11749a14e58696976bd2b9292054ad1ee502a7a0a99bb1acfcee26d",
     "meshes/generated/base_link.msh": "540e95de80e71b04c95def95f9ddd85096a67d7808ff30f93d7a401b9acb03d8",
     "meshes/generated/waist_pitch_link.msh": "c2e6c0e69d82b7b3c8c3b6ddfd9a0fd20ffb70d3418b580a421bee51d31f539e",
     "reachability.json": "49c6e928320734ffaf3cf8ff870cd00b8f20a7effe69d77feb0a6bedf7421b63",
     "robot.xml": "960493cd240ba3939c00cad24add58a11cc4e1bfb585b696178a6ceb531ce68c",
     "validation.txt": "a58fd0ac037f8a01868ed53c2ee876ed4da66986d695a1f9e78e112a3141ddde",
-    "validation/README.md": "b92c1d1aa8d5b45b61f7041a69ebf8b1027d8b2a365999f5baf6b946241b97c7",
+    "validation/README.md": "538254807a98ca3fb2c6bb12df4beda15440c561aa7e11b8494de83c61dc1d86",
     "validation/r_turn_restore.json": "74b69662b0421b322df502e0ce5cc5199a8f4367881f5afe9ffc21d295307e7a",
     "validation/r_turn_restore.mp4": "e1405770a676e1bef86df7f4c9ad52b3194b04f9b115d274241ade5c5168a1bc",
     "validation/r_turn_restore.png": "fb6362898ba553209390418489483d2ee5dbb3ac4a7913a710a1141d098fc270",
@@ -61,7 +61,12 @@
     "validation/full20_fast.json": "dd41aacbe6866252258b7c039442e4b47750f0ed7ab7962f02207c96f8dd8018",
     "validation/full20_fast.mp4": "928ac8b703dd97ada492551edeebf6dd57eecd18f56d9878674b1b7a0761c83f",
     "validation/full20_fast.png": "f24108f825e867157e6b37da0f65cd7dd96bfc3e6edb0e23800767e8d44ddd1c",
-    "validation/full20_fast.srt": "9295722190cd78af2bfdd0675eac3a282a79859733910b4c527c966baf028a0c"
+    "validation/full20_fast.srt": "9295722190cd78af2bfdd0675eac3a282a79859733910b4c527c966baf028a0c",
+    "validation/cruise_probe_results.json": "1774fdb7763f99f8d02e26ddc592b7248f3b3872ee6468a6bd35c2c52570b08b",
+    "validation/full20_cruise.json": "df97504b08e6638d31d314b84582552e0c24a819b04aacfd22280dac1d94dd32",
+    "validation/full20_cruise.mp4": "19dfc26b6ddbc546e68332c4f6598b63d49cc780c2e6d289c92c7f23dcd863fd",
+    "validation/full20_cruise.png": "8947df3a869c740e2761686898a74d402be65540e4534e00bc6301153f8a524a",
+    "validation/full20_cruise.srt": "616fdb625105f4316f30a3cc94d04d7471a032b5f531e7c576a1011b58ad5ea9"
   },
   "mesh_conversions": [
     {

@@ -5,10 +5,10 @@ std::string rx_full_body_scene(const std::string& scene, const std::filesystem::
 class RxFullBody {
  public:
   RxFullBody(mjModel* model, mjData* data, const std::filesystem::path& bundle,
-             double centering_gain = 0);
+             double centering_gain = 0, bool realign_open = false);
 
   void reference(int hand, double angle, double dt);
-  void control(mjData* data);
+  void control(mjData* data, std::array<bool, 2> closed = {true, true});
   const std::array<std::array<int, 2>, 2>& wrist_ranges() const { return wrist_ranges_; }
   double angle(int hand) const { return angles_[hand]; }
   double error(const mjData* data, int hand) const;
@@ -28,6 +28,8 @@ class RxFullBody {
   double peak_error_ = 0, centering_gain_ = 0;
   int core_ = -1;
   Vec center_offset_ = Vec::Zero();
+  std::array<Vec, 2> hand_offsets_{Vec::Zero(), Vec::Zero()};
+  bool realign_open_ = false;
   void solve(int hand, double angle);
 };
 }  // namespace rm::cube
