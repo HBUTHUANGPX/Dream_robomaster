@@ -209,15 +209,15 @@ MuJoCo 3.15.0 验证中，20 步演示打乱在腕部 8 倍、夹爪 32 倍配�
 运动参考不直接修改物理状态。
 当前不包含行走或站立平衡控制。
 
-在仓库根目录完成 `./rm setup` 后，先执行短序列。
+在仓库根目录完成 `./rm setup` 后，执行下述20步打乱与还原。
 录制需要可用的 EGL 和 FFmpeg。
 
 ```bash
 ./rm cube --mechanical \
   --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
   --rx-full-body assets/rx_full_body \
-  --mechanical-config modules/cube/configs/mechanical-rx-full-body.json \
-  --scramble R --solve --record \
+  --mechanical-config modules/cube/configs/mechanical-rx-full-body-fast.json \
+  --scramble "R U F' L2 D B R' U2 F D' L B2 U' R2 F2 D L' U B' R" --solve --record \
   --output output/cube-mechanical/rx-full-body
 ```
 
@@ -233,7 +233,16 @@ MuJoCo 3.15.0 验证中，20 步演示打乱在腕部 8 倍、夹爪 32 倍配�
 使用同样参数加 `--plan-only`，并去掉 `--solve --record`，可先输出软件验证后的动作序列。
 
 原机关节控制采用实验性 `kp=1500 N·m/rad`、`kv=35 N·m·s/rad` 和重力补偿。
-全身配置的工具峰值速度为0.5 rad/s，峰值加速度为2 rad/s²；夹爪开合为0.5秒。
+快速配置的工具峰值速度为2 rad/s，加速度上限为10 rad/s²；夹爪开合为0.25秒。
+90°转动约1.473秒，动作间不增加等待。
+指尖接触时间常数由8毫秒改为1毫秒，以减少快速换手时的接触变形；仿真步长保持0.5毫秒。
+夹持力矩仍为0.3 N·m、摩擦系数仍为1.2，魔方质量仍为74克，原关节限位及F/S限矩保持有效。
+双臂可通过 `rx_full_body_centering_gain_s` 启用公共平移补偿，默认关闭。
+增益单位为每秒，范围为0至20；快速配置设为4。补偿量限制在1毫米内，变化速度限制为每秒10毫米。
+补偿读取仿真中的魔方核心位置，经逆运动学和原机关节执行器纠正中心漂移。
+它不直接修改魔方状态，不增加回位动作或等待；实际硬件需要对应的位姿观测。
+接触刚度尚未由实物测量标定；此结果用于当前仿真模型。
+历史低速配置 `mechanical-rx-full-body.json` 保留0.5 rad/s和0.5秒开合，供复现早期短序列。
 这些值用于整机接入验证，不是硬件推荐值或速度上限结论。
 F/S电机测量曲线、分组与适用边界见 [TN 数据说明](../../assets/rx_gripper/tn/README.md)。
 
@@ -241,7 +250,10 @@ F/S电机测量曲线、分组与适用边界见 [TN 数据说明](../../assets/
 执行时间27.162秒，录像额外保留0.5秒尾帧；最终块体位置误差0.265毫米。
 双手末端最终位置误差分别为0.080和0.061毫米。
 报告与1倍速录像保存在 [整机验收资产](../../assets/rx_full_body/validation/r_turn_restore.json) 和 [短序列视频](../../assets/rx_full_body/validation/r_turn_restore.mp4)。
-该结果不代表整机20步长序列已验收。
+上述是历史短序列结果。当前快速配置已通过20步打乱和20步还原，执行时间214.198秒。
+[完整1倍速视频](../../assets/rx_full_body/validation/full20_fast.mp4) 包含全部动作和步骤字幕，时长214.7秒。
+[物理验收报告](../../assets/rx_full_body/validation/full20_fast.json) 的 `passed`、`solved` 均为 `true`，最终块体位置误差0.240毫米。
+3和4 rad/s在本次长序列未通过，不作为默认配置。此结果只验证所列序列，不表示所有打乱均已验证。
 
 补充验证：`U` 打乱、`U'` 还原通过，包含双臂换手、整块转动和左臂转层。
 执行时间39.943秒，最终块体位置误差0.258毫米。

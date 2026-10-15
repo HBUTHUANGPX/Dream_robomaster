@@ -4,7 +4,8 @@ namespace rm::cube {
 std::string rx_full_body_scene(const std::string& scene, const std::filesystem::path& bundle);
 class RxFullBody {
  public:
-  RxFullBody(mjModel* model, mjData* data, const std::filesystem::path& bundle);
+  RxFullBody(mjModel* model, mjData* data, const std::filesystem::path& bundle,
+             double centering_gain = 0);
 
   void reference(int hand, double angle, double dt);
   void control(mjData* data);
@@ -24,7 +25,9 @@ class RxFullBody {
   std::array<std::array<int, 2>, 2> wrist_ranges_;
   std::vector<int> motor_type_;
   std::array<double, 2> angles_{};
-  double peak_error_ = 0;
+  double peak_error_ = 0, centering_gain_ = 0;
+  int core_ = -1;
+  Vec center_offset_ = Vec::Zero();
   void solve(int hand, double angle);
 };
 }  // namespace rm::cube

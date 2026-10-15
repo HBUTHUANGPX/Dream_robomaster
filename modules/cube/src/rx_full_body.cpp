@@ -174,13 +174,18 @@ std::string rx_full_body_scene(const std::string& scene, const std::filesystem::
   xmlFree(data);
   return out;
 }
-RxFullBody::RxFullBody(mjModel* m, mjData* d, const std::filesystem::path& bundle)
+RxFullBody::RxFullBody(mjModel* m, mjData* d, const std::filesystem::path& bundle,
+                       double centering_gain)
     : m_(m),
       reference_(mj_makeData(m), mj_deleteData),
       velocity_(m->nu),
       limits_(m->nu),
       velocity_limits_(m->nu),
       motor_type_(m->nu) {
+  if (!std::isfinite(centering_gain) || centering_gain < 0 || centering_gain > 20)
+    throw std::invalid_argument("中心补偿增益必须在[0,20]内");
+  centering_gain_ = centering_gain;
+  core_ = mj_name2id(m, mjOBJ_BODY, "mechanical_core");
   const auto cfg = pose(bundle);
   wrist_ranges_ = cfg.at("wrist_ranges").get<std::array<std::array<int, 2>, 2>>();
   std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> urdf(
@@ -240,7 +245,7 @@ void RxFullBody::solve(int h, double angle) {
       Eigen::Quaterniond(m_->site_quat[4 * sites_[h]], m_->site_quat[4 * sites_[h] + 1],
                          m_->site_quat[4 * sites_[h] + 2], m_->site_quat[4 * sites_[h] + 3])
           .toRotationMatrix();
-  const Vec position = Eigen::Map<const Vec>(m_->site_pos + 3 * sites_[h]);
+  const Vec position = Eigen::Map<const Vec>(m_->site_pos + 3 * sites_[h]) + center_offset_;
   std::vector<mjtNum> jp(3 * m_->nv), jr(3 * m_->nv);
   for (int it = 0; it < 100; it++) {
     mj_kinematics(m_, reference_.get());
@@ -287,10 +292,30 @@ void RxFullBody::reference(int h, double angle, double dt) {
   }
 }
 void RxFullBody::control(mjData* d) {
+  std::vector<double> correction_velocity(m_->nu, 0);
+  if (centering_gain_ > 0 && core_ >= 0) {
+    // 只改双臂参考，不改魔方状态或施加虚构物体力。两手采用同一平移补偿。
+    const auto old = std::vector<mjtNum>(reference_->qpos, reference_->qpos + m_->nq);
+    Vec delta = centering_gain_ * m_->opt.timestep *
+                (Vec(0, 0, .1) - Eigen::Map<const Vec>(d->xpos + 3 * core_));
+    const double step_limit = .01 * m_->opt.timestep;
+    if (delta.norm() > step_limit) delta *= step_limit / delta.norm();
+    center_offset_ += delta;
+    if (center_offset_.norm() > .001) center_offset_ *= .001 / center_offset_.norm();
+    solve(0, angles_[0]);
+    solve(1, angles_[1]);
+    for (int a : driven_) {
+      int q = m_->jnt_qposadr[m_->actuator_trnid[2 * a]];
+      correction_velocity[a] = (reference_->qpos[q] - old[q]) / m_->opt.timestep;
+    }
+  }
   for (int a : driven_) {
     int j = m_->actuator_trnid[2 * a], v = m_->jnt_dofadr[j], q = m_->jnt_qposadr[j];
     double target = reference_->qpos[q];
-    d->ctrl[a] = target + (35 * velocity_[a] + d->qfrc_bias[v]) / 1500;
+    const double speed = velocity_[a] + correction_velocity[a];
+    if (std::abs(speed) > velocity_limits_[a])
+      throw std::runtime_error("中心补偿后整臂参考速度超过URDF限制");
+    d->ctrl[a] = target + (35 * speed + d->qfrc_bias[v]) / 1500;
     const double tn = motor_type_[a] == 1 ? rx_f_torque_limit(d->qvel[v])
                       : motor_type_[a] == 3
                           ? limits_[a]
@@ -310,11 +335,13 @@ double RxFullBody::error(const mjData* d, int h) const {
 }
 double RxFullBody::position_error(const mjData* d, int h) const {
   return (Eigen::Map<const Vec>(d->xpos + 3 * hands_[h]) -
-          Eigen::Map<const Vec>(m_->site_pos + 3 * sites_[h]))
+          Eigen::Map<const Vec>(m_->site_pos + 3 * sites_[h]) - center_offset_)
       .norm();
 }
 Json RxFullBody::report(const mjData* d) const {
   Json out = {{"fixed_base", true},
+              {"centering_gain_s_inv", centering_gain_},
+              {"center_offset_m", {center_offset_.x(), center_offset_.y(), center_offset_.z()}},
               {"native_tn_enabled", true},
               {"wrist_ranges", wrist_ranges_},
               {"native_joint_actuators", driven_.size()},
@@ -333,7 +360,9 @@ Json RxFullBody::report(const mjData* d) const {
   for (int h = 0; h < 2; h++) {
     Vec p = Eigen::Map<const Vec>(d->xpos + 3 * hands_[h]) -
             Eigen::Map<const Vec>(m_->site_pos + 3 * sites_[h]);
-    out[h ? "B" : "A"] = {{"orientation_error_rad", error(d, h)}, {"position_error_m", p.norm()}};
+    out[h ? "B" : "A"] = {{"orientation_error_rad", error(d, h)},
+                          {"position_error_m", position_error(d, h)},
+                          {"nominal_position_error_m", p.norm()}};
   }
   return out;
 }

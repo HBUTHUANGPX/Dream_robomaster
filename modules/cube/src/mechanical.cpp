@@ -44,6 +44,7 @@ Json settings = {{"cube_mass_kg", .088},
                  {"internal_contact_impedance", .9999},
                  {"internal_contact_dimension", 3},
                  {"friction_impedance_ratio", 10.},
+                 {"friction_noslip_iterations", 0},
                  {"alignment_timeout_s", 2.},
                  {"alignment_regrasp_attempts", 2},
                  {"robot_search_ms", 1000.},
@@ -53,6 +54,7 @@ Json settings = {{"cube_mass_kg", .088},
                  {"max_torque_nm", .03},
                  {"rx_jaw_torque_nm", .3},
                  {"rx_wrist_tn", 0},
+                 {"rx_full_body_centering_gain_s", 0.},
                  {"rx_wrist_speed_rad_s", 0.},
                  {"rx_wrist_accel_rad_s2", 80.},
                  {"rx_wrist_empty_multiplier", 1.5},
@@ -94,6 +96,9 @@ void load_settings(const std::filesystem::path& path) {
     if (key == "alignment_regrasp_attempts" &&
         (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 2))
       throw std::invalid_argument("alignment_regrasp_attempts must be an integer in [0,2]");
+    if (key == "friction_noslip_iterations" &&
+        (!v.is_number_integer() || v.get<double>() < 0 || v.get<double>() > 100))
+      throw std::invalid_argument("friction_noslip_iterations must be an integer in [0,100]");
     if (key == "cap_merge_quads" &&
         (!v.is_number_integer() || (v.get<double>() != 0 && v.get<double>() != 1)))
       throw std::invalid_argument("cap_merge_quads must be zero or one");
@@ -449,7 +454,8 @@ std::string scene() {
     << value("timestep_s")
     << "' gravity='0 0 -9.81' integrator='implicitfast' solver='Newton' "
        "iterations='100' cone='elliptic' impratio='"
-    << value("friction_impedance_ratio")
+    << value("friction_impedance_ratio") << "' noslip_iterations='"
+    << settings["friction_noslip_iterations"].get<int>()
     << "'/><size memory='256M'/><default><geom "
        "friction='.03 .0001 .00001' solref='.001 1' solimp='"
     << value("internal_contact_impedance") << ' ' << value("internal_contact_impedance")
@@ -645,7 +651,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       }
     }
     std::unique_ptr<RxFullBody> full_body;
-    if (!full_body_bundle.empty()) full_body = std::make_unique<RxFullBody>(m, d, full_body_bundle);
+    if (!full_body_bundle.empty())
+      full_body = std::make_unique<RxFullBody>(m, d, full_body_bundle,
+                                               value("rx_full_body_centering_gain_s"));
     for (const char* hand : {"A", "B"}) {
       if (!rx || full_body) break;
       int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(hand) + "_yaw_drive").c_str());
@@ -977,9 +985,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           advance(m->opt.timestep, true);
         }
         full_body->reference(h, target, m->opt.timestep);
+        report["full_body"] = full_body->report(d);
         if (full_body->position_error(d, h) > .001)
           throw std::runtime_error("RX整臂末端位置跟踪失败");
-        report["full_body"] = full_body->report(d);
         report["wrist_motions"].push_back({{"logical_axis", h == 0 ? "A" : "B"},
                                            {"mode", mode},
                                            {"start_time_s", began},

@@ -42,21 +42,26 @@
     "urdf/rx_assy_v2_runtime_baseline.urdf": "92ebfc70c15b510b1ad760cba293ae9aa9bce36deb8255dfab277e33f3a3612a"
   },
   "generated_files": {
-    "README.md": "95b918fd35223b173da1daf65bb94e8fe82764429ca7b4003994e00e207e19d5",
+    "README.md": "9f1b015b8408b1deebe0f30e76cee0263ead294b4ffa1448230937f5191548a9",
     "grasp_pose.json": "aec5d1eaf11749a14e58696976bd2b9292054ad1ee502a7a0a99bb1acfcee26d",
     "meshes/generated/base_link.msh": "540e95de80e71b04c95def95f9ddd85096a67d7808ff30f93d7a401b9acb03d8",
     "meshes/generated/waist_pitch_link.msh": "c2e6c0e69d82b7b3c8c3b6ddfd9a0fd20ffb70d3418b580a421bee51d31f539e",
     "reachability.json": "49c6e928320734ffaf3cf8ff870cd00b8f20a7effe69d77feb0a6bedf7421b63",
     "robot.xml": "960493cd240ba3939c00cad24add58a11cc4e1bfb585b696178a6ceb531ce68c",
     "validation.txt": "a58fd0ac037f8a01868ed53c2ee876ed4da66986d695a1f9e78e112a3141ddde",
-    "validation/README.md": "41805d28c00f341cc0f2bad007c449e79674c6d156a56c863d75de7bd5235e6b",
+    "validation/README.md": "b92c1d1aa8d5b45b61f7041a69ebf8b1027d8b2a365999f5baf6b946241b97c7",
     "validation/r_turn_restore.json": "74b69662b0421b322df502e0ce5cc5199a8f4367881f5afe9ffc21d295307e7a",
     "validation/r_turn_restore.mp4": "e1405770a676e1bef86df7f4c9ad52b3194b04f9b115d274241ade5c5168a1bc",
     "validation/r_turn_restore.png": "fb6362898ba553209390418489483d2ee5dbb3ac4a7913a710a1141d098fc270",
     "validation/sweep.json": "3f038e41b971dc38ebcb4e7184d0326a81d487be1cf43108e5c9268586cf7c4a",
     "validation/u_turn_restore.json": "6b3f87b35055d9473ac66369778dcf3c566680c88799186ef8788a943362d17b",
     "validation/u_turn_restore.mp4": "bfbbcb9ef566a9b190c3291b4d9ad3dbea20493b8df62747d886a64254703c5f",
-    "validation/u_turn_restore.png": "349a7f1ec0cf898603d406b5a76503800d57c2eea51e71098fd48db72e5c6cb2"
+    "validation/u_turn_restore.png": "349a7f1ec0cf898603d406b5a76503800d57c2eea51e71098fd48db72e5c6cb2",
+    "validation/speed_probe_results.json": "e4f2efbb9064fd85d5cd2e5cb55855b6df885d10b8f6a17c19500780a0ee8fc0",
+    "validation/full20_fast.json": "dd41aacbe6866252258b7c039442e4b47750f0ed7ab7962f02207c96f8dd8018",
+    "validation/full20_fast.mp4": "928ac8b703dd97ada492551edeebf6dd57eecd18f56d9878674b1b7a0761c83f",
+    "validation/full20_fast.png": "f24108f825e867157e6b37da0f65cd7dd96bfc3e6edb0e23800767e8d44ddd1c",
+    "validation/full20_fast.srt": "9295722190cd78af2bfdd0675eac3a282a79859733910b4c527c966baf028a0c"
   },
   "mesh_conversions": [
     {

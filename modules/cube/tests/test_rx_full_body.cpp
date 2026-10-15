@@ -65,6 +65,18 @@ int main(int argc, char** argv) {
       rejected = true;
     }
     if (!rejected) throw std::runtime_error("未拒绝超出已验证角度的指令");
+    rm::cube::RxFullBody centered(m.get(), d.get(), root / "assets/rx_full_body", 4);
+    int core_joint = mj_name2id(m.get(), mjOBJ_JOINT, "mechanical_core_free");
+    if (core_joint < 0) throw std::runtime_error("缺少魔方核心自由关节");
+    d->qpos[m->jnt_qposadr[core_joint]] = -.0004;
+    mj_forward(m.get(), d.get());
+    const std::vector<mjtNum> displaced(d->qpos, d->qpos + m->nq);
+    for (int i = 0; i < 1500; ++i) centered.control(d.get());
+    const auto correction = centered.report(d.get()).at("center_offset_m");
+    if (correction[0].get<double>() < .0009 || correction[0].get<double>() > .001000001)
+      throw std::runtime_error("中心偏移应反向补偿并限制在1毫米内");
+    if (!std::equal(displaced.begin(), displaced.end(), d->qpos))
+      throw std::runtime_error("中心补偿不得直接修正物体或关节状态");
     std::cout << report.dump(2) << "\n全身连接、原生执行器、目标位姿和接触参数隔离检查通过\n";
     return 0;
   } catch (const std::exception& e) {
