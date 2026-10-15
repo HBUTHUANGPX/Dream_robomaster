@@ -34,3 +34,23 @@
 集成构建完成后，在仓库根目录运行 `ctest --test-dir build -R '^cube_torque_speed$' --output-on-failure`。预期逐格匹配参考表，并通过零速、低速、交叉段、单调化、正反转、测量终点、超速及非有限输入检查。失败时保留参考表，核对来源哈希、公式和数据，不应通过改写参考结果掩盖差异。
 
 `cube_wrist_tn` 是另一个包装器动力学测试入口；TN查询单测通过不代表完整魔方还原或录像验收通过。
+
+## 全身 F 电机扩展
+
+`f_motor_measurements.csv` 保存同一来源文件 `RXP2_F_MOTOR_PROFILE` 的19个原始点。
+`f_motor_reference.csv` 是离线调用同一来源查表函数生成的3799格参考值和零 sentinel。
+C++接口 `rx_f_torque_limit` 使用相同 PCHIP、累计最小值和0.05 rpm向上取格规则。
+F电机测量终点为189.9 rpm；零速为59.817 Nm，不乘静态倍率。
+`cube_torque_speed` 同时逐格检查 F 和 S 曲线。
+运行时不调用 Python。
+
+全身控制按来源分组：肩俯仰、髋俯仰、髋侧摆、膝和腰偏航使用 F；其余臂关节和髋偏航使用 S。
+踝和腰俯仰、腰侧摆采用来源的双 S 电机等效倍率2。
+颈部没有对应测量数据，保留 URDF 静态力矩限制。
+所有关节再取 URDF effort 与动态限矩的较小值。
+关节参考速度不得超过原始 URDF velocity。
+这些是仿真控制限制，不代表已完成真实硬件控制器标定。
+
+F表本次离线生成使用的 `torque_speed.py` SHA-256 为 `6874ae0c8eb7e3f65b0f200fdfd16784fd38ff2ca02420c5dec0cd53813e0e3c`。
+`rx_p2_actuator_data.py` 仍为上表所列哈希。
+上表中的 `torque_speed.py` 哈希是 S 表导入时的历史记录；S 表保留原参考值，并已重新通过逐格回归。

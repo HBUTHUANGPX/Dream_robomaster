@@ -10,17 +10,24 @@
 namespace rm::cube {
 namespace {
 // 来源和 SHA-256 见 assets/rx_gripper/tn/README.md；数组包含零速锚点。
+template <size_t N>
 struct Curve {
-  std::array<double, 14> speed, torque;
+  std::array<double, N> speed, torque;
 };
-constexpr Curve motor32{
+constexpr Curve<14> motor32{
     {0., 11.2, 26.2, 52.3, 78.3, 104.2, 130.3, 155.3, 181.2, 207.2, 233.4, 259.3, 285.3, 309.6},
     {21.32, 21.32, 21.19, 21.05, 20.89, 20.89, 20.67, 20.54, 20.62, 20.46, 20.23, 19.84, 19.66,
      19.12}};
-constexpr Curve motor34{
+constexpr Curve<14> motor34{
     {0., 11.2, 26.3, 52.4, 78.2, 104.1, 130.2, 155.2, 181.2, 207.2, 233.2, 259.3, 285.3, 310.3},
     {21.31, 21.31, 21.17, 21.15, 21.05, 21.05, 21.12, 20.88, 20.69, 20.54, 20.38, 20.29, 19.61,
      19.21}};
+// 同一来源 RXP2_F_MOTOR_PROFILE；零速锚点沿用首个实测值。
+constexpr Curve<20> motor_f{
+    {0,   10,    19.5,  29.7,  40,    50.2,  59.8,  69.7, 80.1, 89.7,
+     100, 110.3, 119.8, 129.8, 139.8, 149.8, 159.8, 170,  180,  189.9},
+    {59.817, 59.817, 59.557, 59.463, 59.220, 58.700, 58.800, 58.218, 58.582, 56.205,
+     51.536, 48.367, 45.047, 42.213, 39.836, 37.998, 33.287, 30.141, 27.771, 25.654}};
 constexpr double step_rpm = .05;
 constexpr double index_scale = (60. / (2. * std::numbers::pi)) / step_rpm;
 constexpr size_t last_measured_bin = 6192;  // floor(min(309.6,310.3)/.05 + 1e-12)
@@ -33,26 +40,28 @@ double endpoint(double h0, double h1, double d0, double d1) {
   return slope;
 }
 
-std::array<double, 14> slopes(const Curve& curve) {
-  std::array<double, 13> h{}, d{};
+template <size_t N>
+std::array<double, N> slopes(const Curve<N>& curve) {
+  std::array<double, N - 1> h{}, d{};
   for (size_t i = 0; i < h.size(); ++i) {
     h[i] = curve.speed[i + 1] - curve.speed[i];
     d[i] = (curve.torque[i + 1] - curve.torque[i]) / h[i];
   }
-  std::array<double, 14> result{};
+  std::array<double, N> result{};
   for (size_t i = 1; i + 1 < result.size(); ++i) {
     if (d[i - 1] * d[i] <= 0.) continue;
     const double left = 2. * h[i] + h[i - 1], right = h[i] + 2. * h[i - 1];
     result[i] = (left + right) / (left / d[i - 1] + right / d[i]);
   }
   result.front() = endpoint(h[0], h[1], d[0], d[1]);
-  result.back() = endpoint(h[12], h[11], d[12], d[11]);
+  result.back() = endpoint(h[N - 2], h[N - 3], d[N - 2], d[N - 3]);
   return result;
 }
 
-double evaluate(const Curve& c, const std::array<double, 14>& d, double speed) {
+template <size_t N>
+double evaluate(const Curve<N>& c, const std::array<double, N>& d, double speed) {
   const size_t i = std::min<size_t>(
-      std::upper_bound(c.speed.begin(), c.speed.end(), speed) - c.speed.begin() - 1, 12);
+      std::upper_bound(c.speed.begin(), c.speed.end(), speed) - c.speed.begin() - 1, N - 2);
   const double width = c.speed[i + 1] - c.speed[i];
   const double t = (speed - c.speed[i]) / width, t2 = t * t, t3 = t2 * t;
   return std::max(0., (2. * t3 - 3. * t2 + 1.) * c.torque[i] + (t3 - 2. * t2 + t) * width * d[i] +
@@ -79,6 +88,24 @@ double rx_s_torque_limit(double velocity_rad_s) {
   const double bin = std::ceil(std::abs(velocity_rad_s) * index_scale);
   if (bin > double(last_measured_bin)) return 0.;
   static const Table limits = build();  // C++ 保证首次初始化线程安全；后续只有查表。
+  return limits[static_cast<size_t>(bin)];
+}
+double rx_f_torque_limit(double velocity_rad_s) {
+  if (!std::isfinite(velocity_rad_s))
+    throw std::invalid_argument("F motor TN requires finite joint velocity");
+  constexpr size_t last = 3798;
+  const double bin = std::ceil(std::abs(velocity_rad_s) * index_scale);
+  if (bin > last) return 0;
+  static const auto limits = [] {
+    std::array<double, last + 1> table{};
+    const auto d = slopes(motor_f);
+    double previous = std::numeric_limits<double>::infinity();
+    for (size_t i = 0; i <= last; ++i) {
+      previous = std::min(previous, evaluate(motor_f, d, i * step_rpm));
+      table[i] = previous;
+    }
+    return table;
+  }();
   return limits[static_cast<size_t>(bin)];
 }
 }  // namespace rm::cube

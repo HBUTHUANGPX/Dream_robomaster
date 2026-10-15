@@ -136,14 +136,16 @@ int id(const mjModel* model, mjtObj type, const std::string& name) {
   return result;
 }
 void initialize_hand(mjModel* model, mjData* data, bool left) {
-  const std::string prefix = left ? "A_l" : "B_r";
+  const bool swapped = mj_name2id(model, mjOBJ_BODY, "A_r_gripper_link") >= 0;
+  const std::string hand = left != swapped ? "A" : "B";
+  const std::string prefix = hand + (left ? "_l" : "_r");
   const double motor = -2.25, t = angle(motor);
   auto put = [&](const std::string& suffix, double value) {
     const int joint = id(model, mjOBJ_JOINT, prefix + suffix);
     data->qpos[model->jnt_qposadr[joint]] = value;
   };
   put("_gripper_motor_joint", motor);
-  data->ctrl[id(model, mjOBJ_ACTUATOR, left ? "A_fingers_actuator" : "B_fingers_actuator")] = motor;
+  data->ctrl[id(model, mjOBJ_ACTUATOR, hand + "_fingers_actuator")] = motor;
   Mat S = Vec(1, -1, -1).asDiagonal(), T = left ? S : Mat::Identity(), rm = rx(phase - motor);
   for (const std::string branch : {"positive", "negative"}) {
     Mat U = branch == "positive" ? Mat::Identity() : S;

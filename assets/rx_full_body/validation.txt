@@ -1,0 +1,67 @@
+MuJoCo 3.15.0
+关节：29 hinge
+执行器：29 position
+joint waist_yaw_joint [-1.57, 1.57] effort=40.6
+joint waist_roll_joint [-0.436, 0.436] effort=36.8
+joint waist_pitch_joint [-0.262, 0.524] effort=36.8
+joint r_shoulder_pitch_joint [-3.229, 1.92] effort=40.6
+joint r_shoulder_roll_joint [-1.833, 0.262] effort=18.4
+joint r_shoulder_yaw_joint [-3.054, 2.007] effort=18.4
+joint r_elbow_joint [-0.524, 2.094] effort=18.4
+joint r_wrist_roll_joint [-2.007, 3.054] effort=18.4
+joint r_wrist_pitch_joint [-1.623, 1.623] effort=18.4
+joint l_shoulder_pitch_joint [-3.229, 1.92] effort=40.6
+joint l_shoulder_roll_joint [-0.262, 1.833] effort=18.4
+joint l_shoulder_yaw_joint [-2.007, 3.054] effort=18.4
+joint l_elbow_joint [-0.524, 2.094] effort=18.4
+joint l_wrist_roll_joint [-3.054, 2.007] effort=18.4
+joint l_wrist_pitch_joint [-1.623, 1.623] effort=18.4
+joint neck_yaw_joint [-1.57, 1.57] effort=1
+joint neck_pitch_joint [-0.785, 0.785] effort=18.4
+joint r_hip_pitch_joint [-2.094, 0.524] effort=40.6
+joint r_hip_roll_joint [-0.785, 0.785] effort=40.6
+joint r_hip_yaw_joint [-1.047, 1.047] effort=18.4
+joint r_knee_joint [0, 1.798] effort=40.6
+joint r_ankle_pitch_joint [-0.61, 0.61] effort=36.8
+joint r_ankle_roll_joint [-0.52, 0.52] effort=36.8
+joint l_hip_pitch_joint [-2.094, 0.524] effort=40.6
+joint l_hip_roll_joint [-0.785, 0.785] effort=40.6
+joint l_hip_yaw_joint [-1.047, 1.047] effort=18.4
+joint l_knee_joint [0, 1.798] effort=40.6
+joint l_ankle_pitch_joint [-0.61, 0.61] effort=36.8
+joint l_ankle_roll_joint [-0.52, 0.52] effort=36.8
+body base_link mass=1.21466682
+body waist_yaw_link mass=0.47574357
+body waist_roll_link mass=0.10825972
+body waist_pitch_link mass=4.41259708
+body r_shoulder_pitch_link mass=0.5006299
+body r_shoulder_roll_link mass=0.42043981
+body r_shoulder_yaw_link mass=0.42018501
+body r_elbow_link mass=0.42043981
+body r_wrist_roll_link mass=0.42090788
+body r_wrist_pitch_link mass=0.13800008
+body l_shoulder_pitch_link mass=0.50062991
+body l_shoulder_roll_link mass=0.42043981
+body l_shoulder_yaw_link mass=0.42018501
+body l_elbow_link mass=0.42043981
+body l_wrist_roll_link mass=0.42090788
+body l_wrist_pitch_link mass=0.13800008
+body neck_yaw_link mass=0.25403176
+body neck_pitch_link mass=0.75996297
+body r_hip_pitch_link mass=0.7106715
+body r_hip_roll_link mass=0.56715713
+body r_hip_yaw_link mass=0.58199503
+body r_knee_link mass=1.4336883
+body r_ankle_pitch_link mass=0.09212349
+body r_ankle_roll_link mass=0.27100342
+body l_hip_pitch_link mass=0.71067151
+body l_hip_roll_link mass=0.56715713
+body l_hip_yaw_link mass=0.58187142
+body l_knee_link mass=1.43368874
+body l_ankle_pitch_link mass=0.09212349
+body l_ankle_roll_link mass=0.27100342
+visual=30 collision=30
+总质量（kg）：19.17962149
+零位接触数：0
+迁移加载：通过
+100 步有限值及警告检查：通过（不代表控制器验收）

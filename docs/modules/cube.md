@@ -199,3 +199,50 @@ RX本次完整仿真结果：20步打乱、3000毫秒预算、三个线程、速
 MuJoCo 3.15.0 验证中，20 步演示打乱在腕部 8 倍、夹爪 32 倍配置下还原全部 54 个色块。独立优化将 510 个动作减至 434 个。该原生运行检查 261,662 个旋转步，禁触、数值警告和内部面电机力均为零。最小间隙为 91.400 mm。最终相对位置误差为 0.000118 mm，朝向误差为 0.0322°。
 
 在恰好半步的时长边界上，C++ 舍入可能与 Python 的偶数舍入相差一个 0.1 ms 物理步。因此不要求两者步数完全相同。本机 C++ 行为测试在 48.56 s 内通过。GLFW 的 R 后 Z 操作通过 Xvfb 验证。原生 MP4 通过完整 FFmpeg 解码。这些结果是仿真验证，不是硬件标定。
+
+## RX 全身原机关节实验
+
+整机资产位于 [assets/rx_full_body](../../assets/rx_full_body/README.md)。
+该模式固定骨盆，保留29个原机关节及其质量、惯性和力矩限制。
+四连杆夹爪分别连接原腕关节，没有附加 yaw 轴。
+末端转动通过六轴手臂逆运动学和位置执行器完成，夹持仍使用摩擦。
+运动参考不直接修改物理状态。
+当前不包含行走或站立平衡控制。
+
+在仓库根目录完成 `./rm setup` 后，先执行短序列。
+录制需要可用的 EGL 和 FFmpeg。
+
+```bash
+./rm cube --mechanical \
+  --rx-bundle assets/rx_gripper/mujoco_linkage_v5 \
+  --rx-full-body assets/rx_full_body \
+  --mechanical-config modules/cube/configs/mechanical-rx-full-body.json \
+  --scramble R --solve --record \
+  --output output/cube-mechanical/rx-full-body
+```
+
+运行结束后检查输出目录的 `report.json`，只有 `passed=true` 才表示该次物理执行通过。
+`demo.mp4` 是该次执行的视频；失败时也可能存在视频，不能仅凭视频文件判断还原完成。
+遇到关节不可达、失去接触或物理姿态检查失败时，保留报告和录像用于定位。
+不要扩大关节限制或关闭碰撞来绕过失败。
+
+抓持姿态与可用工具转角保存在 `grasp_pose.json`。
+当前 A 侧使用右臂，范围为 −90° 至0°；B 侧使用左臂，范围为0° 至90°。
+动作搜索按这些范围拆分逆转和半圈，并安排开爪回位。
+预算不足时直接报告失败，不退回无关节限制的旧动作方案。
+使用同样参数加 `--plan-only`，并去掉 `--solve --record`，可先输出软件验证后的动作序列。
+
+原机关节控制采用实验性 `kp=1500 N·m/rad`、`kv=35 N·m·s/rad` 和重力补偿。
+全身配置的工具峰值速度为0.5 rad/s，峰值加速度为2 rad/s²；夹爪开合为0.5秒。
+这些值用于整机接入验证，不是硬件推荐值或速度上限结论。
+F/S电机测量曲线、分组与适用边界见 [TN 数据说明](../../assets/rx_gripper/tn/README.md)。
+
+本次整机短序列验证：`R` 打乱、通用求解得到 `R'`、物理执行还原通过。
+执行时间27.162秒，录像额外保留0.5秒尾帧；最终块体位置误差0.265毫米。
+双手末端最终位置误差分别为0.080和0.061毫米。
+报告与1倍速录像保存在 [整机验收资产](../../assets/rx_full_body/validation/r_turn_restore.json) 和 [短序列视频](../../assets/rx_full_body/validation/r_turn_restore.mp4)。
+该结果不代表整机20步长序列已验收。
+
+补充验证：`U` 打乱、`U'` 还原通过，包含双臂换手、整块转动和左臂转层。
+执行时间39.943秒，最终块体位置误差0.258毫米。
+报告见 [U 面验收](../../assets/rx_full_body/validation/u_turn_restore.json)，视频见 [双臂换手与还原](../../assets/rx_full_body/validation/u_turn_restore.mp4)。

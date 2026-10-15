@@ -109,3 +109,9 @@ FAST-LIO 的 ROS 构建和容器回放尚未通过本机运行验收。
 使用前馈控制和74克质量基准，见[快速腕轴入口](docs/mechanical-rx.md#快速腕轴控制与质量基准)。
 取消动作间等待并测量速度边界，见[无等待执行实验](docs/mechanical-rx.md#无等待执行边界)。
 比较方块与四角小球接触，见[小球指垫实验](docs/mechanical-rx.md#四角小球指垫实验)。
+
+## RX 全身魔方实验
+
+魔方机械模式可用 `--rx-full-body assets/rx_full_body` 接入完整 RX。
+该实验固定骨盆，由原六轴双臂协调转动夹爪。
+运行条件、短序列命令及验证边界见 [RX 全身原机关节实验](docs/modules/cube.md#rx-全身原机关节实验)。

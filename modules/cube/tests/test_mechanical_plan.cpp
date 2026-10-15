@@ -222,6 +222,49 @@ int main(int argc, char** argv) {
     }
     costs.duration[0][2] = 3600.;
     custom_check({}, costs, 0);
+    const std::array<std::array<int, 2>, 2> wrist_ranges{{{-1, 0}, {0, 1}}};
+    auto restricted_check = [&](const std::vector<std::string>& moves, Mat orientation,
+                                const PrimitiveCosts* profile = nullptr) {
+      const auto result = plan_mechanical_moves(moves, orientation, .4, 5000, profile, wrist_ranges);
+      replay(result.actions, moves, orientation);
+      for (const auto& action : result.actions)
+        if (action.kind == "yaw") {
+          const auto& range = wrist_ranges[action.hand == "A" ? 0 : 1];
+          need(action.target >= range[0] * pi / 2 - 1e-9 &&
+                   action.target <= range[1] * pi / 2 + 1e-9, "受限规划腕角越限");
+        }
+      need(result.report.at("chosenplanner") != "peephole", "受限规划使用旧回退");
+      need(result.report.at("chosen") == (profile ? custom_measured(result.actions, *profile)
+                                                 : measured(result.actions, .4)),
+           "受限规划成本错误");
+      return result;
+    };
+    const auto all_moves = split_moves("R R' R2 L L' L2 U U' U2 D D' D2 F F' F2 B B' B2");
+    restricted_check(all_moves, Mat::Identity());
+    restricted_check(all_moves, robot_orientations()[7], &costs);
+    // 整序列标签超过默认内存预算，确定性验证逐动作回退。
+    const auto limited_fallback = restricted_check(std::vector<std::string>(400, "R"), Mat::Identity());
+    need(limited_fallback.report.at("chosenplanner") == "robot_search_per_move",
+         "未验证受限逐动作回退");
+    need(plan_mechanical_moves({}, Mat::Identity(), .4, 0, nullptr, wrist_ranges).actions.empty(),
+         "受限空序列失败");
+    for (double budget : {0., 100.}) {
+      bool rejected = false;
+      try {
+        plan_mechanical_moves({"R"}, Mat::Identity(), .4, budget, nullptr,
+                              {{{0, 0}, {0, 0}}});
+      } catch (const std::runtime_error&) { rejected = true; }
+      need(rejected, "受限无解或零预算回退到非法动作");
+    }
+    for (auto range : std::array<std::array<int, 2>, 4>{{{-3, 0}, {0, 3}, {1, 0}, {1, 2}}}) {
+      auto invalid = wrist_ranges;
+      invalid[0] = range;
+      bool rejected = false;
+      try {
+        plan_mechanical_moves({}, Mat::Identity(), .4, 0, nullptr, invalid);
+      } catch (const std::invalid_argument&) { rejected = true; }
+      need(rejected, "受限非法参数或起态未拒绝");
+    }
     for (const auto& values :
          std::array<std::array<double, 2>, 5>{{{0., 0.},
                                                {-1., 0.},

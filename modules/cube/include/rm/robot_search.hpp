@@ -10,6 +10,8 @@ struct SearchOptions {
   bool action_count = false, home = false;
   size_t memory_limit_mb = 64;
   PrimitiveCosts costs = PrimitiveCosts::defaults(8, 32, true);
+  // A、B 腕的闭区间，单位为 pi/2；必须落在离散状态域 [-2,2] 内。
+  std::array<std::array<int, 2>, 2> wrist_ranges{{{-2, 2}, {-2, 2}}};
 };
 struct RobotPlan {
   std::vector<Primitive> actions;

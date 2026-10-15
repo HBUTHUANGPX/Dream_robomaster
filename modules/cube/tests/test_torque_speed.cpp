@@ -77,7 +77,30 @@ int main(int argc, char** argv) {
       }
       need(rejected, "非有限速度必须报错");
     }
-    std::cout << "S电机TN：6193格参考下包络、上取整、边界和异常检查通过\n";
+    std::ifstream fin(std::filesystem::path(argv[1]) /
+                      "assets/rx_gripper/tn/f_motor_reference.csv");
+    need(bool(fin), "无法读取F电机独立参考表");
+    std::getline(fin, line);
+    size_t fi = 0;
+    while (std::getline(fin, line)) {
+      auto comma = line.find(',');
+      need(std::stoul(line.substr(0, comma)) == fi, "F参考索引不连续");
+      double v = fi ? (double(fi) - .25) / index_scale : 0;
+      near(rm::cube::rx_f_torque_limit(v), std::stod(line.substr(comma + 1)),
+           "F电机完整参考表不一致");
+      near(rm::cube::rx_f_torque_limit(-v), rm::cube::rx_f_torque_limit(v), "F反转不对称");
+      ++fi;
+    }
+    need(fi == 3800, "F参考表长度错误");
+    near(rm::cube::rx_f_torque_limit(1e100), 0, "F超速未归零");
+    bool f_rejected = false;
+    try {
+      rm::cube::rx_f_torque_limit(std::numeric_limits<double>::quiet_NaN());
+    } catch (const std::invalid_argument&) {
+      f_rejected = true;
+    }
+    need(f_rejected, "F非有限速度未拒绝");
+    std::cout << "F/S电机TN：6193格参考下包络、上取整、边界和异常检查通过\n";
     return 0;
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';

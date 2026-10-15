@@ -1,0 +1,45 @@
+{
+  "a_is_right": true,
+  "tool_flip_rad": [
+    3.141592653589793,
+    0
+  ],
+  "base_position_m": [
+    0.2242328670920743,
+    -0.17008902605691453,
+    -0.14240969487145472
+  ],
+  "base_quaternion": [
+    -0.44889576025217565,
+    0,
+    0,
+    -0.8935841294627055
+  ],
+  "joint_positions_rad": {
+    "waist_roll_joint": -0.06725094624846949,
+    "waist_pitch_joint": -0.10072086000265043,
+    "waist_yaw_joint": 0,
+    "r_shoulder_pitch_joint": -0.9217200969964217,
+    "r_shoulder_roll_joint": -0.47789736823963025,
+    "r_shoulder_yaw_joint": 1.2469574272645603,
+    "r_elbow_joint": -0.028767280121145555,
+    "r_wrist_roll_joint": -0.445719848167668,
+    "r_wrist_pitch_joint": 0.0976338542295661,
+    "l_shoulder_pitch_joint": -0.754621078662564,
+    "l_shoulder_roll_joint": 1.1756832019439591,
+    "l_shoulder_yaw_joint": -1.0538419319546657,
+    "l_elbow_joint": -0.39376524284441444,
+    "l_wrist_roll_joint": 0.34687010160655524,
+    "l_wrist_pitch_joint": 0.0872443891160187
+  },
+  "wrist_ranges": [
+    [
+      -1,
+      0
+    ],
+    [
+      0,
+      1
+    ]
+  ]
+}

@@ -5,7 +5,7 @@ add_library(rm_kociemba STATIC third_party/kociemba/ckociemba/coordcube.c third_
 target_include_directories(rm_kociemba PUBLIC third_party/kociemba/ckociemba/include)
 target_compile_definitions(rm_kociemba PRIVATE _GNU_SOURCE)
 target_link_libraries(rm_kociemba PUBLIC m)
-add_library(rm_cube_core src/mechanical.cpp src/mechanical_plan.cpp src/mechanical_rx.cpp src/mechanical_sdf.cpp src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
+add_library(rm_cube_core src/mechanical.cpp src/mechanical_plan.cpp src/mechanical_rx.cpp src/rx_full_body.cpp src/mechanical_sdf.cpp src/rx_gripper.cpp src/model.cpp src/cube.cpp src/planner.cpp src/gripper.cpp src/primitive.cpp src/robot_search.cpp src/solution_candidates.cpp src/solution_variants.cpp)
 target_include_directories(rm_cube_core PUBLIC include)
 target_link_libraries(rm_cube_core PUBLIC rm_sim Eigen3::Eigen LibXml2::LibXml2 rm_kociemba Threads::Threads)
 add_library(rm_cube_torque_speed STATIC src/torque_speed.cpp)
@@ -103,3 +103,9 @@ add_test(NAME cube_magnets COMMAND rm_cube_magnets_tests)
 # 独立静态磁吸与外壳接触诊断，不推进连续还原状态。
 add_executable(rm_cube_magnet_stability EXCLUDE_FROM_ALL tests/mechanical/magnet_stability.cpp)
 target_link_libraries(rm_cube_magnet_stability PRIVATE rm_cube_core)
+
+add_executable(rm_cube_full_body_tests tests/test_rx_full_body.cpp)
+target_include_directories(rm_cube_full_body_tests PRIVATE src)
+target_link_libraries(rm_cube_full_body_tests PRIVATE rm_cube_core)
+add_test(NAME cube_full_body COMMAND rm_cube_full_body_tests ${PROJECT_SOURCE_DIR})
+set_tests_properties(cube_full_body PROPERTIES TIMEOUT 60)

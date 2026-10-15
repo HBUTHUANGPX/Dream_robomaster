@@ -239,3 +239,9 @@ printf '%s\n' '{"command":"state","args":{}}' | ./rm cube --rpc 2> output/cube-r
 使用前馈控制和74克质量基准，见[快速腕轴入口](mechanical-rx.md#快速腕轴控制与质量基准)。
 取消动作间等待并测量速度边界，见[无等待执行实验](mechanical-rx.md#无等待执行边界)。
 比较方块与四角小球接触，见[小球指垫实验](mechanical-rx.md#四角小球指垫实验)。
+
+## 运行 RX 全身魔方实验
+
+先在仓库根目录完成 `./rm setup`，再按 [RX 全身原机关节实验](modules/cube.md#rx-全身原机关节实验) 执行短序列。
+该模式固定骨盆，不包含站立平衡。录制需要 EGL 和 FFmpeg。
+检查报告中的 `passed` 后再使用录像作为验收结果。

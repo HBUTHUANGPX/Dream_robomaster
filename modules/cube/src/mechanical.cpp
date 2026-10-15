@@ -16,6 +16,7 @@
 #include "rm/rx_gripper.hpp"
 #include "rm/rx_wrist_tn.hpp"
 #include "rm/wrist_motion.hpp"
+#include "rx_full_body.hpp"
 #include "video.hpp"
 
 namespace {
@@ -468,7 +469,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
                  {"model", "experimental_contact_retention"},
                  {"internal_constraint_switches", 0},
                  {"steps", Json::array()}};
-  std::filesystem::path out = root / "output/cube-mechanical/current", config, rx_bundle;
+  std::filesystem::path out = root / "output/cube-mechanical/current", config, rx_bundle,
+                        full_body_bundle;
   std::string sequence = "R U F";
   bool solve = false, record = false, prepared = false, plan_only = false;
   std::optional<double> search_ms_override;
@@ -491,6 +493,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         config = next();
       else if (arg == "--rx-bundle")
         rx_bundle = next();
+      else if (arg == "--rx-full-body")
+        full_body_bundle = next();
       else if (arg == "--solve")
         solve = true;
       else if (arg == "--record")
@@ -505,7 +509,8 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       } else if (arg == "--help" || arg == "-h") {
         std::cout << "机械魔方原型：./rm cube --mechanical [--scramble \"R U F\"] [--solve] "
                      "[--record] [--output 输出目录] [--mechanical-config "
-                     "参数JSON] [--rx-bundle RX目录] [--search-ms 毫秒] [--plan-only]"
+                     "参数JSON] [--rx-bundle RX目录] [--rx-full-body 整机目录] [--search-ms 毫秒] "
+                     "[--plan-only]"
                      "\n默认使用固定核心试验台；指定RX目录则使用自由核心与摩擦夹爪。"
                      "棱角块靠卡脚保持；RX模式包含被动磁吸定位近似。"
                      "录像为1倍速，需要EGL和FFmpeg。\n";
@@ -514,6 +519,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         throw std::invalid_argument("Unsupported mechanical option: " + arg);
     }
     if (!config.empty()) load_settings(config);
+    if (!full_body_bundle.empty() && (rx_bundle.empty() || value("rx_wrist_speed_rad_s") <= 0))
+      throw std::invalid_argument(
+          "RX整机需要 --rx-bundle，且 rx_wrist_speed_rad_s 必须大于0；请使用整机配置");
     if (search_ms_override) settings["robot_search_ms"] = *search_ms_override;
     if (!std::isfinite(value("robot_search_ms")) || value("robot_search_ms") < 0 ||
         value("robot_search_ms") > 60000)
@@ -545,13 +553,21 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         }
     }
 
+    std::array<std::array<int, 2>, 2> wrist_ranges{{{-2, 2}, {-2, 2}}};
+    if (!full_body_bundle.empty()) {
+      std::ifstream input(full_body_bundle / "grasp_pose.json");
+      Json pose;
+      if (!input) throw std::runtime_error("缺少整机抓持姿态");
+      input >> pose;
+      wrist_ranges = pose.at("wrist_ranges").get<decltype(wrist_ranges)>();
+    }
     const auto requested = split_moves(sequence);
     for (const auto& move : requested) parse_move(move);
     if (plan_only) {
       if (solve || record) throw std::invalid_argument("Plan-only cannot solve or record physics");
-      auto plan =
-          plan_mechanical_moves(requested, Mat::Identity(), value("turn_duration_s"),
-                                value("robot_search_ms"), motion_costs ? &*motion_costs : nullptr);
+      auto plan = plan_mechanical_moves(requested, Mat::Identity(), value("turn_duration_s"),
+                                        value("robot_search_ms"),
+                                        motion_costs ? &*motion_costs : nullptr, wrist_ranges);
       std::filesystem::create_directories(out);
       std::ofstream file(out / "plan.json");
       file << Json{{"planning_only", true},
@@ -577,13 +593,18 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     std::ofstream scene_file(out / "scene.xml");
     const bool rx = !rx_bundle.empty();
     auto xml = scene();
-    scene_file << (rx ? mechanical_rx_scene(
-                            xml, rx_bundle, value("rx_bearing_friction_nm"),
-                            value("rx_tip_friction"), value("rx_tip_contact_time_s"),
-                            value("cube_mass_kg"), value("rx_tip_corner_spheres") != 0,
-                            value("rx_tip_sphere_radius_m"), value("rx_tip_sphere_offset_m"),
-                            value("tip_torsional_friction_m"))
-                      : xml);
+    std::string final_scene =
+        (rx ? mechanical_rx_scene(xml, rx_bundle, value("rx_bearing_friction_nm"),
+                                  value("rx_tip_friction"), value("rx_tip_contact_time_s"),
+                                  value("cube_mass_kg"), value("rx_tip_corner_spheres") != 0,
+                                  value("rx_tip_sphere_radius_m"), value("rx_tip_sphere_offset_m"),
+                                  value("tip_torsional_friction_m"))
+            : xml);
+    if (!full_body_bundle.empty()) {
+      if (!rx) throw std::invalid_argument("整机模式需要 --rx-bundle");
+      final_scene = rx_full_body_scene(final_scene, full_body_bundle);
+    }
+    scene_file << final_scene;
     scene_file.close();
     if (!scene_file) throw std::runtime_error("Cannot write mechanical scene");
     Simulation sim(out / "scene.xml");
@@ -623,15 +644,17 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         m->actuator_forcerange[2 * a + 1] = value("rx_jaw_torque_nm");
       }
     }
+    std::unique_ptr<RxFullBody> full_body;
+    if (!full_body_bundle.empty()) full_body = std::make_unique<RxFullBody>(m, d, full_body_bundle);
     for (const char* hand : {"A", "B"}) {
-      if (!rx) break;
+      if (!rx || full_body) break;
       int a = mj_name2id(m, mjOBJ_ACTUATOR, (std::string(hand) + "_yaw_drive").c_str());
       m->actuator_gainprm[10 * a] = value("rx_wrist_kp");
       m->actuator_biasprm[10 * a + 1] = -value("rx_wrist_kp");
       m->actuator_biasprm[10 * a + 2] = -value("rx_wrist_kv");
     }
     std::optional<RxWristTn> wrist_tn;
-    if (value("rx_wrist_tn") == 1) {
+    if (value("rx_wrist_tn") == 1 && !full_body) {
       if (!rx) throw std::invalid_argument("Wrist TN requires RX grippers");
       wrist_tn.emplace(m);
     }
@@ -706,6 +729,11 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       cam.distance = name == "internal" ? .07 : rx ? .4 : .15;
       cam.azimuth = 130;
       cam.elevation = -25;
+      if (full_body && name != "internal") {
+        cam.lookat[2] = -.15;
+        cam.distance = 1.8;
+        cam.azimuth = -50;
+      }
       mjvOption opt;
       mjv_defaultOption(&opt);
       opt.geomgroup[3] = name == "internal";
@@ -771,9 +799,10 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
           }
         }
         if (wrist_tn) wrist_tn->before_step(m, d);
-        if (value("cube_magnet_peak_force_n") > 0) {
+        if (full_body || value("cube_magnet_peak_force_n") > 0) {
           // 场景固定使用 implicitfast；分步接口复用运动学，避免磁吸再计算一次。
           mj_step1(m, d);
+          if (full_body) full_body->control(d);
           magnets.apply_prepared(m, d, value("cube_magnet_peak_force_n"));
           mj_step2(m, d);
         } else {
@@ -876,6 +905,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
         {"inertia_about_com_kg_m2", matrix_json(inertia)},
         {"distribution", "estimated, uniformly scaled original piece/core allocation"}};
     report["initial"] = measure();
+    if (full_body) report["full_body_initial"] = full_body->report(d);
     snapshot("initial");
     snapshot("internal");
     advance(.3);
@@ -927,6 +957,38 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
       return delta.norm() - radius;
     };
     auto command = [&](const std::string& name, double target, double duration) {
+      if (full_body && name.ends_with("_yaw_drive")) {
+        const int h = name.starts_with("A") ? 0 : 1;
+        const double start = full_body->angle(h), began = d->time;
+        const std::string mode = report["current_action"].value("mode", "");
+        const double factor = mode == "empty"   ? value("rx_wrist_empty_multiplier")
+                              : mode == "whole" ? value("rx_wrist_whole_multiplier")
+                                                : 1.;
+        duration = wrist_duration(target - start, factor * value("rx_wrist_speed_rad_s"),
+                                  factor * value("rx_wrist_accel_rad_s2"), m->opt.timestep,
+                                  value("rx_wrist_zero_jerk") != 0,
+                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0);
+        const int count = std::lround(duration / m->opt.timestep);
+        for (int k = 1; k <= count; k++) {
+          auto ref = wrist_sample(start, target, duration, k * m->opt.timestep,
+                                  value("rx_wrist_zero_jerk") != 0,
+                                  mode != "empty" && value("rx_wrist_brake_half_turn") != 0);
+          full_body->reference(h, ref.position, m->opt.timestep);
+          advance(m->opt.timestep, true);
+        }
+        full_body->reference(h, target, m->opt.timestep);
+        if (full_body->position_error(d, h) > .001)
+          throw std::runtime_error("RX整臂末端位置跟踪失败");
+        report["full_body"] = full_body->report(d);
+        report["wrist_motions"].push_back({{"logical_axis", h == 0 ? "A" : "B"},
+                                           {"mode", mode},
+                                           {"start_time_s", began},
+                                           {"duration_s", duration},
+                                           {"target", target},
+                                           {"end_tracking_error_rad", full_body->error(d, h)},
+                                           {"native_arm_execution", true}});
+        return;
+      }
       int a = mj_name2id(m, mjOBJ_ACTUATOR, name.c_str());
       if (a < 0) throw std::runtime_error("Missing RX actuator: " + name);
       double start = d->ctrl[a];
@@ -1144,9 +1206,9 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     }
     auto execute_moves = [&](const std::vector<std::string>& moves) {
       if (rx) {
-        auto selected = plan_mechanical_moves(moves, robot_orientation, value("turn_duration_s"),
-                                              value("robot_search_ms"),
-                                              motion_costs ? &*motion_costs : nullptr);
+        auto selected = plan_mechanical_moves(
+            moves, robot_orientation, value("turn_duration_s"), value("robot_search_ms"),
+            motion_costs ? &*motion_costs : nullptr, wrist_ranges);
         report["planning"].push_back(selected.report);
         auto& plan = selected.actions;
         for (const auto& a : plan) {
@@ -1178,10 +1240,11 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
             if (a.mode == "face") check_pose("before " + a.move);
             if (d->time > checked_at) save_state("aligned_");
             int actuator = mj_name2id(m, mjOBJ_ACTUATOR, (a.hand + "_yaw_drive").c_str());
-            double start = d->ctrl[actuator];
+            double start = full_body ? full_body->angle(a.hand == "A" ? 0 : 1) : d->ctrl[actuator];
             command(a.hand + "_yaw_drive", a.target, value("turn_duration_s"));
             int joint = mj_name2id(m, mjOBJ_JOINT, (a.hand + "_yaw").c_str());
-            if (std::abs(d->qpos[m->jnt_qposadr[joint]] - a.target) > .006)
+            if ((full_body ? full_body->error(d, a.hand == "A" ? 0 : 1)
+                           : std::abs(d->qpos[m->jnt_qposadr[joint]] - a.target)) > .006)
               throw std::runtime_error("RX wrist tracking failed");
             if (a.mode == "whole") {
               robot_orientation = wrist_rotation(a.hand, a.target - start) * robot_orientation;
@@ -1270,6 +1333,7 @@ int rm::cube::mechanical_main(const std::filesystem::path& root, int argc, char*
     report["solved"] = report["final_facelets"] == solved;
     if (solve && !report["solved"].get<bool>())
       throw std::runtime_error("Mechanical cube did not finish solved");
+    if (full_body) report["full_body"] = full_body->report(d);
     report["final_pose"] = measure();
     if (report["final_pose"]["position_error_m"].get<double>() > .0005 ||
         report["final_pose"]["orientation_error_rad"].get<double>() > .02)

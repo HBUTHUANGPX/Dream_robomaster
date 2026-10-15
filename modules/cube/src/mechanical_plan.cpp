@@ -91,7 +91,8 @@ Plan convert(const std::vector<Primitive>& primitives, RobotState state,
 
 MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat orientation,
                                      double turn_duration_s, double search_ms,
-                                     const PrimitiveCosts* costs) {
+                                     const PrimitiveCosts* costs,
+                                     std::array<std::array<int, 2>, 2> wrist_ranges) {
   if (!std::isfinite(turn_duration_s) || turn_duration_s <= 0 || turn_duration_s > 3599.85)
     throw std::invalid_argument("Invalid mechanical turn duration");
   if (!std::isfinite(search_ms) || search_ms < 0 || search_ms > 60000)
@@ -101,6 +102,65 @@ MechanicalPlan plan_mechanical_moves(const std::vector<std::string>& moves, Mat 
       for (double seconds : row)
         if (!std::isfinite(seconds) || seconds <= 0 || seconds > 3600)
           throw std::invalid_argument("Mechanical action costs must be finite and in (0,3600]");
+  if (wrist_ranges != SearchOptions{}.wrist_ranges) {
+    SearchOptions options;
+    options.home = true;
+    options.wrist_ranges = wrist_ranges;
+    options.max_search_ms = search_ms;
+    if (costs)
+      options.costs = *costs;
+    else
+      for (int a = 0; a < 12; ++a)
+        options.costs.duration[a].fill(a % 6 >= 4 ? .65 : turn_duration_s + .15);
+    const RobotState start{orientation_index(orientation), {0, 0}, {true, true}};
+    const auto began = Clock::now();
+    const auto budget = std::chrono::duration_cast<Clock::duration>(
+        std::chrono::duration<double, std::milli>(search_ms));
+    const auto deadline = began + budget;
+    std::optional<RobotPlan> candidate;
+    std::string planner = "robot_search";
+    try {
+      // 留一半总预算给逐动作搜索；它也使用相同腕范围和归零终态。
+      candidate = optimize_robot_moves(moves, start, options, began + budget / 2);
+    } catch (const std::runtime_error& e) {
+      if (std::string(e.what()) != "Robot search memory limit reached") throw;
+    }
+    if (!candidate && Clock::now() < deadline) {
+      RobotPlan combined;
+      combined.end = start;
+      bool complete = true;
+      for (const auto& move : moves) {
+        auto step = optimize_robot_moves({move}, combined.end, options, deadline);
+        if (!step) {
+          complete = false;
+          break;
+        }
+        combined.actions.insert(combined.actions.end(), step->actions.begin(), step->actions.end());
+        combined.end = step->end;
+      }
+      if (complete) {
+        combined.stop_reason = "per_move_fallback";
+        candidate = std::move(combined);
+        planner = "robot_search_per_move";
+      }
+    }
+    if (!candidate)
+      throw std::runtime_error("No mechanical plan found within wrist_ranges and search budget");
+    MechanicalPlan result{convert(candidate->actions, start, moves), Json::object()};
+    auto& report = result.report;
+    report["moves"] = moves;
+    report["start_orientation"] = matrix_json(orientation);
+    report["wrist_ranges"] = wrist_ranges;
+    report["raw"] = nullptr;
+    report["peephole"] = nullptr;
+    report["chosenplanner"] = planner;
+    report["candidate"] = primitive_plan_json(candidate->actions, start, options.costs);
+    report["search_ms"] = std::chrono::duration<double, std::milli>(Clock::now() - began).count();
+    report["search_stop_reason"] = candidate->stop_reason;
+    report["chosen"] = measure(result.actions, turn_duration_s, costs);
+    report["estimated_execution_s"] = report["chosen"]["estimated_execution_s"];
+    return result;
+  }
   const auto raw = compile_moves(moves, orientation, true);
   MechanicalPlan result{optimize_plan(raw, orientation), Json::object()};
   auto& report = result.report;

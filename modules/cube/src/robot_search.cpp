@@ -136,6 +136,9 @@ std::optional<std::vector<double>> suffix_bounds(const Graph& graph,
   return distance;
 }
 void validate_options(const SearchOptions& o) {
+  for (const auto& range : o.wrist_ranges)
+    if (range[0] < -2 || range[1] > 2 || range[0] > range[1])
+      throw std::invalid_argument("wrist_ranges must be ordered intervals within [-2,2]");
   if (o.threads < 1 || o.threads > 3) throw std::invalid_argument("threads must be in [1,3]");
   if (!std::isfinite(o.max_search_ms) || o.max_search_ms < 0 || o.max_search_ms > 3600000)
     throw std::invalid_argument("max_search_ms must be in [0,3600000]");
@@ -145,6 +148,12 @@ void validate_options(const SearchOptions& o) {
     for (double d : row)
       if (!std::isfinite(d) || d < 0 || d > 3600)
         throw std::invalid_argument("Invalid primitive duration");
+}
+bool wrist_allowed(const RobotState& state, const SearchOptions& o) {
+  for (int h = 0; h < 2; ++h)
+    if (state.wrist[h] < o.wrist_ranges[h][0] || state.wrist[h] > o.wrist_ranges[h][1])
+      return false;
+  return true;
 }
 }  // namespace
 SearchOptions search_options(const Json& args, const PrimitiveCosts& costs) {
@@ -185,6 +194,7 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
                                               const SearchFeedback* feedback) {
   validate_options(o);
   int initial = robot_state_id(start);
+  if (!wrist_allowed(start, o)) throw std::invalid_argument("Start wrist outside wrist_ranges");
   if (moves.size() > 1000) throw std::invalid_argument("At most 1000 face moves");
   std::vector<std::pair<char, int>> expected;
   for (auto& m : moves) {
@@ -292,7 +302,7 @@ std::optional<RobotPlan> optimize_robot_moves(const std::vector<std::string>& mo
     }
     for (int a = 0; a < 12; ++a) {
       const Edge& e = (*g)[state][a];
-      if (e.state < 0) continue;
+      if (e.state < 0 || !wrist_allowed(robot_state_from_id(e.state), o)) continue;
       int next_stage = stage;
       if (e.face) {
         if (size_t(progress) >= expected.size() || e.face != expected[progress].first) continue;
@@ -327,6 +337,7 @@ RobotSearchResult search_robot_solution(const std::string& state, const RobotSta
   const auto began = Clock::now();
   validate_options(o);
   robot_state_id(start);
+  if (!wrist_allowed(start, o)) throw std::invalid_argument("Start wrist outside wrist_ranges");
   validate_facelets(state);
   const auto deadline = began + std::chrono::duration_cast<Clock::duration>(
                                     std::chrono::duration<double, std::milli>(o.max_search_ms));
